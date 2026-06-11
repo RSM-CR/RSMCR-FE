@@ -1,20 +1,81 @@
-#Encabezado de la factura
-
-Nombre= "RSM COSTA RICA AUDIT TAX AND CONSULTING SERVICES SOCIEDAD ANONIMA"
-CedJur="3101177137"
-CorrRec="facturasproveedorCEADR@iqvia.com"
-TelEm="41151500"
-CodigoPais="506"
-Provincia="1"
-Canton="2"
-Distrito="3"
-OtrasSenas="Edificio Las Terrazas Business Center 5to piso"
+import xml.etree.ElementTree as ET
 
 
-#Detalles de la factura
+class Factura:
+    def __init__(self, archivo_xml="Prueba.xml"):
+        self.tree = ET.parse(archivo_xml)
+        self.root = self.tree.getroot()
 
-Codigo="002"
-Cantidad=1
-PrecioUnitario="75.00"
-Detalle="Licencia uso de Sistema Xero de junio"
-Impuesto="13.00"
+        self.encabezado = {}
+        self.detalle_servicio = []
+
+    def obtener_encabezado(self):
+        receptor = self.root.find(".//{*}Receptor")
+
+        if receptor is None:
+            return {}
+
+        encabezado = {
+            "Nombre": receptor.findtext(".//{*}Nombre"),
+            "Numero": receptor.findtext(".//{*}Numero"),
+            "CorreoElectronico": receptor.findtext(".//{*}CorreoElectronico"),
+            "NumTelefono": receptor.findtext(".//{*}NumTelefono"),
+            "Provincia": receptor.findtext(".//{*}Provincia"),
+            "Canton": receptor.findtext(".//{*}Canton"),
+            "Distrito": receptor.findtext(".//{*}Distrito"),
+            "OtrasSenas": receptor.findtext(".//{*}OtrasSenas"),
+        }
+
+        self.encabezado = encabezado
+        return self.encabezado
+
+    def obtener_detalle_servicio(self):
+        self.detalle_servicio = []
+
+        for prod in self.root.findall(".//{*}LineaDetalle"):
+            item = {
+                "Codigo": prod.findtext(".//{*}Codigo"),
+                "Cantidad": prod.findtext(".//{*}Cantidad"),
+                "UnidadMedida": prod.findtext(".//{*}UnidadMedida"),
+                "Detalle": prod.findtext(".//{*}Detalle"),
+                "PrecioUnitario": prod.findtext(".//{*}PrecioUnitario"),
+                "MontoTotal": prod.findtext(".//{*}MontoTotal"),
+            }
+
+            if any(item.values()):
+                self.detalle_servicio.append(item)
+
+        return self.detalle_servicio
+
+    def mostrar_informacion(self):
+        encabezado = self.obtener_encabezado()
+        detalle = self.obtener_detalle_servicio()
+
+        print("Encabezado\n")
+
+        print(f"Nombre del cliente: {encabezado.get('Nombre')}")
+        print(f"Cédula Jurídica: {encabezado.get('Numero')}")
+        print(f"Correo electrónico al que se va a enviar la factura: {encabezado.get('CorreoElectronico')}")
+        print(f"Teléfono: {encabezado.get('NumTelefono')}")
+        print(f"Provincia: {encabezado.get('Provincia')}")
+        print(f"Canton: {encabezado.get('Canton')}")
+        print(f"Distrito: {encabezado.get('Distrito')}")
+        print(f"Otras Señas: {encabezado.get('OtrasSenas')}")
+
+        print("\nDetalle de la factura\n")
+
+        if not detalle:
+            print("No hay datos")
+        else:
+            for i, item in enumerate(detalle, 1):
+                print(f" Línea: {i}")
+                print(f"Código: {item.get('Codigo')}")
+                print(f"Cantidad: {item.get('Cantidad')}")
+                print(f"Precio: {item.get('PrecioUnitario')}")
+                print(f"Descripción: {item.get('Detalle')}")
+                print(f"Monto Total: {item.get('MontoTotal')}")
+                print()
+
+if __name__ == "__main__":
+    factura = Factura()
+    factura.mostrar_informacion()

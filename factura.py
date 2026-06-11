@@ -1,47 +1,56 @@
 import xml.etree.ElementTree as ET
 
-tree = ET.parse("Prueba.xml") #Aquí agarra el xml brindado y la información
-root = tree.getroot()
 
-#encabezado
+class Factura:
+    def __init__(self, archivo_xml = "Prueba.xml"):
+        self.tree = ET.parse(archivo_xml)
+        self.root = self.tree.getroot()
 
-receptor = root.find(".//{*}Receptor") #el .// es para buscar en todo el documento, no solo en el primer nivel, y Receptor es la etiqueta que quiero encontrar
+        self.encabezado = {}
+        self.detalle_servicio = []
 
-Encabezado = {} #creo un diccionario para guardar la información del encabezado
+    def obtener_encabezado(self):
+        receptor = self.root.find(".//{*}Receptor")  # buscar en todo el documento
 
+        if receptor is None:
+            return {}
 
-if receptor is not None: #si el receptor existe, entonces guardo su información
-    Encabezado = {
-    "Nombre": receptor.findtext(".//{*}Nombre"),
-    "Numero": receptor.findtext(".//{*}Numero"),
-    "CorreoElectronico": receptor.findtext(".//{*}CorreoElectronico"),
-    "NumTelefono": receptor.findtext(".//{*}NumTelefono"),
-    "Provincia": receptor.findtext(".//{*}Provincia"),
-    "Canton": receptor.findtext(".//{*}Canton"),
-    "Distrito": receptor.findtext(".//{*}Distrito"),
-    "OtrasSenas": receptor.findtext(".//{*}OtrasSenas")
-    }
+        encabezado = {
+            "Nombre": receptor.findtext(".//{*}Nombre"),
+            "Numero": receptor.findtext(".//{*}Numero"),
+            "CorreoElectronico": receptor.findtext(".//{*}CorreoElectronico"),
+            "NumTelefono": receptor.findtext(".//{*}NumTelefono"),
+            "Provincia": receptor.findtext(".//{*}Provincia"),
+            "Canton": receptor.findtext(".//{*}Canton"),
+            "Distrito": receptor.findtext(".//{*}Distrito"),
+            "OtrasSenas": receptor.findtext(".//{*}OtrasSenas"),
+        }
 
+        self.encabezado = encabezado
+        return self.encabezado
 
-#detalles
+    def obtener_detalle_servicio(self):
+        self.detalle_servicio = []
+        for prod in self.root.findall(".//{*}LineaDetalle"):
+            item = {
+                "Codigo": prod.findtext(".//{*}Codigo"),
+                "Cantidad": prod.findtext(".//{*}Cantidad"),
+                "UnidadMedida": prod.findtext(".//{*}UnidadMedida"),
+                "Detalle": prod.findtext(".//{*}Detalle"),
+                "PrecioUnitario": prod.findtext(".//{*}PrecioUnitario"),
+                "MontoTotal": prod.findtext(".//{*}MontoTotal"),
+            }
+            if any(item.values()):
+                self.detalle_servicio.append(item)
 
-DetalleServicio = []
+        return self.detalle_servicio
 
-for prod in root.findall(".//{*}LineaDetalle"):
-    item = {
-        "Codigo": prod.findtext(".//{*}Codigo"),
-        "Cantidad": prod.findtext(".//{*}Cantidad"),
-        "PrecioUnitario": prod.findtext(".//{*}PrecioUnitario"),
-        "Detalle": prod.findtext(".//{*}Detalle")
-    }
-    
-    if any(item.values()):
-        DetalleServicio.append(item)
-
-#Resultado
-data = {
-    "Encabezado": Encabezado,
-    "DetalleServicio": DetalleServicio
-}
-
-print(data)
+    def mostrar_informacion(self):
+        return {
+            "Encabezado": self.obtener_encabezado(),
+            "DetalleServicio": self.obtener_detalle_servicio(),
+        }
+if __name__ == "__main__":
+    factura = Factura()
+    info = factura.mostrar_informacion()
+    print(info)

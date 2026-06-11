@@ -1,9 +1,9 @@
 import xml.etree.ElementTree as ET
-from abc import ABC, abstractmethod
+from abstracciones.Fuente import Fuente, CallbackNuevaFactura
+from factura import Factura
 from typing import Callable
 
 CallbackNuevaFactura = Callable[["Factura"], None]
-
 
 class Factura:
     def __init__(self, archivo_xml="Prueba.xml"):
@@ -80,27 +80,6 @@ class Factura:
                 print(f"Monto Total: {item.get('MontoTotal')}")
                 print()
 
-
-class Fuente(ABC):
-    def __init__(self):
-        self.callbacks = []
-
-    @abstractmethod
-    def subir_documento(self, documento):
-        pass
-
-    def escuchar_nueva_factura(self, funcion: CallbackNuevaFactura):
-        self.callbacks.append(funcion)
-
-    def notificar_nueva_factura(self, factura):
-        contador = 0
-        for callback in self.callbacks:
-            callback(factura)
-            contador += 1
-
-        print(f"Se agregó {contador} factura")
-
-
 class FuenteXML(Fuente):
     def subir_documento(self, documento):
         factura = Factura(documento)
@@ -109,7 +88,6 @@ class FuenteXML(Fuente):
 
 def procesar_factura(factura):
     factura.mostrar_informacion()
-
 
 if __name__ == "__main__":
     fuente = FuenteXML()

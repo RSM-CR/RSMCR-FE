@@ -14,8 +14,7 @@ OtrasSenas="Edificio Las Terrazas Business Center 5to piso"
 #Detalles de la factura
 
 Codigo="002"
-Cantidad="1"
+Cantidad=1
 PrecioUnitario="75.00"
 Detalle="Licencia uso de Sistema Xero de junio"
 Impuesto="13.00"
-

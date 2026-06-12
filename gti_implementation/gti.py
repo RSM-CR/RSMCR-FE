@@ -35,12 +35,7 @@ class gti (ds):
             plugins=[history]
         )
 
-        service = client.bind(
-            "GTICargaFactura",
-            "GTICargaFacturaSoap12"
-        )
-
-        response = await service.InsertarDocumentos(
+        response = await client.service.InsertarDocumentos(
             pvcDocumentosXML=xml_documents,
             pvcCorreoUsuario=usuario,
             pvcClaveUsuario=clave

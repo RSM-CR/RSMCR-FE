@@ -15,9 +15,8 @@ class Fuente(ABC):
     def subir_documento(self, documento):
         pass
 
-    @abstractmethod
     def escuchar_nueva_factura(self, funcion: CallbackNuevaFactura):
-        self.callback = funcion
+        self.callbacks.append(funcion)
 
     # Falta añadir el tipo de dato de factura pero aún no está
     def notificar_nueva_factura(self, factura):

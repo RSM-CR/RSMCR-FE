@@ -59,7 +59,4 @@ class gti (ds):
             )
         )
 
-        print(client.service.InsertarDocumentos)
-        client.wsdl.dump()
-
         print("Respuesta: ", repr(response))

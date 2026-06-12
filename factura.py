@@ -52,26 +52,11 @@ class datos:
         for linea_xml in root.findall(".//{*}LineaDetalle"):
             linea_obj = LineasDetalle()
             linea_obj.codigo = linea_xml.findtext(".//{*}Codigo")
-            ...
+            linea_obj.cantidad = linea_xml.findtext(".//{*}Cantidad")
+            linea_obj.unidad_medida = linea_xml.findtext(".//{*}UnidadMedida")
+            linea_obj.detalle = linea_xml.findtext(".//{*}Detalle")
+            linea_obj.precio_unitario = linea_xml.findtext(".//{*}PrecioUnitario")
+            linea_obj.monto_total = linea_xml.findtext(".//{*}MontoTotal")
 
             factura.cosas.append(linea_obj)
-
-            # info.append({
-            #     "nombre": factura.nombre,
-            #     "numero": factura.numero,
-            #     "correo": factura.correo,
-            #     "telefono": factura.telefono,
-            #     "provincia": factura.provincia,
-            #     "canton": factura.canton,
-            #     "distrito": factura.distrito,
-            #     "otras_senas": factura.otras_senas,
-            #     "codigo": linea_xml.findtext(".//{*}Codigo"),
-            #     "cantidad": linea_xml.findtext(".//{*}Cantidad"),
-            #     "unidad_medida": linea_xml.findtext(".//{*}UnidadMedida"),
-            #     "detalle": linea_xml.findtext(".//{*}Detalle"),
-            #     "precio_unitario": linea_xml.findtext(".//{*}PrecioUnitario"),
-            #     "monto_total": linea_xml.findtext(".//{*}MontoTotal")
-            #     #falta el impuesto
-            # })
-        # factura.cosas = info
         return factura

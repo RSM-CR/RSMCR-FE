@@ -10,14 +10,14 @@ class gti (ds):
     async def upload_facture(self):
 
         with open("Prueba.xml", "r", encoding="utf-8") as f:
-            xml_factura = f.read()
+            xml_facture = f.read()
 
         load_dotenv()
 
-        documentos_xml = f"""
+        xml_documents = f"""
         <Documentos>
             <FacturaElectronicaXML><![CDATA[
-        {xml_factura}
+        {xml_facture}
             ]]></FacturaElectronicaXML>
         </Documentos>
         """
@@ -31,11 +31,10 @@ class gti (ds):
         )
 
         response = await client.service.InsertarFacturaPagada(
-            pvcDocumentosXML=xml_factura,
+            pvcDocumentosXML=xml_documents,
             pvcCorreoUsuario=usuario,
             pvcClaveUsuario=clave
         )
         print(client.service.InsertarFacturaPagada)
         client.wsdl.dump()
-        print(xml_factura[:10000000000])
         print("Respuesta: ", response)

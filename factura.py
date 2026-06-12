@@ -2,7 +2,7 @@ import xml.etree.ElementTree as ET
 
 
 class Factura:
-    def __init__(self, archivo_xml="Prueba.xml"):
+    def __init__(self):
         self.tree = ET.parse(archivo_xml)
         self.root = self.tree.getroot()
         self.nombre = None

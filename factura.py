@@ -17,7 +17,7 @@ class Factura:
         self.precio_unitario: str | None = None
         self.monto_total: str | None = None
         #falta el impuesto
-        self.cosas = LineasDetalle()
+        self.cosas = list[LineasDetalle]()
 
 class LineasDetalle:
     def __init__(self):
@@ -48,23 +48,30 @@ class datos:
             factura.distrito = receptor.findtext(".//{*}Distrito")
             factura.otras_senas = receptor.findtext(".//{*}OtrasSenas")
 
-        for linea in root.findall(".//{*}LineaDetalle"):
-            info.append({
-                "nombre": factura.nombre,
-                "numero": factura.numero,
-                "correo": factura.correo,
-                "telefono": factura.telefono,
-                "provincia": factura.provincia,
-                "canton": factura.canton,
-                "distrito": factura.distrito,
-                "otras_senas": factura.otras_senas,
-                "codigo": linea.findtext(".//{*}Codigo"),
-                "cantidad": linea.findtext(".//{*}Cantidad"),
-                "unidad_medida": linea.findtext(".//{*}UnidadMedida"),
-                "detalle": linea.findtext(".//{*}Detalle"),
-                "precio_unitario": linea.findtext(".//{*}PrecioUnitario"),
-                "monto_total": linea.findtext(".//{*}MontoTotal")
-                #falta el impuesto
-            })
-        factura.cosas = info
+
+        for linea_xml in root.findall(".//{*}LineaDetalle"):
+            linea_obj = LineasDetalle()
+            linea_obj.codigo = linea_xml.findtext(".//{*}Codigo")
+            ...
+
+            factura.cosas.append(linea_obj)
+
+            # info.append({
+            #     "nombre": factura.nombre,
+            #     "numero": factura.numero,
+            #     "correo": factura.correo,
+            #     "telefono": factura.telefono,
+            #     "provincia": factura.provincia,
+            #     "canton": factura.canton,
+            #     "distrito": factura.distrito,
+            #     "otras_senas": factura.otras_senas,
+            #     "codigo": linea_xml.findtext(".//{*}Codigo"),
+            #     "cantidad": linea_xml.findtext(".//{*}Cantidad"),
+            #     "unidad_medida": linea_xml.findtext(".//{*}UnidadMedida"),
+            #     "detalle": linea_xml.findtext(".//{*}Detalle"),
+            #     "precio_unitario": linea_xml.findtext(".//{*}PrecioUnitario"),
+            #     "monto_total": linea_xml.findtext(".//{*}MontoTotal")
+            #     #falta el impuesto
+            # })
+        # factura.cosas = info
         return factura

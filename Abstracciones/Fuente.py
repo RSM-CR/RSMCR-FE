@@ -18,13 +18,12 @@ class Fuente(ABC):
         En el caso de Xero, esto se utiliza para devolver un PDF como archivo adjunto."""
         pass
 
-    @abstractmethod
     def escuchar_nueva_factura(self, funcion: CallbackNuevaFactura) -> None:
         """Añade un callback que se ejecuta cada vez que se detecta una nueva factura.
         El formato de este callback es dictado por [CallbackNuevaFactura](fuente.CallbackNuevaFactura).
         
         :param CallbackNuevaFactura funcion: La función o método que se ejecutará cuando se detecta la creación de una nueva factura"""
-        self.callback = funcion
+        self.callbacks.append(funcion)
 
     # Falta añadir el tipo de dato de factura pero aún no está
     def notificar_nueva_factura(self, factura):

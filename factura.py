@@ -21,7 +21,7 @@ class Factura:
 
 class datos:
     @staticmethod
-    def obtener_datos(archivo_xml = "Prueba.xml")-> Factura:
+    def obtener_datos_GTI(archivo_xml = "Prueba.xml")-> Factura:
         factura = Factura()
         tree = ET.parse(archivo_xml)
         root = tree.getroot()

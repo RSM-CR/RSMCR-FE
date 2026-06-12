@@ -17,7 +17,17 @@ class Factura:
         self.precio_unitario: str | None = None
         self.monto_total: str | None = None
         #falta el impuesto
-        self.cosas = []
+        self.cosas = LineasDetalle()
+
+class LineasDetalle:
+    def __init__(self):
+        self.codigo: str | None = None
+        self.cantidad: str | None = None
+        self.unidad_medida: str | None = None
+        self.detalle: str | None = None
+        self.precio_unitario: str | None = None
+        self.monto_total: str | None = None
+        #falta el impuesto
 
 class datos:
     @staticmethod

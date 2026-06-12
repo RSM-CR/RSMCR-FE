@@ -1,3 +1,6 @@
 # Sphinx
 /docs/build/
 /docs/source/apidocs/
+
+# Caché de Python
+**/__pycache__/

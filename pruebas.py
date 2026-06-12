@@ -3,7 +3,6 @@ from abstracciones.Fuente import Fuente, CallbackNuevaFactura
 from factura import Factura
 from typing import Callable
 
-CallbackNuevaFactura = Callable[["Factura"], None]
 
 class Factura:
     def __init__(self, archivo_xml="Prueba.xml"):

@@ -2,26 +2,26 @@ import xml.etree.ElementTree as ET
 
 class Factura:
     def __init__(self):
-        self.nombre = None
-        self.numero = None
-        self.correo = None
-        self.telefono = None
-        self.provincia = None
-        self.canton = None
-        self.distrito = None
-        self.otras_senas = None
-        self.codgigo = None
-        self.cantidad = None
-        self.unidad_medida = None
-        self.detalle = None
-        self.precio_unitario = None
-        self.monto_total = None
+        self.nombre: str | None = None
+        self.numero: str | None = None
+        self.correo: str | None = None
+        self.telefono: str | None = None
+        self.provincia: str | None = None
+        self.canton: str | None = None
+        self.distrito: str | None = None
+        self.otras_senas: str | None = None
+        self.codigo: str | None = None
+        self.cantidad: str | None = None
+        self.unidad_medida: str | None = None
+        self.detalle: str | None = None
+        self.precio_unitario: str | None = None
+        self.monto_total: str | None = None
         #falta el impuesto
         self.cosas = []
 
 class datos:
     @staticmethod
-    def obtener_datos_GTI(archivo_xml = "Prueba.xml")-> Factura:
+    def obtener_datos(archivo_xml = "Prueba.xml")-> Factura:
         factura = Factura()
         tree = ET.parse(archivo_xml)
         root = tree.getroot()

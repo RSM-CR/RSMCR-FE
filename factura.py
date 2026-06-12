@@ -1,10 +1,7 @@
 import xml.etree.ElementTree as ET
 
-
 class Factura:
     def __init__(self):
-        self.tree = ET.parse(archivo_xml)
-        self.root = self.tree.getroot()
         self.nombre = None
         self.numero = None
         self.correo = None
@@ -13,67 +10,51 @@ class Factura:
         self.canton = None
         self.distrito = None
         self.otras_senas = None
-        self.detalle_servicio = []
+        self.codgigo = None
+        self.cantidad = None
+        self.unidad_medida = None
+        self.detalle = None
+        self.precio_unitario = None
+        self.monto_total = None
+        #falta el impuesto
+        self.cosas = []
 
-    def obtener_encabezado(self):
-        receptor = self.root.find(".//{*}Receptor") #.// sirve para buscar todo en específicamente ese elemento
+class datos:
+    @staticmethod
+    def obtener_datos(archivo_xml = "Prueba.xml")-> Factura:
+        factura = Factura()
+        tree = ET.parse(archivo_xml)
+        root = tree.getroot()
 
-        if receptor is None:
-            return
+        info = []
+        receptor = root.find(".//{*}Receptor") #.// sirve para buscar todo en específicamente ese elemento
+        if receptor is not None:
+            factura.nombre = receptor.findtext(".//{*}Nombre")
+            factura.numero = receptor.findtext(".//{*}Numero")
+            factura.correo = receptor.findtext(".//{*}CorreoElectronico")
+            factura.telefono = receptor.findtext(".//{*}NumTelefono")
+            factura.provincia = receptor.findtext(".//{*}Provincia")
+            factura.canton = receptor.findtext(".//{*}Canton")
+            factura.distrito = receptor.findtext(".//{*}Distrito")
+            factura.otras_senas = receptor.findtext(".//{*}OtrasSenas")
 
-        self.nombre = receptor.findtext(".//{*}Nombre")
-        self.numero = receptor.findtext(".//{*}Numero")
-        self.correo = receptor.findtext(".//{*}CorreoElectronico")
-        self.telefono = receptor.findtext(".//{*}NumTelefono")
-        self.provincia = receptor.findtext(".//{*}Provincia")
-        self.canton = receptor.findtext(".//{*}Canton")
-        self.distrito = receptor.findtext(".//{*}Distrito")
-        self.otras_senas = receptor.findtext(".//{*}OtrasSenas")
-
-    def obtener_detalle_servicio(self):
-        self.detalle_servicio = []
-
-        for prod in self.root.findall(".//{*}LineaDetalle"):
-
-
-            linea = type("LineaDetalle", (), {})()
-
-            linea.codigo = prod.findtext(".//{*}Codigo")
-            linea.cantidad = prod.findtext(".//{*}Cantidad")
-            linea.unidad_medida = prod.findtext(".//{*}UnidadMedida")
-            linea.detalle = prod.findtext(".//{*}Detalle")
-            linea.precio_unitario = prod.findtext(".//{*}PrecioUnitario")
-            linea.monto_total = prod.findtext(".//{*}MontoTotal")
-
-            self.detalle_servicio.append(linea)
-
-    def mostrar_informacion(self):
-
-        self.obtener_encabezado()
-        self.obtener_detalle_servicio()
-
-
-        print("----- ENCABEZADO -----")
-        print("Nombre:", self.nombre)
-        print("Numero:", self.numero)
-        print("Correo:", self.correo)
-        print("Telefono:", self.telefono)
-        print("Provincia:", self.provincia)
-        print("Canton:", self.canton)
-        print("Distrito:", self.distrito)
-        print("Otras Señas:", self.otras_senas)
-
-        print("\n----- DETALLE -----")
-        for linea in self.detalle_servicio:
-            print("Codigo:", linea.codigo)
-            print("Cantidad:", linea.cantidad)
-            print("Unidad:", linea.unidad_medida)
-            print("Detalle:", linea.detalle)
-            print("Precio:", linea.precio_unitario)
-            print("Total:", linea.monto_total)
-            print("-------------------")
-
-if __name__ == "__main__":
-    factura = Factura()
-    factura.mostrar_informacion()
-    
+        for linea in root.findall(".//{*}LineaDetalle"):
+            info.append({
+                "nombre": factura.nombre,
+                "numero": factura.numero,
+                "correo": factura.correo,
+                "telefono": factura.telefono,
+                "provincia": factura.provincia,
+                "canton": factura.canton,
+                "distrito": factura.distrito,
+                "otras_senas": factura.otras_senas,
+                "codigo": linea.findtext(".//{*}Codigo"),
+                "cantidad": linea.findtext(".//{*}Cantidad"),
+                "unidad_medida": linea.findtext(".//{*}UnidadMedida"),
+                "detalle": linea.findtext(".//{*}Detalle"),
+                "precio_unitario": linea.findtext(".//{*}PrecioUnitario"),
+                "monto_total": linea.findtext(".//{*}MontoTotal")
+                #falta el impuesto
+            })
+        factura.cosas = info
+        return factura

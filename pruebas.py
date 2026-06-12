@@ -1,5 +1,5 @@
 import xml.etree.ElementTree as ET
-from abstracciones.Fuente import Fuente, CallbackNuevaFactura
+from Abstracciones.Fuente import Fuente, CallbackNuevaFactura
 from factura import Factura
 from typing import Callable
 

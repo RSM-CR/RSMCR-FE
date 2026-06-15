@@ -13,7 +13,7 @@ class Entorno(BaseSettings):
     SECRETO_CLIENTE: SecretStr = Field(default=...)
     USUARIO_GTI: SecretStr = Field(default=...)
     CONTRASENA_GTI: SecretStr = Field(default=...)
-    PUERTO: int = 3000
+    PUERTO: int = 8000
 
 def crear_entorno():
     if os.path.exists(".env"):

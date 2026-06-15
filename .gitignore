@@ -42,3 +42,7 @@ coverage/
 *.log
 *.tgz
 *.zip
+
+# Sphinx
+/docs/build/
+/docs/source/apidocs/

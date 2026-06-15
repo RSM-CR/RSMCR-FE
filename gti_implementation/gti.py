@@ -2,7 +2,6 @@ from destino import Destino as ds
 from zeep import AsyncClient
 from zeep.transports import AsyncTransport
 from zeep.plugins import HistoryPlugin
-from lxml import etree
 import httpx
 from dotenv import load_dotenv
 import os

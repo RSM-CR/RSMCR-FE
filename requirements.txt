@@ -6,4 +6,6 @@ sphinx-autodoc2==0.5.0
 xero-python==14.0.0
 fastapi[standard]==0.136.3
 authlib==1.7.2
+types-authlib==1.6.11.20260518
 itsdangerous==2.2.0
+python-dotenv==1.2.2

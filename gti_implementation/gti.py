@@ -1,4 +1,4 @@
-from gti_implementation.destination import destination as ds
+from destino import Destino as ds
 from zeep import AsyncClient
 from zeep.transports import AsyncTransport
 from zeep.plugins import HistoryPlugin
@@ -8,12 +8,8 @@ from dotenv import load_dotenv
 import os
 
 class gti (ds):
-        
-    async def upload_facture(self):
+    async def subir_factura(self, xml_facture):
         load_dotenv()
-
-        with open("Prueba.xml", "r") as f:
-            xml_facture = f.read()
 
         xml_documents = f"""
         <Documentos>
@@ -70,7 +66,13 @@ class gti (ds):
             )
         )
 
-        print(client.service.InsertarDocumentos)
-        client.wsdl.dump()
+        # print(client.service.InsertarDocumentos)
+        # client.wsdl.dump()
 
         print("Respuesta: ", repr(response))
+        return response
+
+    async def obtener_documento(self, res: subir_factura):
+        print(type(res))
+        print(res)
+

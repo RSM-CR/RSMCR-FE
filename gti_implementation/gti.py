@@ -1,4 +1,4 @@
-from destino import Destino as ds
+from Abstracciones.Destino import Destino as ds
 from zeep import AsyncClient
 from zeep.transports import AsyncTransport
 from zeep.plugins import HistoryPlugin

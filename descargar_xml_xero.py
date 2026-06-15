@@ -5,7 +5,9 @@ from dotenv import load_dotenv, set_key
 from pathlib import Path
 from base64 import b64encode
 from httpx import Response
+import xml.etree.ElementTree as ET
 import os
+import json
 
 camino_env = ".env"
 
@@ -32,7 +34,8 @@ if not secreto_cliente:
 app = FastAPI()
 app.add_middleware(SessionMiddleware, secret_key="porfa-cambiame-soy-insegura") # No usar SessionMiddleware para la versión final porque le manda las credenciales al usuario
 
-token = None
+token = ""
+id_tenant = None
 
 oauth = OAuth()
 xero: StarletteOAuth2App = oauth.register(
@@ -61,25 +64,38 @@ async def login(request: Request):
 
 @app.get("/auth/xero")
 async def auth(code: str, request: Request):
+    global token
+    global id_tenant
+
     print("Autenticándose...")
     bytes_base64 = b64encode((id_cliente + ":" + secreto_cliente).encode("utf-8"))
 
-    global token
     token = await xero.authorize_access_token(request)
+
+    tenants_available = json.load(await xero.get("https://api.xero.com/connections", token=token))
+    if len(tenants_available) > 1:
+        print("Hay varios tenants disponibles. Se escogió el primero disponible")
+    id_tenant = tenants_available[0]["tenantId"]
+
     print("Autenticación exitosa.")
     print("Abre \033[34mhttp://localhost:8000/download/xml/id_factura\033[0m en tu navegador para descargar una factura")
     print("Reemplaza id_factura por el identificador único de la factura")
-    return """Autenticación exitosa.
+    return f"""Autenticación exitosa.
     Abre http://localhost:8000/download/xml/id_factura en tu navegador para descargar una factura
     Reemplaza id_factura por el identificador único de la factura"""
 
 @app.get("/download/xml/{id_factura}")
 async def download(id_factura: str, request: Request):
     print("Descargando factura...")
-    factura: Response = await xero.get(f"/api.xro/2.0/Invoices/{id_factura}", token=token)
+
+    headers = {
+        "Xero-tenant-id": id_tenant
+    }
+
+    factura: Response = await xero.get(f"/api.xro/2.0/Invoices/{id_factura}", token=token, headers=headers)
     factura.raise_for_status()
     print("Descarga completada.")
-    return factura
+    return Response(content=factura.content, status_code=200)
 
 if __name__ == "__main__":
     print("\033[32mIniciando servidor...\033[0m")

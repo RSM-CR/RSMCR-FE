@@ -1,10 +1,14 @@
-import xml.etree.ElementTree as ET
+import json
 
 
-class Factura:
-    def __init__(self, archivo_xml="PruebaXero.xml"):
-        self.tree = ET.parse(archivo_xml)
-        self.root = self.tree.getroot()
+class App:
+    import json #Se necesita importar el json globalmente, sino no funciona.
+
+
+    def __init__(self, archivo_json="PruebaXero.json"):
+        with open(archivo_json, "r", encoding="utf-8") as archivo:
+            self.data = json.load(archivo)
+
         self.nombre = None
         self.numero = None
         self.correo = None
@@ -16,34 +20,32 @@ class Factura:
         self.detalle_servicio = []
 
     def obtener_encabezado(self):
-        receptor = self.root.find(".//{*}Invoice") #.// sirve para buscar todo en específicamente ese elemento
+        factura = self.data.get("Invoice", {})
 
-        if receptor is None:
-            return
-
-        self.name = receptor.findtext(".//{*}Name")
-        self.numero = receptor.findtext(".//{*}Numero") # En Xero no hay un campo específico para el número de factura, por lo que se deja como None
-        self.email = receptor.findtext(".//{*}EmailAddress")
-        self.phone = receptor.findtext(".//{*}Phone") # En Xero no hay un campo específico para el teléfono del cliente, por lo que se deja como None
-        self.province = receptor.findtext(".//{*}Province") # En Xero no hay un campo específico para la provincia del cliente, por lo que se deja como None
-        self.canton = receptor.findtext(".//{*}Canton") # En Xero no hay un campo específico para el cantón del cliente, por lo que se deja como None
-        self.distrito = receptor.findtext(".//{*}Distrito") # En Xero no hay un campo específico para el distrito del cliente, por lo que se deja como None
-        self.reference = receptor.findtext(".//{*}Reference")
-        self.currency_code = receptor.findtext(".//{*}CurrencyCode")
+        self.nombre = factura.get("Name")
+        self.numero = factura.get("Numero")
+        self.correo = factura.get("EmailAddress")
+        self.telefono = factura.get("Phone")
+        self.provincia = factura.get("Province")
+        self.canton = factura.get("Canton")
+        self.distrito = factura.get("Distrito")
+        self.otras_senas = factura.get("Reference")
+        self.moneda = factura.get("CurrencyCode")
 
     def obtener_detalle_servicio(self):
         self.detalle_servicio = []
 
-        for prod in self.root.findall(".//{*}LineItem"):
+        line_items = self.data.get("Invoice", {}).get("LineItems", [])
 
+        for prod in line_items:
 
             linea = type("LineItem", (), {})()
 
-            linea.account_code = prod.findtext(".//{*}AccountCode")
-            linea.quantity = prod.findtext(".//{*}Quantity")
-            linea.description = prod.findtext(".//{*}Description")
-            linea.unit_amount = prod.findtext(".//{*}UnitAmount")
-            linea.line_amount = prod.findtext(".//{*}LineAmount")
+            linea.account_code = prod.get("AccountCode")
+            linea.quantity = prod.get("Quantity")
+            linea.description = prod.get("Description")
+            linea.unit_amount = prod.get("UnitAmount")
+            linea.line_amount = prod.get("LineAmount")
 
             self.detalle_servicio.append(linea)
 
@@ -53,26 +55,28 @@ class Factura:
         self.obtener_detalle_servicio()
 
         print("----- ENCABEZADO -----")
-        print("Nombre:", self.name)
-        print("Numero:", self.numero)
-        print("Correo:", self.email)
-        print("Telefono:", self.phone)
-        print("Provincia:", self.province)
-        print("Canton:", self.canton)
+        print("Nombre:", self.nombre)
+        print("Número:", self.numero)
+        print("Correo:", self.correo)
+        print("Teléfono:", self.telefono)
+        print("Provincia:", self.provincia)
+        print("Cantón:", self.canton)
         print("Distrito:", self.distrito)
-        print("Otras Señas:", self.reference)
-        print("Moneda:", self.currency_code)
+        print("Otras Señas:", self.otras_senas)
+        print("Moneda:", self.moneda)
 
         print("\n----- DETALLE -----")
         for linea in self.detalle_servicio:
-            print("Codigo:", linea.account_code)
+            print("Código:", linea.account_code)
             print("Cantidad:", linea.quantity)
-            print("Unidad:", linea.unit_amount)
             print("Detalle:", linea.description)
-            print("Precio:", linea.unit_amount)
+            print("Precio Unitario:", linea.unit_amount)
             print("Total:", linea.line_amount)
             print("-------------------")
 
+
 if __name__ == "__main__":
-    factura = Factura()
+    factura = App() #If para mostrar en termianl los resultados agarrados del JSON (solo para pruebas).
     factura.mostrar_informacion()
+
+

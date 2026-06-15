@@ -125,5 +125,8 @@ class gti (ds):
                 encoding="unicode"
             )
         )
-        print(client.wsdl.dump())
-        print(await send_xml())
+
+        print(client.service.InsertarDocumentos)
+        client.wsdl.dump()
+
+        print("Respuesta: ", repr(response))

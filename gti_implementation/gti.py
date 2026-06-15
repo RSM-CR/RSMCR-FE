@@ -1,4 +1,4 @@
-from destino import Destino as ds
+from Abstracciones.Destino import Destino as ds
 from zeep import AsyncClient
 from zeep.transports import AsyncTransport
 from zeep.plugins import HistoryPlugin
@@ -71,7 +71,6 @@ class gti (ds):
         print("Respuesta: ", repr(response))
         return response
 
-    async def obtener_documento(self, res: subir_factura):
-        print(type(res))
-        print(res)
+    async def obtener_documento(self):
+        pass
 

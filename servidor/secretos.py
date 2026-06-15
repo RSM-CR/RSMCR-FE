@@ -4,7 +4,7 @@ from pydantic_core import PydanticUndefined
 import logging
 import os
 
-class Entorno(BaseSettings):
+class _Entorno(BaseSettings):
     # Lee del .env
     model_config = SettingsConfigDict(env_file=".env", env_file_encoding="utf-8")
 
@@ -25,7 +25,7 @@ def crear_entorno():
     nuevo_entorno = list[str]()
 
     # Hace un bucle que pregunta por todas las variables definidas en Entorno
-    for nombre, info in Entorno.model_fields.items():
+    for nombre, info in _Entorno.model_fields.items():
         opcional = info.default is not PydanticUndefined
 
         valor = input(f"Introduce un valor para {nombre}{f" (Opcional. Dejar en blanco para el valor por defecto de {info.default})" if opcional else ""}\n> ").strip()
@@ -43,5 +43,5 @@ def crear_entorno():
 
 if __name__ == "__main__":
     print("Imprimiendo todos los valores del .env...")
-    entorno = Entorno()
+    entorno = _Entorno()
     print(entorno.model_dump())

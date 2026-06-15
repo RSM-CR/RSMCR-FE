@@ -5,5 +5,5 @@ class destination (ABC):
 		pass
 	
 	@abstractmethod
-	async def upload_facture(self, body: dict):
+	async def upload_facture():
 		pass

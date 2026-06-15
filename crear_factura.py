@@ -1,7 +1,9 @@
 from factura import Factura
+from factura import FacturaXero
+import xml.etree.ElementTree as ET
 
 def crear_factura_GTI(archivo_xml="Prueba.xml") -> Factura:
-    factura = Factura()
+    factura = FacturaGTI()
 
     receptor = factura.root.find(".//{*}Receptor") #.// sirve para buscar todo en específicamente ese elemento
 
@@ -54,6 +56,11 @@ def crear_factura_GTI(archivo_xml="Prueba.xml") -> Factura:
     return factura
     
     
-def crear_factura_Xero():
-    # Aqui va todo lo que se ocupa para crear la factura de Xero
+def crear_factura_Xero(archivo_xml="pruebachat.xml") -> Factura:
+    factura = Factura()
+
+    receptor = factura.root.find(".//{*}Contact") #.// sirve para buscar todo en específicamente ese elemento
+    if receptor is None:
+        return
+    
     pass

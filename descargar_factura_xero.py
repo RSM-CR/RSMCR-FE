@@ -1,38 +1,18 @@
 from fastapi import FastAPI, Request
 from starlette.middleware.sessions import SessionMiddleware
 from authlib.integrations.starlette_client import OAuth, StarletteOAuth2App
-from dotenv import load_dotenv, set_key
 from pathlib import Path
 from base64 import b64encode
 from httpx import Response
 import xml.etree.ElementTree as ET
-import os
 import json
-
-camino_env = ".env"
-
-archivo_env = Path(camino_env)
-
-if not archivo_env.exists():
-    print("No se encontró un archivo .env. Creando...")
-    archivo_env.touch()
-
-load_dotenv(camino_env, override=True)
-
-id_cliente = os.getenv("ID_CLIENTE") or ""
-if not id_cliente:
-    print("No se encontró un ID del cliente en las variables de entorno")
-    id_cliente = input("Introduce el ID del cliente generado por Xero\n> ")
-    set_key(camino_env, "ID_CLIENTE", id_cliente)
-
-secreto_cliente = os.getenv("SECRETO_CLIENTE") or ""
-if not secreto_cliente:
-    print("No se encontró el secreto del cliente en las variables de entorno")
-    secreto_cliente = input("Introduce el secreto del cliente generado por Xero\n> ")
-    set_key(camino_env, "SECRETO_CLIENTE", secreto_cliente)
+from servidor.secretos import entorno
 
 app = FastAPI()
 app.add_middleware(SessionMiddleware, secret_key="porfa-cambiame-soy-insegura") # No usar SessionMiddleware para la versión final porque le manda las credenciales al usuario
+
+id_cliente = entorno.ID_CLIENTE.get_secret_value()
+secreto_cliente = entorno.SECRETO_CLIENTE.get_secret_value()
 
 token = ""
 id_tenant = None
@@ -118,4 +98,4 @@ if __name__ == "__main__":
     print("Espera a que el servidor inicie y abre \033[34mhttp://localhost:8000/login/xero\033[0m")
 
     import uvicorn
-    uvicorn.run(app, host="localhost", port=8000)
+    uvicorn.run(app, host="localhost", port=entorno.PUERTO)

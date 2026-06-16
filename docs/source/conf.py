@@ -32,7 +32,6 @@ autodoc2_packages = [
     "../../Capa.py",
     "../../factura.py"
 ]
-autodoc2_docstrings = 'all'
 # Procesa todo como Markdown en vez de como .rst
 autodoc2_docstring_parser_regexes = [
     (r".*", "myst"),

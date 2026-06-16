@@ -62,12 +62,11 @@ class DatosGTI:
     
 
 
-with open("prueba.json", "r", encoding="utf-8") as archivo_json:
-    data = json.load(archivo_json)
-
 class DatosXero:
     @staticmethod
     def obtener_datos(archivo_json: str) -> list[Factura]:
+        with open("prueba.json", "r", encoding="utf-8") as archivo_json:
+            data = json.load(archivo_json)
         facturas = []            
         for invoice in data["Invoices"]:
             factura = Factura()

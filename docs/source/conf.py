@@ -29,7 +29,8 @@ language = 'es'
 autodoc2_packages = [
     "../../abstracciones/destino.py",
     "../../abstracciones/fuente.py",
-    "../../Capa.py"
+    "../../Capa.py",
+    "../../factura.py"
 ]
 autodoc2_docstrings = 'all'
 # Procesa todo como Markdown en vez de como .rst

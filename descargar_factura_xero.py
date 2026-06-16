@@ -6,7 +6,9 @@ from base64 import b64encode
 from httpx import Response
 import xml.etree.ElementTree as ET
 import json
-from servidor.secretos import entorno
+from servidor.secretos import obtener_entorno
+
+entorno = obtener_entorno()
 
 app = FastAPI()
 app.add_middleware(SessionMiddleware, secret_key="porfa-cambiame-soy-insegura") # No usar SessionMiddleware para la versión final porque le manda las credenciales al usuario
@@ -36,13 +38,13 @@ def apagar_servidor():
     pid = os.getpid()
     os.kill(pid, signal.SIGINT)
 
-@app.get("/login/xero")
+@app.get("/xero/login")
 async def login(request: Request):
     print("Iniciando sesión...")
     url_auth = request.url_for("auth")
     return await xero.authorize_redirect(request, url_auth) # Esto devuelve el state pero authlib lo valida automáticamente
 
-@app.get("/auth/xero")
+@app.get("/xero/auth")
 async def auth(code: str, request: Request):
     global token
     global id_tenant

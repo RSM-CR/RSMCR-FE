@@ -9,12 +9,12 @@ class _Entorno(BaseSettings):
     model_config = SettingsConfigDict(env_file=".env", env_file_encoding="utf-8")
 
     # Define todas las configuraciones
-    ID_CLIENTE: SecretStr = Field(default=...)
-    SECRETO_CLIENTE: SecretStr = Field(default=...)
+    ID_CLIENTE_XERO: SecretStr = Field(default=...)
+    SECRETO_CLIENTE_XERO: SecretStr = Field(default=...)
     USUARIO_GTI: SecretStr = Field(default=...)
     CONTRASENA_GTI: SecretStr = Field(default=...)
-    TOKEN_ACTUALIZACION: SecretStr = SecretStr("")
-    ID_TENANT: str = ""
+    TOKEN_ACTUALIZACION_XERO: SecretStr = SecretStr("")
+    ID_TENANT_XERO: str = ""
     PUERTO: int = 8000
 
 def crear_entorno():

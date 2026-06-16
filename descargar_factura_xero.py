@@ -13,8 +13,8 @@ entorno = obtener_entorno()
 app = FastAPI()
 app.add_middleware(SessionMiddleware, secret_key="porfa-cambiame-soy-insegura") # No usar SessionMiddleware para la versión final porque le manda las credenciales al usuario
 
-id_cliente = entorno.ID_CLIENTE.get_secret_value()
-secreto_cliente = entorno.SECRETO_CLIENTE.get_secret_value()
+id_cliente = entorno.ID_CLIENTE_XERO.get_secret_value()
+secreto_cliente = entorno.SECRETO_CLIENTE_XERO.get_secret_value()
 
 token = ""
 id_tenant = None
@@ -50,7 +50,6 @@ async def auth(code: str, request: Request):
     global id_tenant
 
     print("Autenticándose...")
-    bytes_base64 = b64encode((id_cliente + ":" + secreto_cliente).encode("utf-8"))
 
     token = await xero.authorize_access_token(request)
 

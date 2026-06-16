@@ -28,7 +28,8 @@ language = 'es'
 # https://sphinx-autodoc2.readthedocs.io/en/latest/config.html
 autodoc2_packages = [
     "../../abstracciones/destino.py",
-    "../../abstracciones/fuente.py"
+    "../../abstracciones/fuente.py",
+    "../../Capa.py"
 ]
 autodoc2_docstrings = 'all'
 # Procesa todo como Markdown en vez de como .rst

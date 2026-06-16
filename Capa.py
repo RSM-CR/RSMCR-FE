@@ -1,23 +1,7 @@
 import json
-from factura import Factura
 
 class App:
-    import json #Se necesita importar el json globalmente, sino no funciona.
-
-
-    """def __init__(self, archivo_json="PruebaXero.json"):
-        with open(archivo_json, "r", encoding="utf-8") as archivo:
-            self.data = json.load(archivo)
-
-        self.nombre = None
-        self.numero = None
-        self.correo = None
-        self.telefono = None
-        self.provincia = None
-        self.canton = None
-        self.distrito = None
-        self.otras_senas = None
-        self.detalle_servicio = []"""
+    #import json Se necesita importar el json globalmente, sino no funciona.
 
     def obtener_encabezado(self):
         factura = self.data.get("Invoice", {})
@@ -74,9 +58,11 @@ class App:
             print("Total:", linea.line_amount)
             print("-------------------")
 
+with open("prueba.json", "r", encoding="utf-8") as archivo_json:
+    data = json.load(archivo_json)
 
-if __name__ == "__main__":
-    factura = App() #If para mostrar en termianl los resultados agarrados del JSON (solo para pruebas).
-    factura.mostrar_informacion()
+from factura import DatosXero
+
+
 
 

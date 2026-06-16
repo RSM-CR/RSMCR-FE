@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Invoices>
+    <Invoice>
+        <Type>ACCREC</Type>
+
+        <Contact>
+            <Name>Cliente Ejemplo S.A.</Name>
+            <EmailAddress>cliente@ejemplo.com</EmailAddress>
+        </Contact>
+
+        <Date>2026-06-12</Date>
+        <DueDate>2026-07-12</DueDate>
+
+        <InvoiceNumber>FAC-2026-001</InvoiceNumber>
+
+        <Reference>Proyecto Desarrollo API</Reference>
+
+        <Status>AUTHORISED</Status>
+
+        <CurrencyCode>USD</CurrencyCode>
+
+        <LineAmountTypes>Exclusive</LineAmountTypes>
+
+        <LineItems>
+
+            <LineItem>
+                <Description>Desarrollo Backend</Description>
+                <Quantity>40</Quantity>
+                <UnitAmount>50.00</UnitAmount>
+                <AccountCode>200</AccountCode>
+                <TaxType>OUTPUT</TaxType>
+                <LineAmount>2000.00</LineAmount>
+            </LineItem>
+
+            <LineItem>
+                <Description>Consultoría Técnica</Description>
+                <Quantity>10</Quantity>
+                <UnitAmount>80.00</UnitAmount>
+                <AccountCode>200</AccountCode>
+                <TaxType>OUTPUT</TaxType>
+                <LineAmount>800.00</LineAmount>
+            </LineItem>
+
+        </LineItems>
+
+        <SubTotal>2800.00</SubTotal>
+        <TotalTax>364.00</TotalTax>
+        <Total>3164.00</Total>
+
+    </Invoice>
+</Invoices>

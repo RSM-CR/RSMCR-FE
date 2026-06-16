@@ -1,8 +1,9 @@
+"""Capa.py era un boceto para la traducción de json a objetos de python, pero ahora se usa una función de factura.py"""
 import json
 
 
 class App:
-    import json #Se necesita importar el json globalmente, sino no funciona.
+    import json 
 
 
     def __init__(self, archivo_json="PruebaXero.json"):
@@ -18,8 +19,11 @@ class App:
         self.distrito = None
         self.otras_senas = None
         self.detalle_servicio = []
+        """Reorganiza los datos recibidos del json para crealos como una lista, y así administrar mejor los objetos.
+        """
 
     def obtener_encabezado(self):
+        """Obtiene el encabezado de la factura desde el JSON por medio de la búsqueda del elemento dentro del json."""
         factura = self.data.get("Invoice", {})
 
         self.nombre = factura.get("Name")
@@ -33,6 +37,7 @@ class App:
         self.moneda = factura.get("CurrencyCode")
 
     def obtener_detalle_servicio(self):
+        """Obtiene el encabezado de la factura desde el JSON por medio de la búsqueda del elemento dentro del json. Por el momento, los datos del json de Xero están incompletos con respecto a los datos que otorga el .xml de GTI."""
         self.detalle_servicio = []
 
         line_items = self.data.get("Invoice", {}).get("LineItems", [])
@@ -73,10 +78,11 @@ class App:
             print("Precio Unitario:", linea.unit_amount)
             print("Total:", linea.line_amount)
             print("-------------------")
+    """Se usa para poder llamar mejor este código a otros archivos, viene todo lo relacionado a las traducciones de json a variables de Python (objetos)."""
 
-
-if __name__ == "__main__":
-    factura = App() #If para mostrar en termianl los resultados agarrados del JSON (solo para pruebas).
-    factura.mostrar_informacion()
+class muestra:
+    if __name__ == "__main__":
+        factura = App() #If para mostrar en termianl los resultados agarrados del JSON (solo para pruebas).
+        factura.mostrar_informacion()
 
 

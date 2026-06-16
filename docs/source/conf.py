@@ -30,7 +30,8 @@ autodoc2_packages = [
     "../../abstracciones/destino.py",
     "../../abstracciones/fuente.py",
     "../../Capa.py",
-    "../../factura.py"
+    "../../factura.py",
+    "../../var_a_xml.py"
 ]
 autodoc2_docstrings = 'all'
 # Procesa todo como Markdown en vez de como .rst

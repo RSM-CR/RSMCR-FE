@@ -1,11 +1,11 @@
 import json
-
+from factura import Factura
 
 class App:
     import json #Se necesita importar el json globalmente, sino no funciona.
 
 
-    def __init__(self, archivo_json="PruebaXero.json"):
+    """def __init__(self, archivo_json="PruebaXero.json"):
         with open(archivo_json, "r", encoding="utf-8") as archivo:
             self.data = json.load(archivo)
 
@@ -17,7 +17,7 @@ class App:
         self.canton = None
         self.distrito = None
         self.otras_senas = None
-        self.detalle_servicio = []
+        self.detalle_servicio = []"""
 
     def obtener_encabezado(self):
         factura = self.data.get("Invoice", {})

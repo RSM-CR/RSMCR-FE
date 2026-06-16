@@ -13,22 +13,30 @@ class _Entorno(BaseSettings):
     SECRETO_CLIENTE: SecretStr = Field(default=...)
     USUARIO_GTI: SecretStr = Field(default=...)
     CONTRASENA_GTI: SecretStr = Field(default=...)
+    TOKEN_ACTUALIZACION: SecretStr = SecretStr("")
+    ID_TENANT: str = ""
     PUERTO: int = 8000
 
 def crear_entorno():
     if os.path.exists(".env"):
-        logging.warning("El archivo .env ya existe. ¿Deseas sobreescribirlo? s/N")
+        print("El archivo .env ya existe. ¿Deseas sobreescribirlo? s/N")
         # Operador Walrus (:=): Crea una variable antes de seguir con las comparaciones del if
         if (sobreescribir := input("> ").lower()) != "s" and sobreescribir != "y":
             return
     
+    print("¿Deseas configurar los parámetros opcionales? s/N")
+    configurar_opcionales = (entrada := input("> ").lower()) == "s" or entrada == "y"
+
     nuevo_entorno = list[str]()
 
     # Hace un bucle que pregunta por todas las variables definidas en Entorno
     for nombre, info in _Entorno.model_fields.items():
         opcional = info.default is not PydanticUndefined
 
-        valor = input(f"Introduce un valor para {nombre}{f" (Opcional. Dejar en blanco para el valor por defecto de {info.default})" if opcional else ""}\n> ").strip()
+        if opcional and not configurar_opcionales:
+            continue
+
+        valor = input(f"Introduce un valor para {nombre}{f" (Opcional. Dejar en blanco para el valor por defecto de \"{info.default}\")" if opcional else ""}\n> ").strip()
         if not valor and opcional:
             valor = info.default
         while not valor and not opcional:
@@ -40,8 +48,15 @@ def crear_entorno():
         env.write("\n".join(nuevo_entorno) + "\n")
 
     print("¡Archivo .env generado con éxito!")
+    logging.info("Se ha generado un nuevo archivo .env")
 
-entorno = _Entorno()
+_entorno = None
+def obtener_entorno():
+    global _entorno
+    if _entorno is None:
+        _entorno = _Entorno()
+    return _entorno
+
 if __name__ == "__main__":
     print("Imprimiendo todos los valores del .env...")
-    print(entorno.model_dump())
+    print(obtener_entorno().model_dump())

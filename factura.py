@@ -1,7 +1,9 @@
 import xml.etree.ElementTree as ET
+import json
 
 class Factura:
     def __init__(self):
+        #XML
         self.nombre: str | None = None
         self.numero: str | None = None
         self.correo: str | None = None
@@ -16,20 +18,16 @@ class Factura:
         self.detalle: str | None = None
         self.precio_unitario: str | None = None
         self.monto_total: str | None = None
-        #falta el impuesto
-        self.cosas = list[LineasDetalle]()
-
-class LineasDetalle:
-    def __init__(self):
-        self.codigo: str | None = None
-        self.cantidad: str | None = None
-        self.unidad_medida: str | None = None
-        self.detalle: str | None = None
-        self.precio_unitario: str | None = None
-        self.monto_total: str | None = None
+        #Xero
+        self.tipo: str | None = None
+        self.cliente: str | None = None
+        self.estado: str | None = None
+        self.moneda: str | None = None
+        self.lineas = []
+        
         #falta el impuesto
 
-class datos:
+class DatosGTI:
     @staticmethod
     def obtener_datos(archivo_xml = "Prueba.xml")-> Factura:
         factura = Factura()
@@ -47,10 +45,11 @@ class datos:
             factura.canton = receptor.findtext(".//{*}Canton")
             factura.distrito = receptor.findtext(".//{*}Distrito")
             factura.otras_senas = receptor.findtext(".//{*}OtrasSenas")
+            #falta el impuesto
 
 
         for linea_xml in root.findall(".//{*}LineaDetalle"):
-            linea_obj = LineasDetalle()
+            linea_obj = Factura()
             linea_obj.codigo = linea_xml.findtext(".//{*}Codigo")
             linea_obj.cantidad = linea_xml.findtext(".//{*}Cantidad")
             linea_obj.unidad_medida = linea_xml.findtext(".//{*}UnidadMedida")
@@ -60,3 +59,25 @@ class datos:
 
             factura.cosas.append(linea_obj)
         return factura
+    
+
+
+with open("prueba.json", "r", encoding="utf-8") as archivo_json:
+    data = json.load(archivo_json)
+
+class DatosXero:
+    @staticmethod
+    def obtener_datos(archivo_json: str) -> list[Factura]:
+        facturas = []            
+        for invoice in data["Invoices"]:
+            factura = Factura()
+
+            factura.tipo = invoice["Type"]
+            factura.cliente = invoice["Contact"]["Name"]
+            factura.numero = invoice["InvoiceNumber"]
+            factura.estado = invoice["Status"]
+            factura.moneda = invoice["CurrencyCode"]
+            factura.lineas = invoice["LineItems"]
+
+            facturas.append(factura)
+        return facturas

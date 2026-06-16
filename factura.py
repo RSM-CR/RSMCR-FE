@@ -27,7 +27,7 @@ class Factura:
         
         #falta el impuesto
 
-class datos:
+class DatosGTI:
     @staticmethod
     def obtener_datos(archivo_xml = "Prueba.xml")-> Factura:
         factura = Factura()

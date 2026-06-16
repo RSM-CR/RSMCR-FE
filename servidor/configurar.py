@@ -1,7 +1,7 @@
 # Es muy importante poner los imports justo antes de que se usen
 # El órden de inicialización puede causar errores
 if __name__ == "__main__":
-    from servidor.secretos import crear_entorno
+    from secretos import crear_entorno
     print("¡Bienvenido! Te ayudaré a configurar el servidor")
     print("Primero, define las variables de entorno")
     crear_entorno()

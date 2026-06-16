@@ -16,6 +16,7 @@ class _Entorno(BaseSettings):
     TOKEN_ACTUALIZACION_XERO: SecretStr = SecretStr("")
     ID_TENANT_XERO: str = ""
     PUERTO: int = 8000
+    XERO_WEBHOOK_SECRET: SecretStr = Field(default=...)
 
 def crear_entorno():
     if os.path.exists(".env"):

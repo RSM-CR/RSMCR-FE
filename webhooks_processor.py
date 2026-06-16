@@ -1,0 +1,100 @@
+import logging
+import httpx
+from servidor.secretos import obtener_entorno
+from xero.auth import iniciar_sesion
+
+logger = logging.getLogger(__name__)
+_entorno = obtener_entorno()
+
+
+async def fetch_xero_resource(resource_url: str) -> dict | None:
+    try:
+        token = await iniciar_sesion()
+        tenant_id = _entorno.ID_TENANT_XERO
+
+        async with httpx.AsyncClient() as client:
+            resp = await client.get(
+                resource_url,
+                headers={
+                    "Authorization": f"Bearer {token['access_token']}",
+                    "Xero-Tenant-Id": tenant_id,
+                    "Accept": "application/json",
+                },
+            )
+            resp.raise_for_status()
+            return resp.json()
+    except httpx.HTTPStatusError as e:
+        logger.error("Error HTTP al obtener recurso: %s — %s", e.response.status_code, e.response.text)
+        return None
+    except Exception as e:
+        logger.error("Error inesperado al obtener recurso: %s", e)
+        return None
+
+
+async def handle_invoice_create(event: dict) -> None:
+    data = await fetch_xero_resource(event["resourceUrl"])
+    if not data:
+        return
+    for invoice in data.get("Invoices", []):
+        logger.info("Nueva factura — Número: %s | Estado: %s | Total: %s %s",
+            invoice.get("InvoiceNumber"), invoice.get("Status"),
+            invoice.get("Total"), invoice.get("CurrencyCode"))
+
+async def handle_invoice_update(event: dict) -> None:
+    data = await fetch_xero_resource(event["resourceUrl"])
+    if not data:
+        return
+    for invoice in data.get("Invoices", []):
+        logger.info("Factura actualizada — Número: %s | Estado: %s",
+            invoice.get("InvoiceNumber"), invoice.get("Status"))
+
+async def handle_contact_create(event: dict) -> None:
+    data = await fetch_xero_resource(event["resourceUrl"])
+    if not data:
+        return
+    for contact in data.get("Contacts", []):
+        logger.info("Nuevo contacto: %s", contact.get("Name"))
+
+async def handle_contact_update(event: dict) -> None:
+    data = await fetch_xero_resource(event["resourceUrl"])
+    if not data:
+        return
+    for contact in data.get("Contacts", []):
+        logger.info("Contacto actualizado: %s", contact.get("Name"))
+
+async def handle_payment_create(event: dict) -> None:
+    data = await fetch_xero_resource(event["resourceUrl"])
+    if not data:
+        return
+    for payment in data.get("Payments", []):
+        logger.info("Pago registrado — Monto: %s", payment.get("Amount"))
+
+
+EVENT_HANDLERS = {
+    ("INVOICE", "CREATE"):  handle_invoice_create,
+    ("INVOICE", "UPDATE"):  handle_invoice_update,
+    ("CONTACT", "CREATE"):  handle_contact_create,
+    ("CONTACT", "UPDATE"):  handle_contact_update,
+    ("PAYMENT", "CREATE"):  handle_payment_create,
+}
+
+
+async def process_webhook_events(payload: dict) -> None:
+    events = payload.get("events", [])
+    if not events:
+        logger.info("Webhook de verificación recibido (Intent to Receive)")
+        return
+
+    logger.info("Procesando %d evento(s)", len(events))
+    for event in events:
+        category = event.get("eventCategory")
+        event_type = event.get("eventType")
+        handler = EVENT_HANDLERS.get((category, event_type))
+
+        if handler:
+            try:
+                await handler(event)
+            except Exception as e:
+                logger.error("Error en handler %s %s: %s", category, event_type, e)
+        else:
+            logger.warning("Sin handler para: %s %s", category, event_type)

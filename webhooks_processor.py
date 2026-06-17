@@ -1,7 +1,7 @@
 import logging
 import httpx
 from servidor.secretos import obtener_entorno
-from xero.auth import obtener_token
+from xero.auth import crear_cliente
 
 logger = logging.getLogger(__name__)
 _entorno = obtener_entorno()
@@ -9,7 +9,8 @@ _entorno = obtener_entorno()
 
 async def fetch_xero_resource(resource_url: str) -> dict | None:
     try:
-        token = obtener_token()
+        cliente_temp = crear_cliente()
+        token = cliente_temp.token
         tenant_id = _entorno.ID_TENANT_XERO
 
         async with httpx.AsyncClient() as client:

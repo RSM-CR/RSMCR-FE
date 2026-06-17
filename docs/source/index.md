@@ -8,7 +8,9 @@
 ======================
 
 ```{toctree}
-:maxdepth: 2
+:maxdepth: 1
 
+intro
+pasos
 apidocs/index
 ```

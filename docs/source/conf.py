@@ -35,7 +35,8 @@ autodoc2_packages = [
     "../../servidor/configurar.py",
     "../../servidor/secretos.py"
     "../../Capa.py",
-    "../../factura.py"
+    "../../factura.py",
+    "../../var_a_xml.py"
 ]
 
 # Procesa todo como Markdown en vez de como .rst

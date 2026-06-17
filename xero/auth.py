@@ -153,6 +153,8 @@ async def crear_cliente() -> AsyncOAuth2Client:
     cliente.register_compliance_hook("protected_request", _adjuntar_headers)
     await cliente.refresh_token("https://login.xero.com/identity/connect/token", refresh_token=_token_actualizacion)
 
+    _logger.info("Se ha creado un cliente y se ha obtenido la autorización")
+
     return cliente
 
 async def obtener_cliente() -> AsyncOAuth2Client:

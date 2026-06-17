@@ -9,7 +9,7 @@ _entorno = obtener_entorno()
 
 async def fetch_xero_resource(resource_url: str) -> dict | None:
     try:
-        token = await obtener_token()
+        token = obtener_token()
         tenant_id = _entorno.ID_TENANT_XERO
 
         async with httpx.AsyncClient() as client:
@@ -58,49 +58,10 @@ async def handle_invoice_update(event: dict) -> None:
         logger.info("Factura actualizada — Número: %s | Estado: %s",
             invoice.get("InvoiceNumber"), invoice.get("Status"))
 
-async def handle_contact_create(event: dict) -> None:
-    resource_url = event.get("resourceUrl")
-    if not resource_url:
-        logger.error("Evento sin resourceUrl: %s", event)
-        return
-    
-    data = await fetch_xero_resource(event["resourceUrl"])
-    if not data:
-        return
-    for contact in data.get("Contacts", []):
-        logger.info("Nuevo contacto: %s", contact.get("Name"))
-
-async def handle_contact_update(event: dict) -> None:
-    resource_url = event.get("resourceUrl")
-    if not resource_url:
-        logger.error("Evento sin resourceUrl: %s", event)
-        return
-    
-    data = await fetch_xero_resource(event["resourceUrl"])
-    if not data:
-        return
-    for contact in data.get("Contacts", []):
-        logger.info("Contacto actualizado: %s", contact.get("Name"))
-
-async def handle_payment_create(event: dict) -> None:
-    resource_url = event.get("resourceUrl")
-    if not resource_url:
-        logger.error("Evento sin resourceUrl: %s", event)
-        return
-    
-    data = await fetch_xero_resource(event["resourceUrl"])
-    if not data:
-        return
-    for payment in data.get("Payments", []):
-        logger.info("Pago registrado — Monto: %s", payment.get("Amount"))
-
 
 EVENT_HANDLERS = {
     ("INVOICE", "CREATE"):  handle_invoice_create,
     ("INVOICE", "UPDATE"):  handle_invoice_update,
-    ("CONTACT", "CREATE"):  handle_contact_create,
-    ("CONTACT", "UPDATE"):  handle_contact_update,
-    ("PAYMENT", "CREATE"):  handle_payment_create,
 }
 
 

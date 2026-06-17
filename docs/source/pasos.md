@@ -1,6 +1,6 @@
 # Inducción a Sphinx
 
-En este apartado se detalla todo el proceso de instalación de Sphinx dentro de la computadora y, además, incorporarlo a un proyecto de P.
+En este apartado se detalla todo el proceso de instalación de Sphinx dentro de la computadora y, además, incorporarlo a un proyecto de Python.
 
 ## Requerimientos
 
@@ -21,7 +21,7 @@ Luego de esto, se presentan una serie de pasos sencillos de cómo instalar Sphin
 Se reitera, en este manual se va a presentar una forma sencilla de cómo instalarlo. 
 Para hacerlo, solo se necesita ingresar al símbolo de sistema (cmd) y escribir lo siguiente:
 
-`py -m pip install -r requirements.txt`
+`py -m pip install -r requirements.txt` para Windows. `pip install -r requirements.txt` para otros OS.
 
 ### Paso 2: Añadir nuevos archivos (ya sea .md o .py) a un proyecto
 

@@ -55,4 +55,6 @@ A continuación, se te pedirá que ingreses el valor de cada una de las variable
 Introduce un valor para ID_CLIENTE_XERO
 > 
 ```
-Escribe el valor apropiado para la variable y presiona Enter.
+Escribe el valor apropiado para la variable y presiona Enter. Una vez termines, podrás ver que se ha creado un archivo `.env`.
+> [!TIP]
+> Puedes cambiar la configuración en cualquier momento editando a `.env` manualmente. No se pueden añadir variables no contempladas dentro de [secretos._Entorno](secretos._Entorno) porque de lo contrario se producirá un error en el código.

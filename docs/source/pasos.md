@@ -51,7 +51,15 @@ Por otro lado, el `index.md` se le puede conocer como el "archvio madre", ya que
 #### Cómo vincular un **.py** a Sphinx
 
 1. Se debe de crear el archivo `.py` por fuera de la carpeta `/docs`.
-2. Dentro de `conf.py`, debe de aparecer una sección llamada `autodoc2_packages`. En esa lista se ingresan los archivos que se desea que aparezcan dentro de la web. En caso de que los archivos estén dentro de una carpeta previamente creada, se tiene que ingresar el directorio.
+2. Dentro de `conf.py`, debe de aparecer una sección llamada `autodoc2_packages`. En esa lista se ingresan los archivos que se desea que aparezcan dentro de la web. En caso de que los archivos estén dentro de una carpeta previamente creada, se tiene que ingresar el directorio. Por ejemplo:
+```
+autodoc2_packages = [
+    "../../abstracciones/destino.py",
+    "../../abstracciones/fuente.py",
+    "../../Capa.py",
+    "../../factura.py"
+]
+```
 
 #### Cómo vincular un **.md** a Sphinx
 

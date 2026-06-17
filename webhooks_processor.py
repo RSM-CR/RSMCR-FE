@@ -1,95 +1,83 @@
-import logging
-import httpx
-from servidor.secretos import obtener_entorno
-from xero.auth import crear_cliente
+import logging # Importar el módulo logging para registrar información, advertencias y errores en el servidor de webhooks. Esto es importante para monitorear el funcionamiento del servidor, detectar problemas y mantener un registro de los eventos que se procesan. Configurar el logging adecuadamente permite tener una visión clara de lo que está sucediendo en el servidor y facilita la depuración en caso de errores o comportamientos inesperados.
+import httpx # Importar httpx para realizar solicitudes HTTP asíncronas a la API de Xero. Esto es necesario para obtener información adicional sobre los eventos que se reciben en los webhooks, como detalles de facturas o clientes, sin bloquear el procesamiento de otros eventos.
+from xero.auth import obtener_cliente # Importar la función obtener_cliente desde el módulo auth para obtener un cliente HTTP configurado con las credenciales de Xero. Este cliente se utilizará para realizar solicitudes a la API de Xero y obtener información adicional sobre los eventos que se reciben en los webhooks, como detalles de facturas o clientes.
 
-logger = logging.getLogger(__name__)
-_entorno = obtener_entorno()
-
-
-async def fetch_xero_resource(resource_url: str) -> dict | None:
-    try:
-        cliente_temp = crear_cliente()
-        token = cliente_temp.token
-        cliente_temp.close()  # type: ignore
-        tenant_id = _entorno.ID_TENANT_XERO
-
-        async with httpx.AsyncClient() as client:
-            resp = await client.get(
-                resource_url,
-                headers={
-                    "Authorization": f"Bearer {token['access_token']}",
-                    "Xero-Tenant-Id": tenant_id,
-                    "Accept": "application/json",
-                },
-            )
-            resp.raise_for_status()
-            return resp.json()
-    except httpx.HTTPStatusError as e:
-        logger.error("Error HTTP al obtener recurso: %s — %s", e.response.status_code, e.response.text)
-        return None
-    except Exception as e:
-        logger.error("Error inesperado al obtener recurso: %s", e)
-        return None
+logger = logging.getLogger(__name__) # Configurar un logger específico para este módulo. Esto permite registrar información, advertencias y errores de manera organizada y diferenciada de otros módulos. El logger se puede configurar para escribir en la consola, archivos o sistemas de monitoreo, facilitando el seguimiento del funcionamiento del servidor de webhooks y la detección de problemas.
+logging.basicConfig(level=logging.INFO) # Configurar el logging para mostrar información igual o mayor a INFO en la consola. Esto significa que se mostrarán mensajes de información, advertencias y errores, pero no mensajes de depuración (DEBUG). Esta configuración es adecuada para un entorno de producción o desarrollo donde se desea tener visibilidad de los eventos importantes sin saturar la salida con demasiados detalles de depuración.
 
 
-async def handle_invoice_create(event: dict) -> None:
-    resource_url = event.get("resourceUrl")
-    if not resource_url:
-        logger.error("Evento sin resourceUrl: %s", event)
-        return
+async def fetch_xero_resource(resource_url: str) -> dict | None: # Función asíncrona para obtener información adicional de la API de Xero utilizando el URL del recurso proporcionado en el evento del webhook. Esta función utiliza el cliente HTTP configurado con las credenciales de Xero para realizar una solicitud GET al recurso especificado, y devuelve los datos en formato JSON. Si ocurre un error durante la solicitud, se registrará el error y se devolverá None.
+    try: # Iniciar un bloque try para manejar posibles excepciones que puedan ocurrir durante la solicitud a la API de Xero. Esto es importante para garantizar que el servidor de webhooks pueda manejar errores de manera adecuada, como problemas de red, errores de autenticación o respuestas inesperadas de la API, sin interrumpir el procesamiento de otros eventos.
+        client = await obtener_cliente() # Obtener un cliente HTTP configurado con las credenciales de Xero utilizando la función obtener_cliente. Este cliente se utilizará para realizar la solicitud a la API de Xero.
+        resp = await client.request("GET", resource_url) # Realizar una solicitud GET al URL del recurso proporcionado utilizando el cliente HTTP. Esto permite obtener información adicional sobre el recurso relacionado con el evento del webhook, como detalles de una factura o cliente.
+        resp.raise_for_status() # Verificar si la respuesta HTTP indica un error (código de estado 4xx o 5xx). Si se detecta un error, se lanzará una excepción httpx.HTTPStatusError que será capturada en el bloque except para registrar el error y devolver None.
+        return resp.json() # Si la solicitud fue exitosa, se devuelve el contenido de la respuesta en formato JSON. Esto permitirá a los handlers de eventos acceder a los detalles del recurso relacionado con el evento del webhook y realizar las acciones necesarias en respuesta a ese evento.
+    except httpx.HTTPStatusError as e: # Capturar errores HTTP específicos que ocurran durante la solicitud a la API de Xero. Esto incluye errores como 404 Not Found, 401 Unauthorized, 500 Internal Server Error, entre otros. Al capturar estos errores, se puede registrar información detallada sobre el error, como el código de estado y el mensaje de error devuelto por la API de Xero, lo que facilita la identificación y solución de problemas relacionados con las solicitudes a la API.
+        logger.error("Error HTTP al obtener recurso: %s — %s", e.response.status_code, e.response.text) # Registrar un mensaje de error que incluye el código de estado HTTP y el texto de la respuesta devuelta por la API de Xero. Esto proporciona información detallada sobre el error que ocurrió durante la solicitud, lo que puede ser útil para diagnosticar problemas con la API o con las credenciales utilizadas.
+        return None # Devolver None para indicar que no se pudo obtener la información del recurso debido a un error HTTP. Esto permite a los handlers de eventos manejar la situación de manera adecuada, como omitir el procesamiento del evento o registrar una advertencia adicional.
+    except Exception as e: # Capturar cualquier otro tipo de excepción que pueda ocurrir durante la ejecución de la función, como errores de red, problemas de configuración, errores de autenticación, entre otros. Al capturar estas excepciones genéricas, se puede registrar un mensaje de error que incluya información sobre la excepción, lo que facilita la identificación y solución de problemas inesperados que puedan surgir durante el procesamiento de los eventos del webhook.
+        logger.error("Error inesperado al obtener recurso: %s", e) # Registrar un mensaje de error que incluye información sobre la excepción que ocurrió durante la ejecución de la función. Esto proporciona detalles sobre el error inesperado, lo que puede ser útil para diagnosticar problemas relacionados con la red, la configuración o cualquier otro aspecto que pueda afectar la capacidad de obtener información del recurso desde la API de Xero.
+        return None # Devolver None para indicar que no se pudo obtener la información del recurso debido a un error inesperado. Esto permite a los handlers de eventos manejar la situación de manera adecuada, como omitir el procesamiento del evento o registrar una advertencia adicional.
+
+
+async def handle_invoice_create(event: dict) -> None: # Handler específico para eventos de creación de facturas (INVOICE CREATE). Esta función se ejecutará cada vez que se reciba un evento de este tipo en el webhook de Xero. El handler obtiene el URL del recurso relacionado con la factura creada, utiliza la función fetch_xero_resource para obtener información adicional sobre la factura desde la API de Xero, y luego registra un mensaje informativo con detalles clave de la factura, como el número de factura, el estado, el total y la moneda. Esto permite tener visibilidad inmediata de las nuevas facturas que se crean en Xero a través del webhook.
+    resource_url = event.get("resourceUrl") # Obtener el URL del recurso relacionado con la factura creada a partir del evento del webhook. Este URL se utiliza para realizar una solicitud a la API de Xero y obtener información adicional sobre la factura, como detalles específicos que no se incluyen directamente en el evento del webhook. Si el evento no contiene un resourceUrl, se registrará un error y se omitirá el procesamiento de este evento.
+    if not resource_url: # Verificar si el evento contiene un resourceUrl. Si no lo tiene, se registra un mensaje de error indicando que el evento es inválido y se omite el procesamiento de este evento. Esto es importante para evitar errores al intentar realizar una solicitud a la API de Xero sin un URL válido, y para mantener la integridad del procesamiento de los eventos del webhook.
+        logger.error("Evento sin resourceUrl: %s", event) # Registrar un mensaje de error que indica que el evento recibido no contiene un resourceUrl, lo que es necesario para obtener información adicional sobre la factura creada. El mensaje incluye el contenido completo del evento para facilitar la identificación del problema y la depuración.
+        return # Omitir el procesamiento de este evento debido a la falta de un resourceUrl válido. Esto evita errores posteriores al intentar acceder a un URL que no existe y permite que el servidor de webhooks continúe procesando otros eventos sin interrupciones.
         
-    data = await fetch_xero_resource(event["resourceUrl"])
-    if not data:
-        return
-    for invoice in data.get("Invoices", []):
-        logger.info("Nueva factura — Número: %s | Estado: %s | Total: %s %s",
-            invoice.get("InvoiceNumber"), invoice.get("Status"),
-            invoice.get("Total"), invoice.get("CurrencyCode"))
+    data = await fetch_xero_resource(event["resourceUrl"]) # Utilizar la función fetch_xero_resource para obtener información adicional sobre la factura creada desde la API de Xero utilizando el resourceUrl proporcionado en el evento del webhook. Esta función realiza una solicitud HTTP a la API de Xero y devuelve los datos en formato JSON. Si ocurre un error durante la solicitud, se registrará el error y se devolverá None, lo que permitirá manejar adecuadamente la situación en el handler.
+    if not data: # Verificar si se pudo obtener la información de la factura desde la API de Xero. Si data es None, significa que ocurrió un error al intentar obtener la información del recurso, y se omite el procesamiento de este evento. Esto es importante para evitar errores posteriores al intentar acceder a datos que no se pudieron obtener, y para mantener la integridad del procesamiento de los eventos del webhook.
+        logger.error("No se pudo obtener información de la factura: %s", event) # Registrar un mensaje de error que indica que no se pudo obtener información de la factura desde la API de Xero utilizando el resourceUrl proporcionado en el evento del webhook. El mensaje incluye el contenido completo del evento para facilitar la identificación del problema y la depuración.
+        return # Omitir el procesamiento de este evento debido a la imposibilidad de obtener información de la factura. Esto evita errores posteriores al intentar acceder a datos que no se pudieron obtener, y permite que el servidor de webhooks continúe procesando otros eventos sin interrupciones.
+    for invoice in data.get("Invoices", []): # Iterar sobre la lista de facturas obtenida en la respuesta de la API de Xero. Aunque generalmente se espera que haya una sola factura relacionada con el evento de creación, es posible que la API devuelva múltiples facturas en algunos casos. Al iterar sobre esta lista, se asegura que se registren los detalles de todas las facturas relacionadas con el evento, proporcionando una visión completa de las facturas creadas en respuesta al evento del webhook.
+        logger.info("Nueva factura — Número: %s | Estado: %s | Total: %s %s", # Registrar un mensaje informativo que incluye detalles clave de la nueva factura creada, como el número de factura, el estado, el total y la moneda. Esto proporciona visibilidad inmediata de las nuevas facturas que se crean en Xero a través del webhook, lo que puede ser útil para monitorear la actividad de facturación y detectar cualquier problema o patrón relevante en las facturas creadas.
+            invoice.get("InvoiceNumber"), invoice.get("Status"), # Obtener el número de factura y el estado de la factura desde los datos obtenidos de la API de Xero. Estos detalles son importantes para identificar la factura y entender su situación actual (por ejemplo, si está pendiente, pagada, etc.).
+            invoice.get("Total"), invoice.get("CurrencyCode")) # Obtener el total de la factura y la moneda desde los datos obtenidos de la API de Xero. Estos detalles son importantes para entender el valor de la factura y la moneda en la que se realizó, lo que puede ser relevante para el seguimiento financiero y la contabilidad.
 
-async def handle_invoice_update(event: dict) -> None:
-    resource_url = event.get("resourceUrl")
-    if not resource_url:
-        logger.error("Evento sin resourceUrl: %s", event)
-        return
+async def handle_invoice_update(event: dict) -> None: # Handler específico para eventos de actualización de facturas (INVOICE UPDATE). Esta función se ejecutará cada vez que se reciba un evento de este tipo en el webhook de Xero. El handler obtiene el URL del recurso relacionado con la factura actualizada, utiliza la función fetch_xero_resource para obtener información adicional sobre la factura desde la API de Xero, y luego registra un mensaje informativo con detalles clave de la factura, como el número de factura y el estado actualizado. Esto permite tener visibilidad inmediata de las actualizaciones que se realizan en las facturas en Xero a través del webhook.
+    resource_url = event.get("resourceUrl") # Obtener el URL del recurso relacionado con la factura actualizada a partir del evento del webhook. Este URL se utiliza para realizar una solicitud a la API de Xero y obtener información adicional sobre la factura, como detalles específicos que no se incluyen directamente en el evento del webhook. Si el evento no contiene un resourceUrl, se registrará un error y se omitirá el procesamiento de este evento. Esto es importante para evitar errores al intentar realizar una solicitud a la API de Xero sin un URL
+    if not resource_url: # Verificar si el evento contiene un resourceUrl. Si no lo tiene, se registra un mensaje de error indicando que el evento es inválido y se omite el procesamiento de este evento. Esto es importante para evitar errores al intentar realizar una solicitud a la API de Xero sin un URL válido, y para mantener la integridad del procesamiento de los eventos del webhook.
+        logger.error("Evento sin resourceUrl: %s", event) # Registrar un mensaje de error que indica que el evento recibido no contiene un resourceUrl, lo que es necesario para obtener información adicional sobre la factura actualizada. El mensaje incluye el contenido completo del evento para facilitar la identificación del problema y la depuración.
+        return # Omitir el procesamiento de este evento debido a la falta de un resourceUrl válido. Esto evita errores posteriores al intentar acceder a un URL que no existe y permite que el servidor de webhooks continúe procesando otros eventos sin interrupciones.
     
-    data = await fetch_xero_resource(event["resourceUrl"])
-    if not data:
-        return
-    for invoice in data.get("Invoices", []):
-        logger.info("Factura actualizada — Número: %s | Estado: %s",
-            invoice.get("InvoiceNumber"), invoice.get("Status"))
+    data = await fetch_xero_resource(event["resourceUrl"]) # Utilizar la función fetch_xero_resource para obtener información adicional sobre la factura actualizada desde la API de Xero utilizando el resourceUrl proporcionado en el evento del webhook. Esta función realiza una solicitud HTTP a la API de Xero y devuelve los datos en formato JSON. Si ocurre un error durante la solicitud, se registrará el error y se devolverá None, lo que permitirá manejar adecuadamente la situación en el handler.
+    if not data: # Verificar si se pudo obtener la información de la factura desde la API de Xero. Si data es None, significa que ocurrió un error al intentar obtener la información del recurso, y se omite el procesamiento de este evento. Esto es importante para evitar errores posteriores al intentar acceder a datos que no se pudieron obtener, y para mantener la integridad del procesamiento de los eventos del webhook.
+        logger.error("No se pudo obtener información de la factura actualizada: %s", event) # Registrar un mensaje de error que indica que no se pudo obtener información de la factura actualizada desde la API de Xero utilizando el resourceUrl proporcionado en el evento del webhook. El mensaje incluye el contenido completo del evento para facilitar la identificación del problema y la depuración.
+        return # Omitir el procesamiento de este evento debido a la imposibilidad de obtener información de la factura actualizada. Esto evita errores posteriores al intentar acceder a datos que no se pudieron obtener, y permite que el servidor de webhooks continúe procesando otros eventos sin interrupciones.
+    for invoice in data.get("Invoices", []): # Iterar sobre la lista de facturas obtenida en la respuesta de la API de Xero. Aunque generalmente se espera que haya una sola factura relacionada con el evento de actualización, es posible que la API devuelva múltiples facturas en algunos casos. Al iterar sobre esta lista, se asegura que se registren los detalles de todas las facturas relacionadas con el evento, proporcionando una visión completa de las facturas actualizadas en respuesta al evento del webhook.
+        logger.info("Factura actualizada — Número: %s | Estado: %s", # Registrar un mensaje informativo que incluye detalles clave de la factura actualizada, como el número de factura y el estado actualizado. Esto proporciona visibilidad inmediata de las actualizaciones que se realizan en las facturas en Xero a través del webhook, lo que puede ser útil para monitorear la actividad de facturación y detectar cualquier problema o patrón relevante en las facturas actualizadas.
+            invoice.get("InvoiceNumber"), invoice.get("Status")) # Obtener el número de factura y el estado actualizado de la factura desde los datos obtenidos de la API de Xero. Estos detalles son importantes para identificar la factura y entender su situación actual después de la actualización (por ejemplo, si cambió de pendiente a pagada, etc.).
 
 
 EVENT_HANDLERS = {
     ("INVOICE", "CREATE"):  handle_invoice_create,
     ("INVOICE", "UPDATE"):  handle_invoice_update,
-}
+} # Diccionario que mapea combinaciones de categoría de evento y tipo de evento a sus respectivos handlers. Esto permite una fácil extensión del sistema para manejar nuevos tipos de eventos simplemente agregando nuevas entradas al diccionario. Por ejemplo, si se desea manejar eventos relacionados con clientes (CUSTOMER), se podría agregar una nueva entrada como ("CUSTOMER", "CREATE"): handle_customer_create, donde handle_customer_create sería una función definida para procesar eventos de creación de clientes. Al utilizar este enfoque, se mantiene el código organizado y modular, facilitando la gestión de diferentes tipos de eventos que Xero puede enviar a través de los webhooks.
 
 
-async def process_webhook_events(payload: dict) -> None:
-    events = payload.get("events", [])
-    if not events:
-        logger.info("Webhook de verificación recibido (Intent to Receive)")
-        return
+async def process_webhook_events(payload: dict) -> None: # Función principal para procesar los eventos recibidos en los webhooks de Xero. Esta función se encarga de manejar la lógica de procesamiento de los eventos, incluyendo la verificación de eventos de prueba (Intent to Receive) y la delegación del procesamiento a los handlers específicos según la categoría y tipo de evento. Al centralizar esta lógica en una función, se facilita el mantenimiento y la extensión del sistema para manejar nuevos tipos de eventos en el futuro.
+    events = payload.get("events", []) # Obtener la lista de eventos del payload recibido en el webhook. Si el payload no contiene una clave "events", se asigna una lista vacía por defecto. Esto es importante para manejar correctamente los casos en los que se recibe un evento de prueba (Intent to Receive) que no incluye eventos reales, permitiendo que el sistema responda adecuadamente a este tipo de eventos sin intentar procesar eventos inexistentes.
+    if not events: # Verificar si la lista de eventos está vacía. Si lo está, se asume que se trata de un evento de prueba (Intent to Receive) enviado por Xero para verificar la configuración del webhook. En este caso, se registra un mensaje informativo indicando que se ha recibido un evento de verificación, y se omite el procesamiento adicional. Esto es importante para responder correctamente a los eventos de prueba sin generar errores o intentos de procesamiento innecesarios.
+        logger.info("Webhook de verificación recibido (Intent to Receive)") # Registrar un mensaje informativo que indica que se ha recibido un webhook de verificación (Intent to Receive) de Xero. Este tipo de evento se envía para verificar la configuración del webhook, y no contiene eventos reales para procesar. Al registrar este mensaje, se tiene visibilidad de que el webhook está funcionando correctamente y que Xero puede comunicarse con el servidor de webhooks.
+        return # Omitir el procesamiento adicional ya que se trata de un evento de prueba (Intent to Receive) que no contiene eventos reales para procesar. Esto evita errores o intentos de procesamiento innecesarios, y permite que el servidor de webhooks responda adecuadamente a este tipo de eventos.
 
-    logger.info("Procesando %d evento(s)", len(events))
-    for event in events:
-        logger.info("Evento recibido: %s", event)
-        logger.info(
-        "Categoría=%s | Tipo=%s | ResourceId=%s",
-        event.get("eventCategory"),
-        event.get("eventType"),
-        event.get("resourceId")
+    logger.info("Procesando %d evento(s)", len(events)) # Registrar un mensaje informativo que indica la cantidad de eventos que se van a procesar. Esto proporciona visibilidad sobre la actividad del webhook y permite monitorear cuántos eventos se están recibiendo y procesando en cada llamada al webhook, lo que puede ser útil para detectar patrones de uso o posibles problemas relacionados con la cantidad de eventos recibidos.
+    for event in events: # Iterar sobre cada evento en la lista de eventos recibidos. Esto permite procesar cada evento individualmente, aplicando la lógica específica para cada tipo de evento según lo definido en los handlers correspondientes. Al iterar sobre los eventos, se asegura que se manejen todos los eventos recibidos en el webhook de manera ordenada y eficiente.
+        logger.info("Evento recibido: %s", event) # Registrar un mensaje informativo que incluye el contenido completo del evento recibido. Esto proporciona visibilidad detallada de cada evento que llega al webhook, lo que puede ser útil para monitorear la actividad, detectar patrones o problemas específicos en los eventos recibidos, y facilitar la depuración en caso de errores o comportamientos inesperados.
+        logger.info("Categoría=%s | Tipo=%s | ResourceId=%s", # Registrar un mensaje informativo que incluye la categoría, el tipo y el ID del recurso del evento recibido. Esto proporciona una visión rápida de los aspectos clave del evento, lo que puede ser útil para monitorear la actividad del webhook y detectar patrones o problemas específicos relacionados con ciertos tipos de eventos o recursos.
+        event.get("eventCategory"), # Obtener la categoría del evento desde el evento recibido. La categoría del evento es un aspecto clave para determinar qué tipo de evento se ha recibido y qué handler específico se debe utilizar para procesarlo. Al registrar esta información, se tiene visibilidad de la distribución de eventos por categoría, lo que puede ser útil para monitorear la actividad del webhook y detectar patrones relacionados con ciertas categorías de eventos.
+        event.get("eventType"), # Obtener el tipo del evento desde el evento recibido. El tipo del evento, junto con la categoría, es fundamental para identificar qué handler específico se debe utilizar para procesar el evento. Al registrar esta información, se tiene visibilidad de la distribución de eventos por tipo, lo que puede ser útil para monitorear la actividad del webhook y detectar patrones relacionados con ciertos tipos de eventos.
+        event.get("resourceId") # Obtener el ID del recurso relacionado con el evento desde el evento recibido. El ID del recurso es importante para identificar qué entidad específica en Xero está relacionada con el evento (por ejemplo, una factura, un cliente, etc.). Al registrar esta información, se tiene visibilidad de los recursos que están siendo afectados por los eventos del webhook, lo que puede ser útil para monitorear la actividad y detectar patrones relacionados con ciertos recursos.
         )
-        category = event.get("eventCategory")
-        event_type = event.get("eventType")
-        handler = EVENT_HANDLERS.get((category, event_type))
+        category = event.get("eventCategory") # Obtener la categoría del evento desde el evento recibido. La categoría del evento es un aspecto clave para determinar qué tipo de evento se ha recibido y qué handler específico se debe utilizar para procesarlo. Al obtener esta información, se puede utilizar junto con el tipo del evento para buscar el handler correspondiente en el diccionario EVENT_HANDLERS y delegar el procesamiento del evento de manera adecuada.
+        event_type = event.get("eventType") # Obtener el tipo del evento desde el evento recibido. El tipo del evento, junto con la categoría, es fundamental para identificar qué handler específico se debe utilizar para procesar el evento. Al obtener esta información, se puede utilizar junto con la categoría del evento para buscar el handler correspondiente en el diccionario EVENT_HANDLERS y delegar el procesamiento del evento de manera adecuada.
+        handler = EVENT_HANDLERS.get((category, event_type)) # Buscar el handler correspondiente en el diccionario EVENT_HANDLERS utilizando la combinación de categoría y tipo del evento. Si no se encuentra un handler para esta combinación, handler será None. Esto permite delegar el procesamiento del evento a la función específica diseñada para manejar ese tipo de evento, lo que facilita la organización y modularidad del código al separar la lógica de procesamiento para diferentes tipos de eventos en funciones distintas.
 
-        if handler:
-            try:
-                await handler(event)
-            except Exception as e:
-                logger.error("Error en handler %s %s: %s", category, event_type, e)
-        else:
-            logger.warning("Sin handler para: %s %s", category, event_type)
+        if handler: # Verificar si se encontró un handler para la combinación de categoría y tipo del evento. Si handler no es None, significa que hay una función definida para procesar este tipo de evento, y se procede a ejecutarla. Esto permite manejar los eventos de manera específica según su categoría y tipo, lo que mejora la claridad y mantenibilidad del código al evitar lógica condicional compleja dentro de un único handler genérico.
+            try: # Iniciar un bloque try para manejar posibles excepciones que puedan ocurrir durante la ejecución del handler específico para el evento. Esto es importante para garantizar que el servidor de webhooks pueda manejar errores de manera adecuada sin interrumpir el procesamiento de otros eventos, y para registrar cualquier error que ocurra durante el procesamiento de un evento específico, lo que facilita la identificación y solución de problemas relacionados con ese tipo de evento.
+                await handler(event) # Ejecutar el handler específico para el evento utilizando await para manejar la naturaleza asíncrona de los handlers. Esto permite que el servidor de webhooks procese eventos de manera eficiente sin bloquear la ejecución, y que cada handler pueda realizar operaciones asíncronas, como solicitudes a la API de Xero, sin afectar el procesamiento de otros eventos.
+            except Exception as e: # Capturar cualquier excepción que ocurra durante la ejecución del handler específico para el evento. Esto incluye errores relacionados con la lógica del handler, problemas de red al interactuar con la API de Xero, errores de autenticación, entre otros. Al capturar estas excepciones, se puede registrar un mensaje de error que incluya información sobre el error y el evento que lo causó, lo que facilita la identificación y solución de problemas relacionados con el procesamiento de ese tipo de evento.
+                logger.error("Error en handler %s %s: %s", category, event_type, e) # Registrar un mensaje de error que incluye la categoría y el tipo del evento, así como información sobre la excepción que ocurrió durante la ejecución del handler específico para ese evento. Esto proporciona detalles sobre el error que ocurrió en el contexto del evento, lo que puede ser útil para diagnosticar problemas relacionados con la lógica del handler, la interacción con la API de Xero o cualquier otro aspecto que pueda afectar el procesamiento de ese tipo de evento.
+        else: # Si no se encontró un handler para la combinación de categoría y tipo del evento, se registra una advertencia indicando que no hay un handler definido para ese tipo de evento. Esto es importante para tener visibilidad de los eventos que se están recibiendo pero que no se están procesando debido a la falta de un handler específico, lo que puede ser útil para detectar la necesidad de implementar nuevos handlers para tipos de eventos adicionales que Xero pueda enviar a través de los webhooks.
+            logger.warning("Sin handler para: %s %s", category, event_type) # Registrar un mensaje de advertencia que indica que no hay un handler definido para la combinación de categoría y tipo del evento recibido. Esto proporciona visibilidad de los eventos que se están recibiendo pero que no se están procesando debido a la falta de un handler específico, lo que puede ser útil para detectar la necesidad de implementar nuevos handlers para tipos de eventos adicionales que Xero pueda enviar a través de los webhooks.

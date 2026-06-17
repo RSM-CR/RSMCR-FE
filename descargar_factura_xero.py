@@ -29,7 +29,7 @@ xero: StarletteOAuth2App = oauth.register(
     authorize_url="https://login.xero.com/identity/connect/authorize",
     server_metadata_url="https://identity.xero.com/.well-known/openid-configuration",
     api_base_url="https://api.xero.com/",
-    client_kwargs={'scope': 'openid profile email accounting.invoices.read'} # Añadir 'offline_access' para servicios más largos
+    client_kwargs={'scope': 'openid profile email offline_access accounting.invoices.read'} # Añadir 'offline_access' para servicios más largos
 )
 
 def apagar_servidor():

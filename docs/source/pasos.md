@@ -62,7 +62,9 @@ Por otro lado, el `index.md` se le puede conocer como el "archvio madre", ya que
 
 El texto básico de documentación para Sphinx se crea por medio de un texto entre triples comillas dobles:
 
-`"""Esto es un texto que comenta un código."""`
+```
+""Esto es un texto que comenta un código."""
+```
 
 Para una mejor organización y más detalles de tipados de texto, se recomienda ingresar a la siguiente página web:
 

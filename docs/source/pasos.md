@@ -64,7 +64,17 @@ autodoc2_packages = [
 #### Cómo vincular un **.md** a Sphinx
 
 1. Se crea un archivo `.md` dentro del directorio `/docs/source`.
-2. Dentro de `index.md`, es posible que ya esté creado de forma predeterminada una lista `toctree`, en caso de no estarlo se debe añadir. Ahí se agrega **único y exclusivamente** el nombre del archivo sin su extensión (.md).
+2. Dentro de `index.md`, es posible que ya esté creado de forma predeterminada una lista `toctree`, en caso de no estarlo se debe añadir. Ahí se agrega **único y exclusivamente** el nombre del archivo sin su extensión (.md). Un ejemplo de cómo se vería el apartado donde hay que añadir el nombre del archivo es:
+````
+```{toctree}
+:maxdepth: 2
+
+intro
+instalar
+pasos
+apidocs/index
+```
+````
 
 ### Paso 3: Documentación dentro de archivos .py
 

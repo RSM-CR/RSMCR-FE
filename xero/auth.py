@@ -1,4 +1,19 @@
-"""Este módulo posee una variedad de funciones que permiten autenticarse e interactuar con la API de Xero con facilidad."""
+"""Este módulo posee una variedad de funciones que permiten autenticarse e interactuar con la API de Xero con facilidad.
+**Sobre el token de autenticación**
+Para acceder al token de autenticación, se puede usar `obtener_cliente().token`. No obstante, el formato de este no está
+muy bien documentado. Por ende, se incluye a continuación:
+```
+{
+    \"id_token\": \"Todos los datos del token de identificación en base64\",
+    \"access_token\": \"Todos los datos del token de acceso en base64. Este es el que se usa para acceder a las APIs\",
+    \"expires_in\": 1800, # El tiempo en el que expirará el token de acceso. Son 1800 segundos, lo que corresponde a 30 minutos
+    \"token_type\": \"Bearer\", # El tipo de token. Para Xero, este debería de ser "Bearer"
+    \"refresh_token\": \"El token de actualización, que es válido por más tiempo que el token de acceso. Se usa para obtener nuevos tokens de acceso\",
+    \"scope\": \"openid profile email accounting.invoices.read offline_access\", # El scope que se solicitó inicialmente al iniciar sesión
+    \"expires_at\": 1781710252 # La fecha cuándo el token de acceso expira
+}
+```
+Este consiste en un diccionario de Python con las llaves que se encuentran arriba."""
 import asyncio
 from secrets import token_hex
 from fastapi import FastAPI, Request, BackgroundTasks
@@ -14,8 +29,9 @@ from typing import Any
 _entorno = obtener_entorno()
 _logger = logging.Logger("XeroAuth")
 
-_token: dict | None = None
 _token_actualizacion = _entorno.TOKEN_ACTUALIZACION_XERO.get_secret_value()
+
+_cliente: OAuth2Client | None = None
 
 async def _iniciar_sesion() -> None:
     if _token_actualizacion and _entorno.ID_TENANT_XERO:
@@ -104,58 +120,51 @@ def _al_actualizar_token(token: dict, refresh_token=None, access_token=None):
     para obtener más información"""
     _logger.info("Actualizando token de acceso...")
     global _token_actualizacion
-    global _token
     
     token_actualizacion_nuevo: str = token.get("refresh_token") # type: ignore
     logging.info(f"Estableciendo TOKEN_ACTUALIZACION_XERO a {token_actualizacion_nuevo}")
     set_key(".env", "TOKEN_ACTUALIZACION_XERO", token_actualizacion_nuevo)
     _token_actualizacion = token_actualizacion_nuevo
 
-    _token = token
+def _adjuntar_headers(url, headers, body):
+    global _entorno
+    headers["Accept"] = "application/json"
+    headers["Xero-tenant-id"] = _entorno.ID_TENANT_XERO
+    return url, headers, body
 
 def crear_cliente() -> OAuth2Client:
     """Crea un
     [OAuth2Client](https://docs.authlib.org/en/stable/oauth2/client/http/api.html#httpx-oauth-2-0)
-    correctamente configurado para su uso con Xero y HTTPX"""
+    correctamente configurado para su uso con Xero y HTTPX.
+    En la mayoría de los casos, se puede reutilizar el mismo cliente para varias solicitudes. Por ende,
+    se recomienda usar [obtener_cliente()](auth.obtener_cliente) a menos que haya una razón específica
+    para usar varios clientes"""
+    global _token_actualizacion
+    if not _token_actualizacion:
+        e = TypeError("El token de actualización está vacío, por lo que no se puede interactuar con la API de Xero. Ejecuta \"python -m servidor.configurar\" para iniciar sesión en Xero y obtener el token.")
+        _logger.critical(e)
+
     cliente = OAuth2Client(
         client_id=_entorno.ID_CLIENTE_XERO.get_secret_value(),
         client_secret=_entorno.SECRETO_CLIENTE_XERO.get_secret_value(),
         token_endpoint_auth_method="client_secret_post",
         update_token=_al_actualizar_token
     )
+    cliente.register_compliance_hook("protected_request", _adjuntar_headers)
+    cliente.refresh_token("https://login.xero.com/identity/connect/token", refresh_token=_token_actualizacion)
+
     return cliente
 
-def obtener_token() -> dict[str, Any]:
-    """Devuelve un diccionario de Python con todos los datos del token. Las llaves disponibles
-    son las siguientes:
-    ```
-    {
-        \"id_token\": \"Todos los datos del token de identificación en base64\",
-        \"access_token\": \"Todos los datos del token de acceso en base64. Este es el que se usa para acceder a las APIs\",
-        \"expires_in\": 1800, # El tiempo en el que expirará el token de acceso. Son 1800 segundos, lo que corresponde a 30 minutos
-        \"token_type\": \"Bearer\", # El tipo de token. Para Xero, este debería de ser "Bearer"
-        \"refresh_token\": \"El token de actualización, que es válido por más tiempo que el token de acceso. Se usa para obtener nuevos tokens de acceso\",
-        \"scope\": \"openid profile email accounting.invoices.read offline_access\", # El scope que se solicitó inicialmente al iniciar sesión
-        \"expires_at\": 1781710252 # La fecha cuándo el token de acceso expira
-    }
-    ```"""
-    global _token
-    global _token_actualizacion
-    if _token is not None:
-        return _token
+def obtener_cliente() -> OAuth2Client:
+    """Obtiene un cliente compartido que puede ser utilizado en todo el programa. Este es el enfoque
+    recomendado para la mayoría de situaciones, a menos de que se requieran clientes distintos por
+    alguna razón en concreto"""
+    global _cliente
+    if _cliente is None:
+        _cliente = crear_cliente()
+    return _cliente
 
-    if not _token_actualizacion:
-        e = TypeError("El token de actualización está vacío, por lo que no se puede interactuar con la API de Xero. Ejecuta \"python -m servidor.configurar\" para iniciar sesión en Xero y obtener el token.")
-        _logger.critical(e)
-
-    xero = crear_cliente()
-    xero.refresh_token("https://login.xero.com/identity/connect/token", refresh_token=_token_actualizacion)
-
-    # OAuth2Client sí tiene un método .close(), pero no está siendo detectado por alguna razón
-    xero.close() # type: ignore
-
-    return _token # type: ignore
 
 if __name__ == "__main__":
     iniciar_sesion()
-    print(obtener_token())
+    print(crear_cliente().token)

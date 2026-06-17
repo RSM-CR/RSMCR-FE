@@ -8,7 +8,6 @@ from servidor.secretos import obtener_entorno
 from dotenv import set_key
 import json
 import logging
-import os
 
 _entorno = obtener_entorno()
 _logger = logging.Logger("XeroAuth")
@@ -32,8 +31,8 @@ async def _iniciar_sesion():
     oauth = OAuth()
     xero: StarletteOAuth2App = oauth.register(
         name="xero",
-        client_id=os.getenv("XERO_CLIENT_ID"),
-        client_secret=os.getenv("XERO_CLIENT_SECRET"),
+        client_id=id_cliente,
+        client_secret=secreto_cliente,
         access_token_url="https://login.xero.com/identity/connect/token",
         access_token_params=None,
         authorize_url="https://login.xero.com/identity/connect/authorize",

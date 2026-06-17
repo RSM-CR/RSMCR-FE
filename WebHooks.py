@@ -18,10 +18,10 @@ WEBHOOK_KEY = os.getenv("XERO_WEBHOOK_SECRET")
 if not WEBHOOK_KEY:
     raise RuntimeError("XERO_WEBHOOK_SECRET no está configurado")
 
-@app.get("/xero/webhooks")
+@app.post("/xero/webhooks")
 async def xero_webhooks(request: Request, background_tasks: BackgroundTasks):
     body = await request.body()
-    signature = request.headers.get("X-Xero-Signature", "")
+    signature = request.headers.get("x-xero-signature", "")
 
     computed_signature = base64.b64encode(
         hmac.new(WEBHOOK_KEY.encode(), body, hashlib.sha256).digest()
@@ -29,15 +29,19 @@ async def xero_webhooks(request: Request, background_tasks: BackgroundTasks):
 
     if not hmac.compare_digest(signature, computed_signature):
         logger.error("Firma de webhook inválida")
+        logger.error("Received: %s", signature)
+        logger.error("Computed: %s", computed_signature)
+        logger.error("Body: %s", body.decode("utf-8"))
         return Response(status_code=401)
 
     payload = json.loads(body)
     background_tasks.add_task(process_webhook_events, payload)
+
     return Response(status_code=200)
 
-if __name__ == "__main__":
-    import uvicorn
-    from servidor.secretos import obtener_entorno
+# if __name__ == "__main__":
+#     import uvicorn
+#     from servidor.secretos import obtener_entorno
 
-    entorno = obtener_entorno()
-    uvicorn.run('WebHooks:app', host="127.0.0.1", port=int(entorno.PUERTO), reload=True, log_level="info")
+#     entorno = obtener_entorno()
+#     uvicorn.run('WebHooks:app', host="127.0.0.1", port=int(entorno.PUERTO), reload=True, log_level="info")

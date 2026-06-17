@@ -11,5 +11,6 @@
 :maxdepth: 1
 
 intro
+pasos
 apidocs/index
 ```

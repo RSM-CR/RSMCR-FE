@@ -11,6 +11,7 @@ async def fetch_xero_resource(resource_url: str) -> dict | None:
     try:
         cliente_temp = crear_cliente()
         token = cliente_temp.token
+        cliente_temp.close()  # type: ignore
         tenant_id = _entorno.ID_TENANT_XERO
 
         async with httpx.AsyncClient() as client:

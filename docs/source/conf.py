@@ -19,19 +19,25 @@ extensions = ['myst_parser', 'autodoc2']
 templates_path = ['_templates']
 exclude_patterns = ['../../docs/*']
 
-myst_enable_extensions = ['fieldlist', 'alert']
+myst_enable_extensions = ['fieldlist', 'alert', 'colon_fence']
 
 language = 'es'
 
 
 # -- Autodoc2 configuration ---------------------------------------------------
 # https://sphinx-autodoc2.readthedocs.io/en/latest/config.html
+autodoc2_class_docstring = "both"
+# Lista de archivos a documentar
 autodoc2_packages = [
     "../../abstracciones/destino.py",
     "../../abstracciones/fuente.py",
+    "../../xero/auth.py",
+    "../../servidor/configurar.py",
+    "../../servidor/secretos.py"
     "../../Capa.py",
     "../../factura.py"
 ]
+
 # Procesa todo como Markdown en vez de como .rst
 autodoc2_docstring_parser_regexes = [
     (r".*", "myst"),

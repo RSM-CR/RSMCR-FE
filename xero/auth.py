@@ -18,7 +18,7 @@ import asyncio
 from secrets import token_hex
 from fastapi import FastAPI, Request, BackgroundTasks
 from authlib.integrations.starlette_client import OAuth, StarletteOAuth2App
-from authlib.integrations.httpx_client import OAuth2Client
+from authlib.integrations.httpx_client import AsyncOAuth2Client
 from starlette.middleware.sessions import SessionMiddleware
 from servidor.secretos import obtener_entorno
 from dotenv import set_key
@@ -31,7 +31,7 @@ _logger = logging.Logger("XeroAuth")
 
 _token_actualizacion = _entorno.TOKEN_ACTUALIZACION_XERO.get_secret_value()
 
-_cliente: OAuth2Client | None = None
+_cliente: AsyncOAuth2Client | None = None
 
 async def _iniciar_sesion() -> None:
     if _token_actualizacion and _entorno.ID_TENANT_XERO:
@@ -111,7 +111,7 @@ def iniciar_sesion() -> None:
     automática."""
     asyncio.run(_iniciar_sesion())
 
-def _al_actualizar_token(token: dict, refresh_token=None, access_token=None):
+async def _al_actualizar_token(token: dict, refresh_token=None, access_token=None):
     """Callback que se ejecuta cada vez que un token se actualiza tanto de forma manual como
     automática. Esta función está diseñada para ser pasada al constructor de
     [OAuth2Client](https://docs.authlib.org/en/stable/oauth2/client/http/api.html#httpx-oauth-2-0). Revisa
@@ -132,7 +132,7 @@ def _adjuntar_headers(url, headers, body):
     headers["Xero-tenant-id"] = _entorno.ID_TENANT_XERO
     return url, headers, body
 
-def crear_cliente() -> OAuth2Client:
+async def crear_cliente() -> AsyncOAuth2Client:
     """Crea un
     [OAuth2Client](https://docs.authlib.org/en/stable/oauth2/client/http/api.html#httpx-oauth-2-0)
     correctamente configurado para su uso con Xero y HTTPX.
@@ -144,27 +144,27 @@ def crear_cliente() -> OAuth2Client:
         e = TypeError("El token de actualización está vacío, por lo que no se puede interactuar con la API de Xero. Ejecuta \"python -m servidor.configurar\" para iniciar sesión en Xero y obtener el token.")
         _logger.critical(e)
 
-    cliente = OAuth2Client(
+    cliente = AsyncOAuth2Client(
         client_id=_entorno.ID_CLIENTE_XERO.get_secret_value(),
         client_secret=_entorno.SECRETO_CLIENTE_XERO.get_secret_value(),
         token_endpoint_auth_method="client_secret_post",
         update_token=_al_actualizar_token
     )
     cliente.register_compliance_hook("protected_request", _adjuntar_headers)
-    cliente.refresh_token("https://login.xero.com/identity/connect/token", refresh_token=_token_actualizacion)
+    await cliente.refresh_token("https://login.xero.com/identity/connect/token", refresh_token=_token_actualizacion)
 
     return cliente
 
-def obtener_cliente() -> OAuth2Client:
+async def obtener_cliente() -> AsyncOAuth2Client:
     """Obtiene un cliente compartido que puede ser utilizado en todo el programa. Este es el enfoque
     recomendado para la mayoría de situaciones, a menos de que se requieran clientes distintos por
     alguna razón en concreto"""
     global _cliente
     if _cliente is None:
-        _cliente = crear_cliente()
+        _cliente = await crear_cliente()
     return _cliente
 
 
 if __name__ == "__main__":
     iniciar_sesion()
-    print(crear_cliente().token)
+    print(asyncio.run(crear_cliente()).token)

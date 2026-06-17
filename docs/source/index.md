@@ -10,6 +10,6 @@
 ```{toctree}
 :maxdepth: 1
 
-explicación
+Explicacion
 apidocs/index
 ```

@@ -1,7 +1,5 @@
 """Se encarga de almacenar, cargar y validar los datos privados de la aplicación de un
 archivo .env"""
-from typing import Any
-
 from pydantic import SecretStr, Field
 from pydantic_settings import BaseSettings, SettingsConfigDict
 from pydantic_core import PydanticUndefined

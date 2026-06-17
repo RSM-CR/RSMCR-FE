@@ -34,11 +34,10 @@ autodoc2_packages = [
     "../../xero/auth.py",
     "../../servidor/configurar.py",
     "../../servidor/secretos.py"
+    "../../Capa.py",
+    "../../factura.py"
 ]
-# Oculta elementos específicos
-autodoc2_hidden_regexes = [
-    "secretos._Entorno.__init__"
-]
+
 # Procesa todo como Markdown en vez de como .rst
 autodoc2_docstring_parser_regexes = [
     (r".*", "myst"),

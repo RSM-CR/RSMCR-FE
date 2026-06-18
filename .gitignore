@@ -54,17 +54,15 @@ coverage/
 /docs/source/apidocs/
 
 # Svelte
-interfaz/logs
-*.log
-interfaz/npm-debug.log*
-interfaz/yarn-debug.log*
-interfaz/yarn-error.log*
-interfaz/pnpm-debug.log*
-interfaz/lerna-debug.log*
-
-# Node
 interfaz/node_modules
-interfaz/dist
-interfaz/dist-ssr
-*.local
+interfaz/.output
+interfaz/.vercel
+interfaz/.netlify
+interfaz/.wrangler
+interfaz/.svelte-kit
+interfaz/build
+
+# Vite
+interfaz/vite.config.js.timestamp-*
+interfaz/vite.config.ts.timestamp-*
 

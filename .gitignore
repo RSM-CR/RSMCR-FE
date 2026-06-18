@@ -54,17 +54,17 @@ coverage/
 /docs/source/apidocs/
 
 # Svelte
-logs
+interfaz/logs
 *.log
-npm-debug.log*
-yarn-debug.log*
-yarn-error.log*
-pnpm-debug.log*
-lerna-debug.log*
+interfaz/npm-debug.log*
+interfaz/yarn-debug.log*
+interfaz/yarn-error.log*
+interfaz/pnpm-debug.log*
+interfaz/lerna-debug.log*
 
 # Node
-node_modules
+interfaz/node_modules
 interfaz/dist
-dist-ssr
+interfaz/dist-ssr
 *.local
 

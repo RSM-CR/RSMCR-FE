@@ -1,33 +1,141 @@
 {
+  "Id": "c3aafb4e-6abe-462e-bf54-196fc072c9fc",
+  "Status": "OK",
+  "ProviderName": "API Explorer",
+  "DateTimeUTC": "\/Date(1781535552170)\/",
   "Invoices": [
     {
       "Type": "ACCREC",
+      "InvoiceID": "f0065405-e5ad-4c34-ad5b-645e72813c03",
+      "InvoiceNumber": "INV-0019",
+      "Reference": "Monthly Support",
+      "Payments": [
+        {
+          "PaymentID": "706f68c5-46b2-43d8-9aa8-41d1cc2a317f",
+          "Date": "\/Date(1779408000000+0000)\/",
+          "Amount": 541.25,
+          "Reference": "",
+          "CurrencyRate": 1.0000000000,
+          "HasAccount": false,
+          "HasValidationErrors": false
+        }
+      ],
+      "Prepayments": [],
+      "Overpayments": [],
+      "AmountDue": 0.00,
+      "AmountPaid": 541.25,
+      "SentToContact": false,
+      "IsDiscounted": false,
+      "HasAttachments": false,
+      "HasErrors": false,
+      "Attachments": [],
+      "InvoicePaymentServices": [],
       "Contact": {
-        "Name": "Cliente Ejemplo S.A."
+        "ContactID": "021b18f8-b62f-4d8a-889e-71fd5427892a",
+        "ContactStatus": "ACTIVE",
+        "Name": "Young Bros Transport",
+        "LegalID": "123456789",
+        "EmailAddress": "rog@ybt.co",
+        "Addresses": [
+          {
+            "AddressType": "STREET",
+            "City": "",
+            "Region": "",
+            "Province": "Heredia",
+            "Canton": "Central",
+            "District": "Mercedes",
+            "OtherAddressDetails": "Residencial Amaranto, casa 67, última entrada a la derecha",
+            "PostalCode": "12",
+            "Country": "6"
+          },
+          {
+            "AddressType": "POBOX",
+            "AddressLine1": "P O Box 5678\r\n",
+            "AddressLine2": "Central Mailing Centre\r\n",
+            "AddressLine3": "",
+            "AddressLine4": "",
+            "City": "Oaktown",
+            "Region": "",
+            "PostalCode": "1235",
+            "Country": ""
+          }
+        ],
+        "Phones": [
+          {
+            "PhoneType": "MOBILE",
+            "PhoneNumber": "",
+            "PhoneAreaCode": "",
+            "PhoneCountryCode": ""
+          },
+          {
+            "PhoneType": "DEFAULT",
+            "PhoneNumber": "3435678",
+            "PhoneAreaCode": "01",
+            "PhoneCountryCode": ""
+          },
+          {
+            "PhoneType": "FAX",
+            "PhoneNumber": "",
+            "PhoneAreaCode": "",
+            "PhoneCountryCode": ""
+          },
+          {
+            "PhoneType": "DDI",
+            "PhoneNumber": "",
+            "PhoneAreaCode": "",
+            "PhoneCountryCode": ""
+          }
+        ],
+        "UpdatedDateUTC": "\/Date(1781287421917+0000)\/",
+        "ContactGroups": [
+          {
+            "ContactGroupID": "50e845c3-464e-4a6d-8951-8794317c7893",
+            "Name": "Training customers",
+            "Status": "ACTIVE",
+            "Contacts": [],
+            "HasValidationErrors": false
+          }
+        ],
+        "IsSupplier": true,
+        "IsCustomer": true,
+        "SalesTrackingCategories": [],
+        "PurchasesTrackingCategories": [],
+        "ContactPersons": [],
+        "HasValidationErrors": false
       },
-      "Date": "2026-06-12",
-      "DueDate": "2026-07-12",
-      "InvoiceNumber": "FAC-2026-001",
-      "Reference": "Proyecto Desarrollo API",
-      "Status": "AUTHORISED",
-      "CurrencyCode": "USD",
+      "DateString": "2026-05-12T00:00:00",
+      "Date": "\/Date(1778544000000+0000)\/",
+      "DueDateString": "2026-05-22T00:00:00",
+      "DueDate": "\/Date(1779408000000+0000)\/",
+      "Status": "PAID",
       "LineAmountTypes": "Exclusive",
       "LineItems": [
         {
-          "Description": "Desarrollo Backend",
-          "Quantity": 40,
-          "UnitAmount": 50.00,
+          "ItemCode": "Support-M",
+          "Description": "Desktop/network support via email & phone.\r\nPer month fixed fee for minimum 20 hours/month.",
+          "UnitAmount": 500.00,
+          "TaxType": "OUTPUT",
+          "TaxAmount": 41.25,
+          "LineAmount": 500.00,
           "AccountCode": "200",
-          "TaxType": "OUTPUT"
-        },
-        {
-          "Description": "Consultoría Técnica",
-          "Quantity": 10,
-          "UnitAmount": 80.00,
-          "AccountCode": "200",
-          "TaxType": "OUTPUT"
+          "Item": {
+            "ItemID": "e82eaa5c-3c5f-47ed-b2a9-7de266ab1eaf",
+            "Name": "Desktop/network support via email & phone",
+            "Code": "Support-M"
+          },
+          "Tracking": [],
+          "Quantity": 1.0000,
+          "LineItemID": "e34817ce-f4f5-48e5-90ba-c1521bfe7783",
+          "AccountID": "d1ebb97b-d207-4ccb-9ab6-8a466a8b4d39",
+          "ValidationErrors": []
         }
-      ]
+      ],
+      "SubTotal": 500.00,
+      "TotalTax": 41.25,
+      "Total": 541.25,
+      "UpdatedDateUTC": "\/Date(1385071949883+0000)\/",
+      "CurrencyCode": "USD",
+      "FullyPaidOnDate": "\/Date(1779408000000+0000)\/"
     }
   ]
 }

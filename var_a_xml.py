@@ -8,7 +8,7 @@ if len(lista_facturas) > 0: #esto hace que el bloque de código se ejecute si ha
 
     variables = lista_facturas[0]  #hace que en la lista se cuente desde el primer objeto, el 0
     
-    python = ["tipo", "cliente", "estado", "moneda", "lineas"] #la lista de lo que se extrae de las variables de Datos Xero
+    python = ["nombre", "cedula", "correo", "telefono", "provincia", "canton", "distrito", "otras_senas", "codigo", "cantidad", "descripcion", "precio", "total"] #la lista de lo que se extrae de las variables de Datos Xero
 
     root = ET.Element("traducido") #le da el nombre a la sección donde van a estar los datos
     for varpy in python: #el for hace que se repita paso por paso hasta tener todos los objetos requeridos

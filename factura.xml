@@ -1,8 +1,0 @@
-<?xml version='1.0' encoding='utf-8'?>
-<traducido>
-   <tipo>ACCREC</tipo>
-   <cliente>Cliente Ejemplo S.A.</cliente>
-   <estado>AUTHORISED</estado>
-   <moneda>USD</moneda>
-   <lineas>[{'Description': 'Desarrollo Backend', 'Quantity': 40, 'UnitAmount': 50.0, 'AccountCode': '200', 'TaxType': 'OUTPUT'}, {'Description': 'Consultoría Técnica', 'Quantity': 10, 'UnitAmount': 80.0, 'AccountCode': '200', 'TaxType': 'OUTPUT'}]</lineas>
-</traducido>

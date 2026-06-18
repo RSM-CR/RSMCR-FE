@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Documentos>
+    <FacturaElectronicaXML>
+
+        <Encabezado>
+
+            <TipoDoc>1</TipoDoc>
+            <CondicionVenta>1</CondicionVenta>
+            <Sucursal>1</Sucursal>
+            <Terminal>1</Terminal>
+            <Moneda>1</Moneda>
+            <SituacionEnvio>1</SituacionEnvio>
+            <CodigoActividad>6202.0</CodigoActividad>
+            <MedioPagos>
+                <TipoMedioPago>1</TipoMedioPago>
+            </MedioPagos>
+            <Receptor>
+                <TipoIdentificacion>2</TipoIdentificacion>
+                <NombreReceptor>Probando</NombreReceptor>
+                <CorreoElectronicoReceptor>correo@example.com</CorreoElectronicoReceptor>
+                <IdentificacionReceptor>303560398</IdentificacionReceptor>
+            </Receptor>
+            <Emisor>
+                <NumCuenta>5473</NumCuenta>
+            </Emisor>
+        </Encabezado>
+
+        <Detalle>
+
+        <Linea>
+
+            <Cantidad>1000.00</Cantidad>
+            <UnidadMedida>20</UnidadMedida>
+            <DetalleMerc>Servicio de desarrollo</DetalleMerc>
+
+            <PrecioUnitario>100.00</PrecioUnitario>
+
+            <MontoTotal>100000.00</MontoTotal>
+
+            <SubTotal>100000.00</SubTotal>
+
+            <Codigo>8231000000000</Codigo>
+
+            <Impuestos>
+                <Impuesto>
+                    <CodigoImpuesto>1</CodigoImpuesto>
+                    <CodigoTarifa>4</CodigoTarifa>
+                    <PorcentajeImpuesto>13.00</PorcentajeImpuesto>
+                    <MontoImpuesto>13000.00</MontoImpuesto>
+                </Impuesto>
+            </Impuestos>
+
+            <MontoTotalLinea>113000.00</MontoTotalLinea>
+
+        </Linea>
+
+        </Detalle>
+
+        <Totales>
+            <TotalServGravados>100000.00</TotalServGravados>
+            <TotalServExentos>0.00</TotalServExentos>
+            <TotalServExonerados>0.00</TotalServExonerados>
+
+            <TotalMercanciasGravadas>0.00</TotalMercanciasGravadas>
+            <TotalMercanciasExentas>0.00</TotalMercanciasExentas>
+            <TotalMercanciasExoneradas>0.00</TotalMercanciasExoneradas>
+
+            <TotalServNoSujetos>0.00</TotalServNoSujetos>
+            <TotalMercanciaNoSujeta>0.00</TotalMercanciaNoSujeta>
+            <TotalNoSujeto>0.00</TotalNoSujeto>
+
+            <TotalGravado>100000.00</TotalGravado>
+            <TotalExento>0.00</TotalExento>
+            <TotalExonerado>0.00</TotalExonerado>
+
+            <TotalVenta>100000.00</TotalVenta>
+
+            <TotalImpuestoAsumidoEmisorFabrica>0.00</TotalImpuestoAsumidoEmisorFabrica>
+
+            <TotalDescuentos>0.00</TotalDescuentos>
+
+            <TotalVentaNeta>100000.00</TotalVentaNeta>
+
+            <TotalImpuesto>13000.00</TotalImpuesto>
+
+            <TotalComprobante>113000.00</TotalComprobante>
+        </Totales>
+        <Extra>
+            <EsVersion4_4>true</EsVersion4_4>
+        </Extra>
+
+    </FacturaElectronicaXML>
+</Documentos>

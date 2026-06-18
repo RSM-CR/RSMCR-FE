@@ -45,8 +45,8 @@
                 <Impuesto>
                     <CodigoImpuesto>1</CodigoImpuesto>
                     <CodigoTarifa>4</CodigoTarifa>
-                    <PorcentajeImpuesto>13.00</PorcentajeImpuesto>
-                    <MontoImpuesto>13000.00</MontoImpuesto>
+                    <PorcentajeImpuesto>4.00</PorcentajeImpuesto>
+                    <MontoImpuesto>4000</MontoImpuesto>
                 </Impuesto>
             </Impuestos>
 
@@ -81,9 +81,9 @@
 
             <TotalVentaNeta>100000.00</TotalVentaNeta>
 
-            <TotalImpuesto>13000.00</TotalImpuesto>
+            <TotalImpuesto>4000.00</TotalImpuesto>
 
-            <TotalComprobante>113000.00</TotalComprobante>
+            <TotalComprobante>104000.00</TotalComprobante>
         </Totales>
         <Extra>
             <EsVersion4_4>true</EsVersion4_4>

@@ -30,22 +30,22 @@ class _Entorno(BaseSettings):
     se puede obtener en
     [https://developer.xero.com/app/manage](https://developer.xero.com/app/manage) dentro de
     la pestaña de configuración."""
-    USUARIO_GTI: SecretStr = Field(default=...)
-    """El nombre de usuario de GTI. Suele ser una cédula jurídica."""
-    CONTRASENA_GTI: SecretStr = Field(default=...)
-    """La contraseña utilizada para iniciar sesion en GTI."""
+    XERO_WEBHOOK_SECRET: SecretStr = Field(default=...)
+    """El secreto que genera Xero para recibir notificaciones del Webhook. Después de crear
+    la aplicación, se puede obtener en
+    [https://developer.xero.com/app/manage](https://developer.xero.com/app/manage)."""
     TOKEN_ACTUALIZACION_XERO: SecretStr = SecretStr("")
     """El token de actualización de Xero para mantener acceso a su API. Se recomienda ver la
     documentación del módulo [auth](auth) para obtener más información."""
     ID_TENANT_XERO: str = ""
     """El ID de la organización de Xero. Se recomienda ver la documentación del módulo
     [auth](auth) para obtener más información."""
+    USUARIO_GTI: SecretStr = Field(default=...)
+    """El nombre de usuario de GTI. Suele ser una cédula jurídica."""
+    CONTRASENA_GTI: SecretStr = Field(default=...)
+    """La contraseña utilizada para iniciar sesion en GTI."""
     PUERTO: int = 8000
     """El puerto de red en el que se va a abrir el servidor. Su valor por defecto es de 8000."""
-    XERO_WEBHOOK_SECRET: SecretStr = Field(default=...)
-    """El secreto que genera Xero para recibir notificaciones del Webhook. Después de crear
-    la aplicación, se puede obtener en
-    [https://developer.xero.com/app/manage](https://developer.xero.com/app/manage)."""
 
 def crear_entorno() -> None:
     """Crea un archivo .env en base a los datos suministrados por el usuario. También, da

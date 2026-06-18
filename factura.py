@@ -1,72 +1,29 @@
-import xml.etree.ElementTree as ET
 import json
 
 class Factura:
     """[class Factura](factura.Factura) lo que hace es almacenar los datos de la factura de forma temporal, para poderlos manejar mejor y de una forma más segura."""
     def __init__(self):
-        #XML
-        self.nombre: str | None = None
-        self.numero: str | None = None
-        self.correo: str | None = None
-        self.telefono: str | None = None
-        self.provincia: str | None = None
-        self.canton: str | None = None
-        self.distrito: str | None = None
-        self.otras_senas: str | None = None
-        self.codigo: str | None = None
-        self.cantidad: str | None = None
-        self.unidad_medida: str | None = None
-        self.detalle: str | None = None
-        self.precio_unitario: str | None = None
-        self.monto_total: str | None = None
-        #Xero
-        self.tipo: str | None = None
-        self.cliente: str | None = None
-        self.estado: str | None = None
-        self.moneda: str | None = None
-        self.lineas = []
-        
-        #falta el impuesto
-
-class DatosGTI:
-    """Dentro de [la clase DatosGTI](factura.DatosGTI), se extraen los datos de un xml y los convierte a variables."""
-    @staticmethod
-    def obtener_datos(archivo_xml = "Prueba.xml")-> Factura:
-        """Esta función llama a el archivo xml. En este caso, se llama [Prueba.xml](obtener_datos)."""
-        factura = Factura()
-        tree = ET.parse(archivo_xml)
-        root = tree.getroot()
-
-        info = []
-        receptor = root.find(".//{*}Receptor")
-        if receptor is not None:
-            factura.nombre = receptor.findtext(".//{*}Nombre")
-            factura.numero = receptor.findtext(".//{*}Numero")
-            factura.correo = receptor.findtext(".//{*}CorreoElectronico")
-            factura.telefono = receptor.findtext(".//{*}NumTelefono")
-            factura.provincia = receptor.findtext(".//{*}Provincia")
-            factura.canton = receptor.findtext(".//{*}Canton")
-            factura.distrito = receptor.findtext(".//{*}Distrito")
-            factura.otras_senas = receptor.findtext(".//{*}OtrasSenas")
-            #falta el impuesto
+        self.nombre = None
+        self.cedula = None
+        self.correo = None
+        self.telefono = None
+        self.provincia = None
+        self.canton = None
+        self.distrito = None
+        self.otras_senas = None
+        self.codigo = None
+        self.cantidad = None
+        self.descripcion = None
+        self.precio = None
+        self.impuesto = None
+        self.total = None
 
 
-        for linea_xml in root.findall(".//{*}LineaDetalle"):
-            linea_obj = Factura()
-            linea_obj.codigo = linea_xml.findtext(".//{*}Codigo")
-            linea_obj.cantidad = linea_xml.findtext(".//{*}Cantidad")
-            linea_obj.unidad_medida = linea_xml.findtext(".//{*}UnidadMedida")
-            linea_obj.detalle = linea_xml.findtext(".//{*}Detalle")
-            linea_obj.precio_unitario = linea_xml.findtext(".//{*}PrecioUnitario")
-            linea_obj.monto_total = linea_xml.findtext(".//{*}MontoTotal")
-
-            factura.cosas.append(linea_obj)
-        return factura
     
 
 
 class DatosXero:
-    """Tiene la misma función que [DatosGTI](DatosGTI), pero en este caso, se extraen los datos de Xero."""
+    """ Se extraen los datos de Xero."""
     @staticmethod
     def obtener_datos(archivo_json: str) -> list[Factura]:
         """Esto hace que mientras exista el json se pueda leer y codificar la información para convertirla luego a una variable."""
@@ -76,12 +33,52 @@ class DatosXero:
         for invoice in data["Invoices"]:
             factura = Factura()
 
-            factura.tipo = invoice["Type"]
-            factura.cliente = invoice["Contact"]["Name"]
-            factura.numero = invoice["InvoiceNumber"]
-            factura.estado = invoice["Status"]
-            factura.moneda = invoice["CurrencyCode"]
-            factura.lineas = invoice["LineItems"]
+        with open(archivo_json, "r", encoding="utf-8") as archivo:
+            data = json.load(archivo)
 
-            facturas.append(factura)
+        facturas = []
+
+        for invoice in data.get("Invoices", []):
+
+            contacto = invoice.get("Contact", {})
+
+            # Buscar dirección STREET
+            direccion = {}
+            for addr in contacto.get("Addresses", []):
+                if addr.get("AddressType") == "STREET":
+                    direccion = addr
+                    break
+
+            # Buscar teléfono DEFAULT
+            telefono = {}
+            for tel in contacto.get("Phones", []):
+                if tel.get("PhoneType") == "DEFAULT":
+                    telefono = tel
+                    break
+
+            # Recorrer todas las líneas de la factura
+            for linea in invoice.get("LineItems", []):
+
+                factura = Factura()
+
+                factura.nombre = contacto.get("Name")
+                factura.cedula = contacto.get("LegalID")
+                factura.correo = contacto.get("EmailAddress")
+                factura.telefono = telefono.get("PhoneNumber")
+
+                factura.provincia = direccion.get("Province")
+                factura.canton = direccion.get("Canton")
+                factura.distrito = direccion.get("District")
+                factura.otras_senas = direccion.get("OtherAddressDetails")
+
+                factura.codigo = linea.get("ItemCode")
+                factura.cantidad = linea.get("Quantity")
+                factura.descripcion = linea.get("Description")
+                factura.precio = linea.get("UnitAmount")
+                factura.impuesto = linea.get("TaxAmount")
+
+                factura.total = invoice.get("Total")
+
+                facturas.append(factura)
+
         return facturas

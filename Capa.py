@@ -1,7 +1,10 @@
 """
 Capa.py era un boceto para la traducción de json a objetos de python, pero ahora se usa una función de factura.py
 > [!CAUTION]
-> Los datos del json de Xero no incluyen toda la información disponible en el .xml de GTI."""
+> Los datos del json de Xero no incluyen toda la información disponible en el .xml de GTI.
+```{deprecated} v0.1
+Este módulo está en desuso y puede ser eliminado en versiones futuras. Usa el módulo [factura](factura) en su lugar.
+```"""
 import json
 
 

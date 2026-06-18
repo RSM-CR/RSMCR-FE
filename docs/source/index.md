@@ -11,6 +11,7 @@
 :maxdepth: 1
 
 intro
+instalar
 pasos
 apidocs/index
 ```

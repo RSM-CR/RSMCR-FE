@@ -1,6 +1,7 @@
 import json
 
 class Factura:
+    """[class Factura](factura.Factura) lo que hace es almacenar los datos de la factura de forma temporal, para poderlos manejar mejor y de una forma más segura."""
     def __init__(self):
         self.nombre = None
         self.cedula = None
@@ -18,10 +19,19 @@ class Factura:
         self.total = None
 
 
-class DatosXero:
+    
 
+
+class DatosXero:
+    """ Se extraen los datos de Xero."""
     @staticmethod
     def obtener_datos(archivo_json: str) -> list[Factura]:
+        """Esto hace que mientras exista el json se pueda leer y codificar la información para convertirla luego a una variable."""
+        with open("prueba.json", "r", encoding="utf-8") as archivo_json:
+            data = json.load(archivo_json)
+        facturas = []            
+        for invoice in data["Invoices"]:
+            factura = Factura()
 
         with open(archivo_json, "r", encoding="utf-8") as archivo:
             data = json.load(archivo)

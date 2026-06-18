@@ -1,8 +1,9 @@
 import xml.etree.ElementTree as ET
 from factura import DatosXero
 
-#cargar los datos
+
 lista_facturas = DatosXero.obtener_datos("prueba.json")
+"""Carga los datos de Xero convertidos en variables y los transforma en un xml para poder ser leídos por GTI."""
 
 if len(lista_facturas) > 0: #esto hace que el bloque de código se ejecute si hay cierta cantidad de elementos específica
 

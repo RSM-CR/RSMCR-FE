@@ -52,8 +52,8 @@ coverage/
 /interfaz/.vercel
 /interfaz/.netlify
 /interfaz/.wrangler
-/interfaz//.svelte-kit
-/interfaz//build
+/interfaz/.svelte-kit
+/interfaz/build
 
 # Vite
 /interfaz/vite.config.js.timestamp-*

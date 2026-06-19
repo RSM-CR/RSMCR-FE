@@ -1,0 +1,1 @@
+<p>Aquí va la vista simple</p>

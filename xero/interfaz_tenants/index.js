@@ -1,6 +1,6 @@
 async function getTenants() {
     try {
-        const response = await fetch('http://localhost:8000/getTenants');
+        const response = await fetch('http://localhost:8000/xero/tenants/get');
         if (!response.ok) throw new Error('Error al obtener tenants: ' + response.status);
         const data = await response.json();
         const tenantSelect = document.getElementById('tenantSelector');
@@ -16,30 +16,30 @@ async function getTenants() {
 }
 
 function selectTenants() {
-    const tenantid = document.getElementById('tenantSelector').value
-    if (tenantid) {
-        localStorage.setItem('tenantId', tenantid)
-        sendData({ tenantid })
-        alert('Tenant selecionado ' + tenantid)
+    const tenantId = document.getElementById('tenantSelector').value
+    if (tenantId) {
+        localStorage.setItem('tenantId', tenantId)
+        sendData(tenantId)
+        // alert('Tenant selecionado ' + tenantId)
     } else {
         alert('Por favor, seleciona un Tenant')
     }
 }
 
-async function sendData(data) {
+async function sendData(tenantId) {
     try {
-        const response = await fetch('http://localhost:8000/postTenants', {
+        const response = await fetch(`http://localhost:8000/xero/tenants/post/${tenantId}`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
             },
-            body: JSON.stringify(data)
         });
 
         if (!response.ok) throw new Error('Error: ' + response.status);
         
         const resutl = await response.json();
         console.log('Respuesta del Servidor', resutl);
+        window.location.replace("/apagar");
     } catch(error) {
         console.error('Error:', error);
     }

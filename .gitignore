@@ -51,7 +51,6 @@ coverage/
 /interfaz/yarn-debug.log*
 /interfaz/yarn-error.log*
 /interfaz/pnpm-debug.log*
-/interfaz/package-lock.json
 /interfaz/yarn.lock
 /interfaz/node_modules
 /interfaz/.output

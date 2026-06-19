@@ -33,7 +33,7 @@ autodoc2_packages = [
     "../../abstracciones/fuente.py",
     "../../xero/auth.py",
     "../../servidor/configurar.py",
-    "../../servidor/secretos.py"
+    "../../servidor/secretos.py",
     "../../Capa.py",
     "../../factura.py",
     "../../var_a_xml.py"

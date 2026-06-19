@@ -1,4 +1,8 @@
 from fastapi import WebSocket
+import logging
+
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
 
 class WebSocketProcessor():
         def __init__(self):
@@ -17,7 +21,8 @@ class WebSocketProcessor():
                 for connection in self.activated_connections:
                         try:
                                await connection.send_json()
-                        except Exception:
+                        except Exception as e:
+                                logger.error("Error durante el procesamiento del WebSocket: %s", e)
                                 disconnected.append(connection)
 
                 for connection in disconnected:

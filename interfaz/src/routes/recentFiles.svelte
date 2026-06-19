@@ -7,7 +7,7 @@
  
 <body>
  
-<h2>Lista Deslizante sin CSS</h2>
+<h2>Lista Deslizante</h2>
  
 <div style="width:300px; overflow-x:scroll; white-space:nowrap; border:1px solid black;">
     <div style="display:inline-block; width:150px; height:100px; background:#ddd; margin-right:10px;">

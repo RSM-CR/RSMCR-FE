@@ -9,15 +9,17 @@
 </script>
 
 <nav>
+<ul>
     {#each tabs as tab}
-        <ul>
+        <li>
             <a href={tab.ruta}>{tab.nombre}</a>
-        </ul>
+        </li>
     {/each}
+</ul>
 </nav>
 
 <style>
-    nav
+    ul
     {
         display: flex;
         gap: 16px;

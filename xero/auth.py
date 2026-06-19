@@ -16,9 +16,11 @@ muy bien documentado. Por ende, se incluye a continuación:
 Este consiste en un diccionario de Python con las llaves que se encuentran arriba."""
 import asyncio
 from secrets import token_hex
-from fastapi import FastAPI, Request, BackgroundTasks
+from fastapi import FastAPI, Request, BackgroundTasks, APIRouter, Response, status
+from fastapi.responses import JSONResponse, RedirectResponse
 from authlib.integrations.starlette_client import OAuth, StarletteOAuth2App
 from authlib.integrations.httpx_client import AsyncOAuth2Client
+from fastapi.staticfiles import StaticFiles
 from starlette.middleware.sessions import SessionMiddleware
 from servidor.secretos import obtener_entorno
 from dotenv import set_key
@@ -33,21 +35,34 @@ _token_actualizacion = _entorno.TOKEN_ACTUALIZACION_XERO.get_secret_value()
 
 _cliente: AsyncOAuth2Client | None = None
 
-async def _iniciar_sesion() -> None:
-    if _token_actualizacion and _entorno.ID_TENANT_XERO:
-        print("Parece que ya has iniciado sesión en Xero antes... ¿Deseas volvera iniciar sesión? s/N")
-        if (iniciar_sesion := input("> ").lower()) != "s" and iniciar_sesion != "y":
-            return
+def router_auth(redirigir_a: str) -> tuple[APIRouter, StarletteOAuth2App]:
+    """Crea un [`APIRouter`](https://fastapi.tiangolo.com/reference/apirouter/) con todos los
+    endpoints necesarios para manejar el inicio de sesión en Xero.
+    
+    :param str redirigir_a: Especifica el link al cual redirigir al usuario una vez la autenticación se complete con éxito.
+    :returns: Una tupla con un [`APIRouter`](https://fastapi.tiangolo.com/reference/apirouter/) y un
+    [`StarletteOAuth2App`](https://docs.authlib.org/en/stable/oauth2/client/web/starlette.html)"""
+    return _router_auth(redirigir_a)
 
-    app = FastAPI()
-    # No se ocupa guardar el secret_key porque la sesión es de un solo uso
-    app.add_middleware(SessionMiddleware, secret_key=token_hex(32))
+def _router_auth(redirigir_a: str, admin = False) -> tuple[APIRouter, StarletteOAuth2App]:
+    """Crea un [`APIRouter`](https://fastapi.tiangolo.com/reference/apirouter/) con todos los
+    endpoints necesarios para manejar el inicio de sesión en Xero.
+    
+    :param str redirigir_a: Especifica el link al cual redirigir al usuario una vez la autenticación se complete con éxito.
+    :param bool admin: Controla si se genera un nuevo token de actualización para `.env`. Esto solo debería ser `True` si se
+    trata del flujo de inicio de sesión inicial que sucede cuando se configura el servidor.
+    :returns: Una tupla con un [`APIRouter`](https://fastapi.tiangolo.com/reference/apirouter/) y un
+    [`StarletteOAuth2App`](https://docs.authlib.org/en/stable/oauth2/client/web/starlette.html)"""
+    router = APIRouter(prefix="/xero")
 
     id_cliente = _entorno.ID_CLIENTE_XERO.get_secret_value()
     secreto_cliente = _entorno.SECRETO_CLIENTE_XERO.get_secret_value()
 
+    token: dict | None = None
+
     oauth = OAuth()
-    xero: StarletteOAuth2App = oauth.register(
+    kwargs = {'scope': 'openid profile email offline_access accounting.invoices.read'} if admin else {'scope': 'openid profile email accounting.invoices.read'}
+    cliente: StarletteOAuth2App = oauth.register(
         name="xero",
         client_id=id_cliente,
         client_secret=secreto_cliente,
@@ -56,52 +71,80 @@ async def _iniciar_sesion() -> None:
         authorize_url="https://login.xero.com/identity/connect/authorize",
         server_metadata_url="https://identity.xero.com/.well-known/openid-configuration",
         api_base_url="https://api.xero.com/",
-        client_kwargs={'scope': 'openid profile email offline_access accounting.invoices.read'}
+        client_kwargs=kwargs
     )
 
-    @app.get("/xero/login")
+    @router.get("/login")
     async def login(request: Request):
         _logger.info("Iniciando sesión...")
         url_auth = request.url_for("auth")
-        return await xero.authorize_redirect(request, url_auth) # Esto devuelve el state pero authlib lo valida automáticamente
+        return await cliente.authorize_redirect(request, url_auth) # Esto devuelve el state pero authlib lo valida automáticamente
 
-    @app.get("/xero/auth")
-    async def auth(code: str, request: Request, tasks: BackgroundTasks):
-        global _token
-        global id_tenant
-
+    @router.get("/auth")
+    async def auth(code: str, request: Request):
         _logger.info("Autenticándose...")
+        token = await cliente.authorize_access_token(request)
 
-        _token = await xero.authorize_access_token(request)
+        if admin:
+            token_actualizacion: str = token.get("refresh_token") # type: ignore
+            _logger.info(f"Estableciendo TOKEN_ACTUALIZACION_XERO a {token_actualizacion}")
+            set_key(".env", "TOKEN_ACTUALIZACION_XERO", token_actualizacion)
 
-        tenants_disponibles = json.load(await xero.get("https://api.xero.com/connections", token=_token))
-        if len(tenants_disponibles) > 1:
-            _logger.warning("Hay varios tenants disponibles. Se escogió el primero disponible")
+        request.session["token"] = {"access_token": token.get("access_token")}
 
-        id_tenant = tenants_disponibles[0]["tenantId"]
-        logging.info(f"Estableciendo ID_TENANT_XERO a {id_tenant}")
-        set_key(".env", "ID_TENANT_XERO", id_tenant)
-
-        token_actualizacion: str = _token.get("refresh_token") # type: ignore
-        logging.info(f"Estableciendo TOKEN_ACTUALIZACION_XERO a {token_actualizacion}")
-        set_key(".env", "TOKEN_ACTUALIZACION_XERO", token_actualizacion)
-
-        tasks.add_task(apagar_servidor)
-
-        return "La autenticación fue exitosa."
+        return RedirectResponse(url=redirigir_a)
     
+    @router.get("/tenants/get")
+    async def obtener_tenants(request: Request) -> JSONResponse:
+        token = request.session.get("token")
+        if token is None:
+            return JSONResponse(content={"error": "No tienes autorización. Inicia sesión primero."}, status_code=status.HTTP_403_FORBIDDEN)
+
+        response = await cliente.get("https://api.xero.com/connections", token=token)
+
+        return response.json()
+    
+    return router, cliente
+
+async def _iniciar_sesion() -> None:
+    if _token_actualizacion and _entorno.ID_TENANT_XERO:
+        print("Parece que ya has iniciado sesión en Xero antes... ¿Deseas volvera iniciar sesión? s/N")
+        if (iniciar_sesion := input("> ").lower()) != "s" and iniciar_sesion != "y":
+            return
+
+    app = FastAPI()
+    # No se ocupa guardar el secret_key porque la sesión es de un solo uso
+    app.add_middleware(SessionMiddleware, secret_key=_entorno.LLAVE_SESIONES.get_secret_value())
+
+    app.mount("/xero/tenants/selector", StaticFiles(directory="./xero/interfaz_tenants", html=True))
+
+    router, cliente = _router_auth("/xero/tenants/selector", True)
+    app.include_router(router)
+
+    @app.post("/xero/tenants/post/{id}")
+    async def establecer_tenant(id: str, request: Request):
+        logging.info(f"Estableciendo ID_TENANT_XERO a {id}")
+        set_key(".env", "ID_TENANT_XERO", id)
+        _entorno.ID_TENANT_XERO = id
+        return "Se ha establecido el ID de tenant con éxito."
+
+    @app.get("/apagar")
+    async def endpoint_apagar(request: Request, tasks: BackgroundTasks):
+        _logger.info("Apagando servidor. La autenticación con Xero dejará de estar disponible")
+        print("La autenticación fue exitosa. Apagando servidor...")
+        tasks.add_task(apagar_servidor)
+        return f"La autenticación fue exitosa y se ha establecido ID_TENANT_XERO a {_entorno.ID_TENANT_XERO}. Regresa al script de configuración."
+
     import uvicorn
     config = uvicorn.Config(app, host="localhost", port=_entorno.PUERTO, loop="asyncio")
     servidor = uvicorn.Server(config)
 
     def apagar_servidor():
-        _logger.info("Apagando servidor. La autenticación con Xero dejará de estar disponible")
-        print("La autenticación fue exitosa. Apagando servidor...")
         servidor.should_exit = True
 
     _logger.info("Iniciando endpoints de autenticación de Xero...")
     print("\033[32mIniciando servidor para la autenticación...\033[0m")
-    print("Abre \033[34mhttp://localhost:8000/xero/login\033[0m e inicia sesión en tu cuenta de Xero")
+    print(f"Abre \033[34mhttp://localhost:{_entorno.PUERTO}/xero/login\033[0m e inicia sesión en tu cuenta de Xero")
     await servidor.serve()
 
 def iniciar_sesion() -> None:

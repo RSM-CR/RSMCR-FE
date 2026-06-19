@@ -4,4 +4,3 @@ from fastapi import FastAPI, Request, Response
 
 app = FastAPI()
 app.include_router(websockets_router, webhooks_router)
-

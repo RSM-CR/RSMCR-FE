@@ -24,5 +24,6 @@
         display: flex;
         gap: 16px;
         padding: 8px;
+        list-style-type: none;
     }
 </style>

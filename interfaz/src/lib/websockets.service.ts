@@ -7,7 +7,7 @@ export function connectWebSocket() {
 	if (socket) return;
 
 	socket = new WebSocket(
-		'app://localhost:8000/app'
+		'ws://localhost:8000/app'
 	);
 
 	socket.onmessage = (event) => {

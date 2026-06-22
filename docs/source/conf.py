@@ -34,6 +34,7 @@ autodoc2_packages = [
     "../../xero/auth.py",
     "../../servidor/configurar.py",
     "../../servidor/secretos.py",
+    "../../servidor/token.py",
     "../../Capa.py",
     "../../factura.py",
     "../../var_a_xml.py"

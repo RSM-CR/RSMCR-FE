@@ -15,16 +15,18 @@ muy bien documentado. Por ende, se incluye a continuación:
 ```
 Este consiste en un diccionario de Python con las llaves que se encuentran arriba."""
 import asyncio
-from secrets import token_hex
+import json
 from fastapi import FastAPI, Request, BackgroundTasks, APIRouter, Response, status
+from fastapi.encoders import jsonable_encoder
 from fastapi.responses import JSONResponse, RedirectResponse
 from authlib.integrations.starlette_client import OAuth, StarletteOAuth2App
 from authlib.integrations.httpx_client import AsyncOAuth2Client
 from fastapi.staticfiles import StaticFiles
+from pydantic import SecretStr
 from starlette.middleware.sessions import SessionMiddleware
 from servidor.secretos import obtener_entorno
+from servidor.token import Tenant, Token
 from dotenv import set_key
-import json
 import logging
 from typing import Any
 
@@ -83,16 +85,34 @@ def _router_auth(redirigir_a: str, admin = False) -> tuple[APIRouter, StarletteO
     @router.get("/auth")
     async def auth(code: str, request: Request):
         _logger.info("Autenticándose...")
-        token = await cliente.authorize_access_token(request)
+        token_xero = await cliente.authorize_access_token(request)
 
         if admin:
-            token_actualizacion: str = token.get("refresh_token") # type: ignore
+            token_actualizacion: str = token_xero.get("refresh_token") # type: ignore
             _logger.info(f"Estableciendo TOKEN_ACTUALIZACION_XERO a {token_actualizacion}")
             set_key(".env", "TOKEN_ACTUALIZACION_XERO", token_actualizacion)
 
-        request.session["token"] = {"access_token": token.get("access_token")}
+        token_id: dict[str, str] = await cliente.parse_id_token(token_xero, nonce=None) # type: ignore
+        tenants_json: list[dict[str, str]] = json.load(await cliente.get("https://api.xero.com/connections", token=token_xero))
+
+        tenants: list[Tenant] = [Tenant(tenantId=tenant.get("tenantId", ""), tenantName=tenant.get("tenantName", "")) for tenant in tenants_json]
+
+        token = Token(sub=token_id.get("sub", ""), tenants=tenants)
+
+        # HACK: Esto debería ser reemplazado en el futuro cuando tengamos base de datos
+        request.session["token"] = jsonable_encoder(token)
 
         return RedirectResponse(url=redirigir_a)
+    
+    @router.get("/tenants/get", response_model=Token)
+    async def obtener_tenants(request: Request) -> JSONResponse:
+        token = request.session.get("token") 
+        if token is None:
+            return JSONResponse(content={"error": "No tienes autorización. Inicia sesión primero."}, status_code=status.HTTP_403_FORBIDDEN)
+
+        return JSONResponse(token.get("tenants"))
+
+    return router, cliente
 
 async def _iniciar_sesion() -> None:
     if _token_actualizacion and _entorno.ID_TENANT_XERO:
@@ -101,7 +121,6 @@ async def _iniciar_sesion() -> None:
             return
 
     app = FastAPI()
-    # No se ocupa guardar el secret_key porque la sesión es de un solo uso
     app.add_middleware(SessionMiddleware, secret_key=_entorno.LLAVE_SESIONES.get_secret_value())
 
     app.mount("/xero/tenants/selector", StaticFiles(directory="./xero/interfaz_tenants", html=True))
@@ -159,6 +178,7 @@ async def _al_actualizar_token(token: dict, refresh_token=None, access_token=Non
     logging.info(f"Estableciendo TOKEN_ACTUALIZACION_XERO a {token_actualizacion_nuevo}")
     set_key(".env", "TOKEN_ACTUALIZACION_XERO", token_actualizacion_nuevo)
     _token_actualizacion = token_actualizacion_nuevo
+    _entorno.TOKEN_ACTUALIZACION_XERO = SecretStr(_token_actualizacion)
 
 def _adjuntar_headers(url, headers, body):
     global _entorno

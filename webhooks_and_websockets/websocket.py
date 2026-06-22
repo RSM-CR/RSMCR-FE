@@ -12,7 +12,7 @@ async def websockets(websocket: WebSocket):
 
     try:
         while True:
-            await websocket.receive_text
+            await websocket.receive_text()
     except Exception as e:
         logger.error("Error en el WebSocket: %s", e)
         processor.disconnect(websocket)

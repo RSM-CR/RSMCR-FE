@@ -1,5 +1,7 @@
 """Se encarga de almacenar, cargar y validar los datos privados de la aplicación de un
 archivo .env"""
+from secrets import token_hex
+
 from pydantic import SecretStr, Field
 from pydantic_settings import BaseSettings, SettingsConfigDict
 from pydantic_core import PydanticUndefined
@@ -46,6 +48,9 @@ class _Entorno(BaseSettings):
     """La contraseña utilizada para iniciar sesion en GTI."""
     PUERTO: int = 8000
     """El puerto de red en el que se va a abrir el servidor. Su valor por defecto es de 8000."""
+    LLAVE_SESIONES: SecretStr = SecretStr(token_hex(32))
+    """La llave que se usa para encriptar los datos sensibles en las cookies que se mandan devuelta al cliente.
+    Se usa en conjunto del [`SessionMiddleware`](https://starlette.dev/middleware/#sessionmiddleware) de Starlette."""
 
 def crear_entorno() -> None:
     """Crea un archivo .env en base a los datos suministrados por el usuario. También, da
@@ -67,6 +72,10 @@ def crear_entorno() -> None:
         opcional = info.default is not PydanticUndefined
 
         if opcional and not configurar_opcionales:
+            if type(info.default) is SecretStr:
+                nuevo_entorno.append(f"{nombre}={info.default.get_secret_value()}")
+            else:
+                nuevo_entorno.append(f"{nombre}={info.default}")
             continue
 
         valor = input(f"Introduce un valor para {nombre}{f" (Opcional. Dejar en blanco para el valor por defecto de \"{info.default}\")" if opcional else ""}\n> ").strip()

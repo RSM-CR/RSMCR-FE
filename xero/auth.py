@@ -129,11 +129,6 @@ async def _iniciar_sesion() -> None:
     router, cliente = _router_auth("/app/tenants/", True)
     app.include_router(router)
 
-    # Hay que definir un endpoint solo para la selección de tenants porque si no las rutas no funcionan
-    @app.get("/app/tenants")
-    async def interfaz_tenants(request: Request):
-        return FileResponse("./interfaz/build/tenants.html")
-
     @app.post("/xero/tenants/post/{id}")
     async def establecer_tenant(id: str, request: Request):
         if request.session.get("token") is None:

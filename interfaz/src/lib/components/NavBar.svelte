@@ -19,10 +19,21 @@
 </nav>
 
 <style>
-    ul
-    {
+
+    ul {
         display: flex;
         gap: 16px;
-        padding: 8px;
+        justify-content: center;
+        align-items: center;
+        font-size: 18px;
+        list-style: none;
+        padding: 0;
+        margin: 0 auto;
+        margin-top: 20px;
+        margin-bottom: 20px;
+        color: #ffffff;
+        border-radius: 10px;
+        background-color: #4A8EAC;
+        width: 300px;
     }
 </style>

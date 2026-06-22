@@ -38,7 +38,7 @@
         <div class="informacion"><input bind:value={otrassenas} placeholder="Otras Señas..." /></div>
         <div class="informacion"><input bind:value={situacionenvio} placeholder="Situación del envío..." /></div>
         <div class="informacion"><input bind:value={codigoactividad} placeholder="Código de Actividad..." /></div>
-        <div class="informacion"><input bind:value={tipoidreceptor} placeholder="Tipo de identificación Receptor..." /></div>
+        <div class="informacion"><input bind:value={tipoidreceptor} placeholder="Tipo de identificación del Receptor..." /></div>
     </div>
 </div>
 

@@ -18,7 +18,7 @@ import asyncio
 import json
 from fastapi import FastAPI, Request, BackgroundTasks, APIRouter, Response, status
 from fastapi.encoders import jsonable_encoder
-from fastapi.responses import JSONResponse, RedirectResponse
+from fastapi.responses import FileResponse, JSONResponse, RedirectResponse
 from authlib.integrations.starlette_client import OAuth, StarletteOAuth2App
 from authlib.integrations.httpx_client import AsyncOAuth2Client
 from fastapi.staticfiles import StaticFiles
@@ -123,10 +123,16 @@ async def _iniciar_sesion() -> None:
     app = FastAPI()
     app.add_middleware(SessionMiddleware, secret_key=_entorno.LLAVE_SESIONES.get_secret_value())
 
-    app.mount("/xero/tenants/selector", StaticFiles(directory="./xero/interfaz_tenants", html=True))
+    # Hay que montar el frontend para obtener el JavaScript y el CSS
+    app.frontend("/app", directory="./interfaz/build", fallback="index.html")
 
-    router, cliente = _router_auth("/xero/tenants/selector", True)
+    router, cliente = _router_auth("/app/tenants/", True)
     app.include_router(router)
+
+    # Hay que definir un endpoint solo para la selección de tenants porque si no las rutas no funcionan
+    @app.get("/app/tenants")
+    async def interfaz_tenants(request: Request):
+        return FileResponse("./interfaz/build/tenants.html")
 
     @app.post("/xero/tenants/post/{id}")
     async def establecer_tenant(id: str, request: Request):

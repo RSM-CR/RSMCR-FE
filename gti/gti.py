@@ -1,6 +1,6 @@
 import asyncio
 
-from Abstracciones.Destino import Destino as ds # Importar la clase Destino (ds) desde el módulo Abstracciones.Destino
+from abstracciones.destino import Destino as ds # Importar la clase Destino (ds) desde el módulo Abstracciones.Destino
 from zeep import AsyncClient # Importar la clase AsyncClient de la biblioteca zeep para manejar solicitudes SOAP asíncronas
 from zeep.transports import AsyncTransport # Importar la clase AsyncTransport de la biblioteca zeep para configurar el transporte asíncrono con httpx
 from zeep.plugins import HistoryPlugin # Importar la clase HistoryPlugin de la biblioteca zeep para registrar las solicitudes y respuestas SOAP

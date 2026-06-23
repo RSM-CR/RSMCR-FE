@@ -1,311 +1,864 @@
 <script>
-    let metododepago = $state('');
-    let tipodoc = $state('');
-    let condicionventa = $state('');
-    let terminal = $state('');
-    let sucursal = $state('');
-    let moneda = $state('');
-    let situacionenvio = $state('');
-    let codigoactividad = $state('');
-    let tipoidreceptor = $state('');
-    let numcuentaemisor = $state('');
-    let unidadmedida = $state('');
-    let provincia = $state('');
-    let canton = $state('');
-    let distrito = $state('');
-    let otrassenas = $state('');
-    let numdoc = $state('hola');
+    // ── Tab activo ────────────────────────────────────────────────────────────
+    let tabActivo = $state('lineas'); // 'lineas' | 'otros'
 
-    let mostrarIVA = $state(false);
-    let motivoExoneracion = $state('');
-    let numDocExoneracion = $state('');
-    let institucion = $state('');
-    let fechaExoneracion = $state('');
+    // ── Campos línea detalle ──────────────────────────────────────────────────
+    let codProducto     = $state('');
+    let codCabys        = $state('');
+    let codMedicamento  = $state('');
+    let unidMedida      = $state('Unidad');
+    let cantidad        = $state(2.00);
+    let precioUnitario  = $state(1000.00);
+    let descripcion     = $state('');
+    let descuento       = $state(0.00);
+    let otrosImps       = $state(0.00);
+    let tipoTransaccion = $state('');
+    let numVinSerie     = $state('');
+
+    // ── Modal IVA ─────────────────────────────────────────────────────────────
+    let modalIVA        = $state(false);
+    let tipoIVA         = $state('');
+    let tarifaIVA       = $state('');
+
+    // Tipo 07
+    let precioVenta07   = $state(0);
+    let precioCompra07  = $state(0);
+
+    // Tipo 08 REBU
+    let precioNeto08    = $state(0);
+    let modalidadRebu   = $state('');
+
+    // Tipo 09
+    let precioFabrica09 = $state(0);
+
+    // Exoneración (solo tipo 01)
+    let motivoExoneracion     = $state('');
+    let numDocExoneracion     = $state('');
+    let institucion           = $state('');
+    let fechaExoneracion      = $state('');
     let porcentajeExoneracion = $state('');
-    let articulo = $state('');
-    let inciso = $state('');
-    let condicion = $state(false);
-    let tipoIVA = $state('');
-    let tarifaIVA = $state('');
+    let articulo              = $state('');
+    let inciso                = $state('');
 
-    const motivosExoneracion = [
-        { value: '01', label: '01 - Compras autorizadas' },
-        { value: '02', label: '02 - Ventas exentas a diplomáticos' },
-        { value: '03', label: '03 - Autoconsumo' },
-        { value: '04', label: '04 - Ventas a diplomáticos' },
-        { value: '05', label: '05 - Zona Franca' },
-        { value: '06', label: '06 - Turismo' },
-        { value: '07', label: '07 - Reciclaje' },
-        { value: '08', label: '08 - Zona Franca (Régimen especial)' },
-        { value: '09', label: '09 - Servicios complementarios exportación' },
-        { value: '10', label: '10 - Órganos municipales' },
-        { value: '11', label: '11 - Exención DGH - Autorización impuesto local' },
-        { value: '99', label: '99 - Otros' },
+    // ── Catálogos ─────────────────────────────────────────────────────────────
+    const unidadesMedida = [
+        'Unidad','Al','Cm','G','Kg','L','M','M2','M3','Ml','Mm','Oz','Pie','Pulg','Tonelada','Otro'
+    ];
+
+    const tiposTransaccion = [
+        { value: '', label: 'Seleccione una opción' },
+        { value: '01', label: '01 – Venta normal' },
+        { value: '02', label: '02 – Consignación' },
+        { value: '03', label: '03 – Donación' },
+        { value: '04', label: '04 – Exportación' },
     ];
 
     const tiposIVA = [
-        { value: '01', label: 'Impuesto al valor agregado' },
-        { value: '02', label: 'I.V.A (Cálculo especial)' },
-        { value: '03', label: 'I.V.A régimen de bienes usados (factor)' },
-        { value: '04', label: 'I.V.A cobrado a nivel de fábrica' },
+        { value: '01', label: '01 – Impuesto al Valor Agregado' },
+        { value: '07', label: '07 – IVA (Cálculo especial)' },
+        { value: '08', label: '08 – IVA Régimen de Bienes Usados (factor)' },
+        { value: '09', label: '09 – IVA cobrado a nivel de fábrica' },
     ];
 
     const tarifasIVA = [
-        { value: '01', label: 'Tarifa 0% (Artículo 32, num 1, RLIVA)' },
-        { value: '02', label: 'Tarifa reducida 1%' },
-        { value: '03', label: 'Tarida reducida 2%' },
-        { value: '04', label: 'Tarifa reducida 4%' },
-        { value: '05', label: 'Tarifa general 13%' },
-        { value: '06', label: 'Tarifa reducida 0.5%' },
-        { value: '07', label: 'Tarifa Exenta' },
-        { value: '08', label: 'Tarifa 0% sin derecho a crédito' },
+        { value: '01', pct: 0,   label: '01 – Tarifa 0% (Exento)' },
+        { value: '02', pct: 1,   label: '02 – Tarifa reducida 1%' },
+        { value: '03', pct: 2,   label: '03 – Tarifa reducida 2%' },
+        { value: '04', pct: 4,   label: '04 – Tarifa reducida 4%' },
+        { value: '05', pct: 0,   label: '05 – Transitorio 0%' },
+        { value: '06', pct: 4,   label: '06 – Transitorio 4%' },
+        { value: '07', pct: 8,   label: '07 – Transitorio 8%' },
+        { value: '08', pct: 13,  label: '08 – Tarifa general 13%' },
+        { value: '09', pct: 0.5, label: '09 – Tarifa reducida 0.5%' },
     ];
 
-    function mostrarArtIns() {
-        if (['02', '03', '06', '07', '08'].includes(motivoExoneracion)) {
-            condicion = true;
-        } else {
-            condicion = false;
-        }
+    const factoresRebu = {
+        '01': { factor: 0.1130, descripcion: 'Modalidad 1 – Comprado a contribuyente con IVA' },
+        '02': { factor: 0.1130, descripcion: 'Modalidad 2 – Margen (venta − compra) × 13%' },
+        '03': { factor: 0.1031, descripcion: 'Modalidad 3 – Factor sobre precio neto (DGT-R-034-2019)' },
+    };
+
+    const motivosExoneracion = [
+        { value: '01', label: '01 – Compras autorizadas' },
+        { value: '02', label: '02 – Ventas exentas a diplomáticos' },
+        { value: '03', label: '03 – Autorizado por Ley Especial' },
+        { value: '04', label: '04 – Exenciones Dirección General de Hacienda' },
+        { value: '05', label: '05 – Transitorio V' },
+        { value: '06', label: '06 – Transitorio IX' },
+        { value: '07', label: '07 – Transitorio XVII' },
+        { value: '99', label: '99 – Otros' },
+    ];
+
+    // ── Derivados ─────────────────────────────────────────────────────────────
+    let subtotal = $derived(+(cantidad * precioUnitario).toFixed(2));
+
+    // IVA tipo 01
+    let tarifaSel    = $derived(tarifasIVA.find(t => t.value === tarifaIVA) ?? null);
+    let pct01        = $derived(tarifaSel?.pct ?? 0);
+    let montoIVA01   = $derived(+(subtotal * pct01 / 100).toFixed(2));
+
+    // IVA tipo 07
+    let diferencia07 = $derived(+(precioVenta07 - precioCompra07).toFixed(2));
+    let montoIVA07   = $derived(+(diferencia07 * 0.13).toFixed(2));
+
+    // IVA tipo 08
+    let factorRebu   = $derived(factoresRebu[modalidadRebu] ?? null);
+    let montoIVA08   = $derived(factorRebu ? +(precioNeto08 * factorRebu.factor).toFixed(2) : 0);
+
+    // IVA tipo 09
+    let montoIVA09   = $derived(+(precioFabrica09 * 0.13).toFixed(2));
+
+    // IVA efectivo (lo que se muestra en el campo IVA del formulario)
+    let ivaCalculado = $derived(
+        tipoIVA === '01' ? montoIVA01 :
+        tipoIVA === '07' ? montoIVA07 :
+        tipoIVA === '08' ? montoIVA08 :
+        tipoIVA === '09' ? montoIVA09 : 0
+    );
+
+    // Exoneración
+    let montoExonerado = $derived(
+        porcentajeExoneracion
+            ? +((subtotal * Number(porcentajeExoneracion)) / 100).toFixed(2)
+            : 0
+    );
+    let ivaEfectivo = $derived(+(ivaCalculado - montoExonerado).toFixed(2));
+
+    // Total línea
+    let totalLinea = $derived(+(subtotal - descuento + otrosImps + (ivaEfectivo > 0 ? ivaEfectivo : ivaCalculado)).toFixed(2));
+
+    let mostrarArtIns = $derived(['02','03','06','07','08'].includes(motivoExoneracion));
+
+    // ── Acciones ──────────────────────────────────────────────────────────────
+    function limpiarLinea() {
+        codProducto = ''; codCabys = ''; codMedicamento = '';
+        unidMedida = 'Unidad'; cantidad = 2.00; precioUnitario = 1000.00;
+        descripcion = ''; descuento = 0.00; otrosImps = 0.00;
+        tipoTransaccion = ''; numVinSerie = '';
+        tipoIVA = ''; tarifaIVA = '';
+        precioVenta07 = 0; precioCompra07 = 0;
+        precioNeto08 = 0; modalidadRebu = '';
+        precioFabrica09 = 0;
+        motivoExoneracion = ''; numDocExoneracion = '';
+        institucion = ''; fechaExoneracion = '';
+        porcentajeExoneracion = ''; articulo = ''; inciso = '';
+    }
+
+    function agregarLinea() {
+        alert(`Línea agregada:\nProducto: ${codProducto || '(sin código)'}\nTotal: ₡${totalLinea.toFixed(2)}`);
+    }
+
+    function onChangeTipoIVA() {
+        tarifaIVA = ''; modalidadRebu = '';
+        motivoExoneracion = ''; porcentajeExoneracion = '';
     }
 </script>
 
-<div class="contenedor">
-    <div class="header">
-        <p class="titulo">Editor de XML</p>
-    </div>
+<!-- ══ CONTENEDOR PRINCIPAL ══════════════════════════════════════════════════ -->
+<div class="panel-root">
 
-    <div class="inputs1">
-        <div class="informacion"><input bind:value={metododepago} placeholder="Método de pago..." /></div>
-        <div class="informacion"><input bind:value={numcuentaemisor} placeholder="Número cuenta emisor..." /></div>
-        <div class="informacion"><input bind:value={tipodoc} placeholder="Tipo de documento..." /></div>
-        <div class="informacion"><input bind:value={numdoc} placeholder="Número de documento..." /></div>
-        <div class="informacion"><input bind:value={unidadmedida} placeholder="Unidad de Medida" /></div>
-        <div class="informacion"><input bind:value={condicionventa} placeholder="Condición de venta..." /></div>
-        <div class="informacion"><input bind:value={provincia} placeholder="Provincia..." /></div>
-        <div class="informacion"><input bind:value={sucursal} placeholder="Sucursal..." /></div>
-        <div class="informacion"><input bind:value={canton} placeholder="Cantón..." /></div>
-        <div class="informacion"><input bind:value={terminal} placeholder="Terminal..." /></div>
-        <div class="informacion"><input bind:value={distrito} placeholder="Distrito..." /></div>
-        <div class="informacion"><input bind:value={moneda} placeholder="Moneda..." /></div>
-        <div class="informacion"><input bind:value={otrassenas} placeholder="Otras Señas..." /></div>
-        <div class="informacion"><input bind:value={situacionenvio} placeholder="Situación del envío..." /></div>
-        <div class="informacion"><input bind:value={codigoactividad} placeholder="Código de Actividad..." /></div>
-        <div class="informacion"><input bind:value={tipoidreceptor} placeholder="Tipo de identificación del Receptor..." /></div>
-    </div>
-
-    <div class="boton-IVA-wrapper">
-        <button class="boton-IVA" onclick={() => mostrarIVA = !mostrarIVA}>
-            {mostrarIVA ? '− Ocultar I.V.A' : '+ Agregar I.V.A'}
+    <!-- Tabs -->
+    <div class="tabs">
+        <button
+            class="tab {tabActivo === 'lineas' ? 'tab--active' : ''}"
+            onclick={() => tabActivo = 'lineas'}>
+            LÍNEAS DETALLE
+        </button>
+        <button
+            class="tab {tabActivo === 'otros' ? 'tab--active' : ''}"
+            onclick={() => tabActivo = 'otros'}>
+            OTROS CARGOS
         </button>
     </div>
 
-    {#if mostrarIVA}
-        <div class="panel-exoneracion">
-            <p class="subtitulo-exoneracion">Calcular el I.V.A</p>
-            <div class="inputs-exoneracion">
-                <div class="informacion-ex">
-                    <select bind:value={tipoIVA} class="select-ex">
-                        <option value="" disabled selected>Tipo de I.V.A...</option>
-                        {#each tiposIVA as tipo}
-                            <option value={tipo.value}>{tipo.label}</option>
-                        {/each}
-                    </select>
+    <!-- ── TAB: LÍNEAS DETALLE ──────────────────────────────────────────────── -->
+    {#if tabActivo === 'lineas'}
+    <div class="lineas-body">
+
+        <!-- Fila 1: Cód. Producto | Cód. CABYS | Cód. Medicamentos | Unid. Medida -->
+        <div class="grid-4">
+            <div class="field">
+                <div class="field__label">
+                    <span>Cód. Producto:</span>
+                    <button class="link-btn">⊕ Agregar más cód.</button>
                 </div>
-                <div class="informacion-ex">
-                    <select bind:value={tarifaIVA} class="select-ex">
-                        <option value="" disabled selected>Tarifa de I.V.A...</option>
-                        {#each tarifasIVA as tarifa}
-                            <option value={tarifa.value}>{tarifa.label}</option>
-                        {/each}
-                    </select>
+                <div class="input-icon-wrap">
+                    <input bind:value={codProducto} class="inp" placeholder="" />
+                    <button class="icon-btn icon-btn--green">🔍</button>
                 </div>
-                <div class="informacion-ex"><textarea bind:value={numdoc}>B</textarea></div>
-                <div class="informacion-ex"><input bind:value={fechaExoneracion} type="date" class="input-fecha" /></div>
-                <div class="informacion-ex"><input bind:value={porcentajeExoneracion} type="number" min="0" max="100" placeholder="Porcentaje a exonerar (%)..." /></div>
+            </div>
+
+            <div class="field">
+                <label class="field__label">Cód. CABYS:</label>
+                <input bind:value={codCabys} class="inp" placeholder="" />
+            </div>
+
+            <div class="field">
+                <div class="field__label">
+                    <span>Cód. Medicamentos:</span>
+                    <span class="info-icon" title="Requerido para medicamentos de consumo humano (v4.4)">ℹ</span>
+                </div>
+                <div class="input-icon-wrap">
+                    <input bind:value={codMedicamento} class="inp" placeholder="Agregar Código" />
+                    <button class="icon-btn icon-btn--green">✏</button>
+                </div>
+            </div>
+
+            <div class="field">
+                <div class="field__label">
+                    <span>Unid. Medida:</span>
+                    <button class="link-btn">⊕ Unid. Comercial</button>
+                </div>
+                <select bind:value={unidMedida} class="inp inp--select">
+                    {#each unidadesMedida as u}
+                        <option value={u}>{u}</option>
+                    {/each}
+                </select>
             </div>
         </div>
 
+        <!-- Fila 2: Cantidad | Precio unitario | Descripción -->
+        <div class="grid-3-wide">
+            <div class="field">
+                <label class="field__label">Cantidad:</label>
+                <input bind:value={cantidad} type="number" step="0.01" class="inp" />
+            </div>
 
+            <div class="field">
+                <label class="field__label">Precio unitario:</label>
+                <input bind:value={precioUnitario} type="number" step="0.01" class="inp" />
+            </div>
 
-
-        <div class="panel-exoneracion">
-            <p class="subtitulo-exoneracion">Exonerar el I.V.A</p>
-            <div class="inputs-exoneracion">
-                <div class="informacion-ex">
-                    <select bind:value={motivoExoneracion} class="select-ex">
-                        <option value="" disabled selected>Motivo de exoneración...</option>
-                        {#each motivosExoneracion as motivo}
-                            <option value={motivo.value}>{motivo.label}</option>
-                        {/each}
-                    </select>
-                </div>
-                   
-                {#if ['02', '03', '06', '07', '08'].includes(motivoExoneracion)}
-                    <div class="informacion-ex">
-                        <input bind:value={articulo} placeholder="Número de artículo..." type="number" />
-                    </div>
-                {/if}
-                  
-                {#if ['02', '03', '06', '07', '08'].includes(motivoExoneracion)}
-                    <div class="informacion-ex">
-                        <input bind:value={inciso} placeholder="Númerod de inciso..." type="number"/>
-                    </div>
-                {/if}    
-                <div class="informacion-ex"><input bind:value={numDocExoneracion} placeholder="Número de documento (17 caracteres)..." maxlength="17" /></div>
-                <div class="informacion-ex"><input bind:value={institucion} placeholder="Institución emisora..." /></div>
-                <div class="informacion-ex"><input bind:value={fechaExoneracion} type="date" class="input-fecha" /></div>
-                <div class="informacion-ex"><input bind:value={porcentajeExoneracion} type="number" min="0" max="100" placeholder="Porcentaje a exonerar (%)..." /></div>
+            <div class="field field--span2">
+                <label class="field__label">Descripción:</label>
+                <input bind:value={descripcion} class="inp" placeholder="" />
             </div>
         </div>
+
+        <!-- Fila 3: Descuento | Otros imps | IVA | Total línea -->
+        <div class="grid-4">
+            <div class="field">
+                <div class="field__label">
+                    <span>Descuento:</span>
+                    <button class="link-btn">✏ Editar</button>
+                </div>
+                <input bind:value={descuento} type="number" step="0.01" class="inp" />
+            </div>
+
+            <div class="field">
+                <div class="field__label">
+                    <span>Otros imps:</span>
+                    <button class="link-btn">✏ Editar</button>
+                </div>
+                <input bind:value={otrosImps} type="number" step="0.01" class="inp" />
+            </div>
+
+            <div class="field">
+                <div class="field__label">
+                    <span>I.V.A:</span>
+                    <button class="link-btn" onclick={() => modalIVA = true}>✏ Editar</button>
+                </div>
+                <input
+                    value={ivaCalculado > 0 || tipoIVA
+                        ? (ivaEfectivo >= 0 && porcentajeExoneracion ? ivaEfectivo : ivaCalculado).toFixed(2)
+                        : '0.00'}
+                    class="inp inp--readonly"
+                    readonly />
+            </div>
+
+            <div class="field">
+                <label class="field__label">Total línea:</label>
+                <input value={totalLinea.toFixed(2)} class="inp inp--readonly" readonly />
+            </div>
+        </div>
+
+        <!-- Fila 4: Tipo transacción | VIN/Serie | botón combo -->
+        <div class="grid-3-bottom">
+            <div class="field">
+                <button class="btn-combo">Lista de productos del combo</button>
+            </div>
+
+            <div class="field">
+                <label class="field__label">Tipo transacción<span class="opcional">(Opcional):</span></label>
+                <select bind:value={tipoTransaccion} class="inp inp--select">
+                    {#each tiposTransaccion as t}
+                        <option value={t.value}>{t.label}</option>
+                    {/each}
+                </select>
+            </div>
+
+            <div class="field">
+                <label class="field__label">Número VIN o Serie<span class="opcional">(Opcional):</span></label>
+                <div class="input-icon-wrap">
+                    <input bind:value={numVinSerie} class="inp" placeholder="" />
+                    <button class="icon-btn icon-btn--green">+</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Fila 5: botones acción -->
+        <div class="actions-row">
+            <div></div>
+            <div></div>
+            <button class="btn-limpiar" onclick={limpiarLinea}>Limpiar Línea</button>
+            <button class="btn-agregar" onclick={agregarLinea}>Agregar Línea</button>
+        </div>
+
+    </div>
+    {/if}
+
+    <!-- ── TAB: OTROS CARGOS ────────────────────────────────────────────────── -->
+    {#if tabActivo === 'otros'}
+    <div class="lineas-body">
+        <p class="otros-placeholder">Sección de Otros Cargos — próximamente.</p>
+    </div>
     {/if}
 </div>
 
+<!-- ══ MODAL IVA ══════════════════════════════════════════════════════════════ -->
+{#if modalIVA}
+<div class="modal-overlay" onclick={() => modalIVA = false}>
+    <div class="modal" onclick={(e) => e.stopPropagation()}>
+        <div class="modal-header">
+            <span class="modal-titulo">Editar I.V.A</span>
+            <button class="modal-close" onclick={() => modalIVA = false}>✕</button>
+        </div>
+
+        <!-- Selector tipo siempre visible -->
+        <div class="modal-section">
+            <label class="modal-label">Tipo de I.V.A:</label>
+            <select bind:value={tipoIVA} onchange={onChangeTipoIVA} class="modal-select">
+                <option value="" disabled selected>Seleccione tipo...</option>
+                {#each tiposIVA as t}
+                    <option value={t.value}>{t.label}</option>
+                {/each}
+            </select>
+        </div>
+
+        <!-- ── TIPO 01 ── -->
+        {#if tipoIVA === '01'}
+            <div class="modal-sep"><span>IVA General</span></div>
+            <div class="modal-grid">
+                <div class="modal-field modal-field--full">
+                    <label class="modal-label">Tarifa de I.V.A:</label>
+                    <select bind:value={tarifaIVA} class="modal-select">
+                        <option value="" disabled selected>Seleccione tarifa...</option>
+                        {#each tarifasIVA as t}
+                            <option value={t.value}>{t.label}</option>
+                        {/each}
+                    </select>
+                </div>
+                <div class="modal-field">
+                    <label class="modal-label">Base imponible:</label>
+                    <input class="modal-inp modal-inp--ro" value="₡{subtotal.toFixed(2)}" readonly />
+                </div>
+                <div class="modal-field">
+                    <label class="modal-label">Tarifa aplicada:</label>
+                    <input class="modal-inp modal-inp--ro" value="{pct01}%" readonly />
+                </div>
+                <div class="modal-field">
+                    <label class="modal-label">Monto I.V.A:</label>
+                    <input class="modal-inp modal-inp--ro" value="₡{montoIVA01.toFixed(2)}" readonly />
+                </div>
+                <div class="modal-field">
+                    <label class="modal-label">Total con I.V.A:</label>
+                    <input class="modal-inp modal-inp--ro" value="₡{(subtotal + montoIVA01).toFixed(2)}" readonly />
+                </div>
+            </div>
+
+            <!-- Sub-sección exoneración -->
+            <div class="modal-sep"><span>Exoneración (opcional)</span></div>
+            <div class="modal-grid">
+                <div class="modal-field modal-field--full">
+                    <label class="modal-label">Motivo de exoneración:</label>
+                    <select bind:value={motivoExoneracion} class="modal-select">
+                        <option value="" selected>— Sin exoneración —</option>
+                        {#each motivosExoneracion as m}
+                            <option value={m.value}>{m.label}</option>
+                        {/each}
+                    </select>
+                </div>
+
+                {#if mostrarArtIns}
+                    <div class="modal-field">
+                        <label class="modal-label">N.° artículo:</label>
+                        <input bind:value={articulo} type="number" class="modal-inp" placeholder="Artículo..." />
+                    </div>
+                    <div class="modal-field">
+                        <label class="modal-label">N.° inciso:</label>
+                        <input bind:value={inciso} type="number" class="modal-inp" placeholder="Inciso..." />
+                    </div>
+                {/if}
+
+                {#if motivoExoneracion}
+                    <div class="modal-field modal-field--full">
+                        <label class="modal-label">N.° documento exoneración (17 car.):</label>
+                        <input bind:value={numDocExoneracion} maxlength="17" class="modal-inp" placeholder="Número de documento..." />
+                    </div>
+                    <div class="modal-field">
+                        <label class="modal-label">Institución emisora:</label>
+                        <input bind:value={institucion} class="modal-inp" placeholder="Institución..." />
+                    </div>
+                    <div class="modal-field">
+                        <label class="modal-label">Fecha exoneración:</label>
+                        <input bind:value={fechaExoneracion} type="date" class="modal-inp" />
+                    </div>
+                    <div class="modal-field">
+                        <label class="modal-label">Porcentaje a exonerar (%):</label>
+                        <input bind:value={porcentajeExoneracion} type="number" min="0" max="100" class="modal-inp" placeholder="0 – 100" />
+                    </div>
+                    {#if porcentajeExoneracion}
+                        <div class="modal-field">
+                            <label class="modal-label">Monto exonerado:</label>
+                            <input class="modal-inp modal-inp--ro" value="₡{montoExonerado.toFixed(2)}" readonly />
+                        </div>
+                        <div class="modal-field">
+                            <label class="modal-label">I.V.A efectivo:</label>
+                            <input class="modal-inp modal-inp--ro" value="₡{ivaEfectivo.toFixed(2)}" readonly />
+                        </div>
+                    {/if}
+                {/if}
+            </div>
+        {/if}
+
+        <!-- ── TIPO 07 ── -->
+        {#if tipoIVA === '07'}
+            <div class="modal-sep"><span>IVA – Cálculo Especial (art. 31 LIVA)</span></div>
+            <p class="modal-nota">Base imponible = Precio de venta − Precio de compra. Tarifa: 13%.</p>
+            <div class="modal-grid">
+                <div class="modal-field">
+                    <label class="modal-label">Precio de venta (₡):</label>
+                    <input bind:value={precioVenta07} type="number" step="0.01" class="modal-inp" placeholder="0.00" />
+                </div>
+                <div class="modal-field">
+                    <label class="modal-label">Precio de compra (₡):</label>
+                    <input bind:value={precioCompra07} type="number" step="0.01" class="modal-inp" placeholder="0.00" />
+                </div>
+                <div class="modal-field">
+                    <label class="modal-label">Diferencia (base):</label>
+                    <input class="modal-inp modal-inp--ro" value="₡{diferencia07.toFixed(2)}" readonly />
+                </div>
+                <div class="modal-field">
+                    <label class="modal-label">Monto I.V.A (13%):</label>
+                    <input class="modal-inp modal-inp--ro" value="₡{montoIVA07.toFixed(2)}" readonly />
+                </div>
+                <div class="modal-field modal-field--full">
+                    <label class="modal-label">Total con I.V.A:</label>
+                    <input class="modal-inp modal-inp--ro" value="₡{(precioVenta07 + montoIVA07).toFixed(2)}" readonly />
+                </div>
+            </div>
+        {/if}
+
+        <!-- ── TIPO 08 ── -->
+        {#if tipoIVA === '08'}
+            <div class="modal-sep"><span>IVA – Régimen Especial Bienes Usados (REBU)</span></div>
+            <p class="modal-nota">IVA = Precio neto de venta × Factor DGT (Res. DGT-R-034-2019).</p>
+            <div class="modal-grid">
+                <div class="modal-field modal-field--full">
+                    <label class="modal-label">Modalidad REBU:</label>
+                    <select bind:value={modalidadRebu} class="modal-select">
+                        <option value="" disabled selected>Seleccione modalidad...</option>
+                        {#each Object.entries(factoresRebu) as [k, v]}
+                            <option value={k}>{v.descripcion}</option>
+                        {/each}
+                    </select>
+                </div>
+                <div class="modal-field modal-field--full">
+                    <label class="modal-label">Precio neto de venta (₡):</label>
+                    <input bind:value={precioNeto08} type="number" step="0.01" class="modal-inp" placeholder="0.00" />
+                </div>
+                {#if modalidadRebu}
+                    <div class="modal-field">
+                        <label class="modal-label">Factor aplicado:</label>
+                        <input class="modal-inp modal-inp--ro" value="{factorRebu?.factor}" readonly />
+                    </div>
+                    <div class="modal-field">
+                        <label class="modal-label">Monto I.V.A:</label>
+                        <input class="modal-inp modal-inp--ro" value="₡{montoIVA08.toFixed(2)}" readonly />
+                    </div>
+                    <div class="modal-field modal-field--full">
+                        <label class="modal-label">Total con I.V.A:</label>
+                        <input class="modal-inp modal-inp--ro" value="₡{(precioNeto08 + montoIVA08).toFixed(2)}" readonly />
+                    </div>
+                {/if}
+            </div>
+        {/if}
+
+        <!-- ── TIPO 09 ── -->
+        {#if tipoIVA === '09'}
+            <div class="modal-sep"><span>IVA cobrado a nivel de fábrica</span></div>
+            <p class="modal-nota">El IVA (13%) ya fue cobrado por el fabricante/importador. Se registra para el XML.</p>
+            <div class="modal-grid">
+                <div class="modal-field modal-field--full">
+                    <label class="modal-label">Precio ex-fábrica (₡):</label>
+                    <input bind:value={precioFabrica09} type="number" step="0.01" class="modal-inp" placeholder="0.00" />
+                </div>
+                <div class="modal-field">
+                    <label class="modal-label">I.V.A incluido (13%):</label>
+                    <input class="modal-inp modal-inp--ro" value="₡{montoIVA09.toFixed(2)}" readonly />
+                </div>
+                <div class="modal-field">
+                    <label class="modal-label">Precio al consumidor:</label>
+                    <input class="modal-inp modal-inp--ro" value="₡{(precioFabrica09 + montoIVA09).toFixed(2)}" readonly />
+                </div>
+            </div>
+        {/if}
+
+        <!-- Botones modal -->
+        <div class="modal-actions">
+            <button class="btn-modal-cancel" onclick={() => modalIVA = false}>Cancelar</button>
+            <button class="btn-modal-ok" onclick={() => modalIVA = false}>Aceptar</button>
+        </div>
+    </div>
+</div>
+{/if}
+
 <style>
-    :global(body) {
-        background-color: #b2e1f5;
-        margin: 0;
+    /* ── Reset / base ────────────────────────────────────────────────────────── */
+    *, *::before, *::after { box-sizing: border-box; }
+    :global(body) { margin: 0; background: #f0f0f0; font-family: Arial, sans-serif; font-size: 13px; color: #333; }
+
+    /* ── Panel raíz ─────────────────────────────────────────────────────────── */
+    .panel-root {
+        background: #fff;
+        border: 1px solid #ccc;
+        border-radius: 4px;
+        margin: 20px;
+        box-shadow: 0 1px 4px rgba(0,0,0,0.12);
     }
 
-    .contenedor {
-        background-color: #d6eef8;
-        border: 2px solid #b0d8ec;
-        border-radius: 20px;
-        padding: 30px 40px;
-        width: 640px;
-        margin: 30px auto;
-    }
-
-    .header {
+    /* ── Tabs ────────────────────────────────────────────────────────────────── */
+    .tabs {
         display: flex;
-        justify-content: center;
-        align-items: center;
-        position: relative;
-        margin-bottom: 25px;
+        border-bottom: 2px solid #ccc;
     }
 
-    .titulo {
-        color: #ffffff;
-        border: 2px solid #4A8EAC;
-        border-radius: 10px;
-        background-color: #4A8EAC;
-        padding: 6px 40px;
-        font-size: 20px;
-        margin: 0;
-        text-align: center;
-    }
-
-    .inputs1 {
-        display: grid;
-        grid-template-columns: 1fr 1fr;
-        gap: 10px;
-    }
-
-    .informacion {
-        background: #4AB265;
-        border: 2px solid #4AB265;
-        border-radius: 10px;
-    }
-
-    input {
-        background: transparent;
+    .tab {
+        padding: 10px 22px;
         border: none;
-        outline: none;
-        color: white;
-        font-size: 15px;
-        padding: 8px 12px;
-        width: 100%;
-        box-sizing: border-box;
-    }
-
-    input::placeholder {
-        color: rgba(255, 255, 255, 0.95);
-    }
-
-    /* Botón */
-    .boton-IVA-wrapper {
-        display: flex;
-        justify-content: center;
-        margin-top: 18px;
-    }
-
-    .boton-IVA {
-        background-color: #4A8EAC;
-        color: white;
-        border: 2px solid #3a7a97;
-        border-radius: 10px;
-        padding: 8px 32px;
-        font-size: 15px;
+        background: #e8e8e8;
+        font-size: 13px;
+        font-weight: 700;
+        color: #555;
         cursor: pointer;
-        transition: background-color 0.2s;
+        border-right: 1px solid #ccc;
+        border-bottom: 2px solid transparent;
+        margin-bottom: -2px;
+        transition: background 0.15s;
+        letter-spacing: 0.03em;
+    }
+    .tab:hover { background: #ddd; }
+    .tab--active {
+        background: #fff;
+        color: #2a7a2a;
+        border-top: 2px solid #4caf50;
+        border-bottom: 2px solid #fff;
     }
 
-    .boton-IVA:hover {
-        background-color: #3a7a97;
-    }
-
-    .panel-exoneracion {
-        margin-top: 16px;
-        background-color: #c3e4f3;
-        border: 2px solid #9acde8;
-        border-radius: 14px;
-        padding: 18px 20px;
-    }
-
-    .subtitulo-exoneracion {
-        color: #4A8EAC;
-        font-size: 16px;
-        font-weight: bold;
-        text-align: center;
-        margin: 0 0 14px 0;
-    }
-
-    .inputs-exoneracion {
-        display: grid;
-        grid-template-columns: 1fr 1fr;
+    /* ── Cuerpo del tab ──────────────────────────────────────────────────────── */
+    .lineas-body {
+        padding: 16px 18px 12px;
+        display: flex;
+        flex-direction: column;
         gap: 10px;
     }
 
-    .inputs-exoneracion .informacion-ex:last-child:nth-child(odd) {
-        grid-column: 1 / -1;
+    /* ── Grids de filas ──────────────────────────────────────────────────────── */
+    .grid-4 {
+        display: grid;
+        grid-template-columns: 1fr 1fr 1.6fr 1fr;
+        gap: 12px;
+        align-items: end;
     }
 
-    .informacion-ex {
-        background: #4A8EAC;
-        border: 2px solid #4A8EAC;
-        border-radius: 10px;
-        display: flex;
+    .grid-3-wide {
+        display: grid;
+        grid-template-columns: 0.7fr 0.7fr 2fr;
+        gap: 12px;
+        align-items: end;
+    }
+
+    .grid-3-bottom {
+        display: grid;
+        grid-template-columns: 0.9fr 1fr 1fr;
+        gap: 12px;
+        align-items: end;
+    }
+
+    .actions-row {
+        display: grid;
+        grid-template-columns: 0.9fr 1fr 1fr 1fr;
+        gap: 12px;
         align-items: center;
+        margin-top: 2px;
     }
 
-    .informacion-ex input,
-    .informacion-ex select {
-        background: transparent;
+    /* ── Field ───────────────────────────────────────────────────────────────── */
+    .field {
+        display: flex;
+        flex-direction: column;
+        gap: 3px;
+    }
+
+    .field__label {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        font-size: 12px;
+        color: #444;
+        font-weight: 600;
+        min-height: 16px;
+    }
+
+    .link-btn {
+        background: none;
         border: none;
+        color: #2a7a2a;
+        font-size: 11px;
+        cursor: pointer;
+        padding: 0;
+        font-weight: 600;
+    }
+    .link-btn:hover { text-decoration: underline; }
+
+    .info-icon {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 16px; height: 16px;
+        background: #2196f3;
+        color: #fff;
+        border-radius: 50%;
+        font-size: 10px;
+        font-weight: 700;
+        cursor: default;
+    }
+
+    .opcional { color: #888; font-weight: 400; margin-left: 2px; }
+
+    /* ── Inputs ──────────────────────────────────────────────────────────────── */
+    .inp {
+        width: 100%;
+        height: 32px;
+        border: 1px solid #bbb;
+        border-radius: 3px;
+        padding: 0 8px;
+        font-size: 13px;
+        color: #333;
+        background: #fff;
         outline: none;
-        color: white;
+        transition: border-color 0.15s;
+    }
+    .inp:focus { border-color: #4caf50; box-shadow: 0 0 0 2px rgba(76,175,80,0.18); }
+
+    .inp--readonly {
+        background: #f5f5f5;
+        color: #555;
+        cursor: default;
+    }
+
+    .inp--select { cursor: pointer; padding-right: 4px; }
+
+    .input-icon-wrap {
+        display: flex;
+        gap: 0;
+    }
+    .input-icon-wrap .inp {
+        border-radius: 3px 0 0 3px;
+        flex: 1;
+    }
+
+    .icon-btn {
+        border: 1px solid #bbb;
+        border-left: none;
+        border-radius: 0 3px 3px 0;
+        width: 32px;
+        cursor: pointer;
         font-size: 14px;
-        padding: 8px 12px;
+        display: flex; align-items: center; justify-content: center;
+        transition: background 0.15s;
+        background: #e8e8e8;
+        flex-shrink: 0;
+    }
+    .icon-btn--green { background: #4caf50; color: #fff; border-color: #4caf50; }
+    .icon-btn--green:hover { background: #388e3c; }
+    .icon-btn:hover { background: #d0d0d0; }
+
+    /* ── Botón combo ─────────────────────────────────────────────────────────── */
+    .btn-combo {
+        height: 32px;
+        background: #9e9e9e;
+        color: #fff;
+        border: none;
+        border-radius: 3px;
+        font-size: 12px;
+        font-weight: 600;
+        cursor: pointer;
         width: 100%;
-        box-sizing: border-box;
+        letter-spacing: 0.02em;
+        transition: background 0.15s;
+        margin-top: 18px; /* alinea con la última fila */
     }
+    .btn-combo:hover { background: #757575; }
 
-    .informacion-ex input::placeholder {
-        color: rgba(255, 255, 255, 0.9);
-    }
-
-    .select-ex {
-        appearance: none;
+    /* ── Botones acción ──────────────────────────────────────────────────────── */
+    .btn-limpiar {
+        height: 34px;
+        background: #9e9e9e;
+        color: #fff;
+        border: none;
+        border-radius: 3px;
+        font-size: 13px;
+        font-weight: 700;
         cursor: pointer;
+        width: 100%;
+        transition: background 0.15s;
     }
+    .btn-limpiar:hover { background: #757575; }
 
-    .select-ex option {
-        background-color: #3a7a97;
-        color: white;
-    }
-
-    .input-fecha::-webkit-calendar-picker-indicator {
-        filter: invert(1);
+    .btn-agregar {
+        height: 34px;
+        background: #4caf50;
+        color: #fff;
+        border: none;
+        border-radius: 3px;
+        font-size: 13px;
+        font-weight: 700;
         cursor: pointer;
+        width: 100%;
+        transition: background 0.15s;
     }
+    .btn-agregar:hover { background: #388e3c; }
+
+    /* ── Placeholder otros cargos ────────────────────────────────────────────── */
+    .otros-placeholder {
+        color: #888;
+        font-style: italic;
+        text-align: center;
+        padding: 40px 0;
+    }
+
+    /* ══ MODAL ════════════════════════════════════════════════════════════════ */
+    .modal-overlay {
+        position: fixed;
+        inset: 0;
+        background: rgba(0,0,0,0.45);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        z-index: 1000;
+    }
+
+    .modal {
+        background: #fff;
+        border-radius: 6px;
+        width: 560px;
+        max-width: 96vw;
+        max-height: 90vh;
+        overflow-y: auto;
+        box-shadow: 0 8px 32px rgba(0,0,0,0.22);
+        padding: 0 0 20px;
+    }
+
+    .modal-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        background: #4caf50;
+        color: #fff;
+        padding: 12px 18px;
+        border-radius: 6px 6px 0 0;
+    }
+    .modal-titulo { font-size: 15px; font-weight: 700; }
+    .modal-close {
+        background: none; border: none; color: #fff;
+        font-size: 18px; cursor: pointer; line-height: 1;
+    }
+    .modal-close:hover { opacity: 0.75; }
+
+    .modal-section {
+        padding: 14px 18px 0;
+        display: flex;
+        flex-direction: column;
+        gap: 4px;
+    }
+
+    .modal-sep {
+        display: flex; align-items: center; gap: 8px;
+        margin: 14px 18px 4px;
+        color: #2a7a2a; font-size: 12px; font-weight: 700;
+        text-transform: uppercase; letter-spacing: 0.05em;
+    }
+    .modal-sep::before, .modal-sep::after {
+        content: ''; flex: 1; height: 1px; background: #c8e6c9;
+    }
+
+    .modal-nota {
+        font-size: 12px; color: #666; font-style: italic;
+        margin: 0 18px 6px; line-height: 1.4;
+    }
+
+    .modal-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 10px;
+        padding: 6px 18px 0;
+    }
+
+    .modal-field {
+        display: flex; flex-direction: column; gap: 3px;
+    }
+    .modal-field--full { grid-column: 1 / -1; }
+
+    .modal-label {
+        font-size: 12px; font-weight: 600; color: #444;
+    }
+
+    .modal-inp {
+        height: 30px;
+        border: 1px solid #bbb;
+        border-radius: 3px;
+        padding: 0 8px;
+        font-size: 13px;
+        color: #333;
+        outline: none;
+    }
+    .modal-inp:focus { border-color: #4caf50; box-shadow: 0 0 0 2px rgba(76,175,80,0.18); }
+    .modal-inp--ro { background: #f5f5f5; color: #555; cursor: default; }
+
+    .modal-select {
+        height: 30px;
+        border: 1px solid #bbb;
+        border-radius: 3px;
+        padding: 0 6px;
+        font-size: 13px;
+        color: #333;
+        outline: none;
+        cursor: pointer;
+        background: #fff;
+    }
+    .modal-select:focus { border-color: #4caf50; }
+
+    .modal-actions {
+        display: flex;
+        justify-content: flex-end;
+        gap: 10px;
+        padding: 16px 18px 0;
+    }
+
+    .btn-modal-cancel {
+        padding: 7px 22px;
+        background: #9e9e9e; color: #fff;
+        border: none; border-radius: 3px;
+        font-size: 13px; font-weight: 600; cursor: pointer;
+    }
+    .btn-modal-cancel:hover { background: #757575; }
+
+    .btn-modal-ok {
+        padding: 7px 22px;
+        background: #4caf50; color: #fff;
+        border: none; border-radius: 3px;
+        font-size: 13px; font-weight: 600; cursor: pointer;
+    }
+    .btn-modal-ok:hover { background: #388e3c; }
 </style>

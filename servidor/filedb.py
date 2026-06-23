@@ -1,5 +1,4 @@
-import asyncio
-
+"""Implementación de [`Db`](db.Db) que almacena archivos en una carpeta local."""
 from abstracciones.db import Db, Documento
 from pathlib import Path
 from aiopath import AsyncPath
@@ -25,7 +24,7 @@ class FileDb(Db):
         async for archivo in dir_tabla.iterdir():
             stat: stat_result = await archivo.stat()
             pareja = (stat.st_mtime_ns, archivo.name, archivo)
-            if not await archivo.is_file() or (ultima_pareja is not None and pareja <= ultima_pareja):
+            if not await archivo.is_file() or (ultima_pareja is not None and pareja >= ultima_pareja):
                 continue
 
             parejas.append(pareja)

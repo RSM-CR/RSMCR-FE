@@ -1,18 +1,27 @@
 from abc import ABC, abstractmethod
+from typing import Callable, Awaitable
+from pydantic import BaseModel
+
+class Documento(BaseModel):
+    nombre: str
+    id: str
+    tabla: str
+    obtener_contenido: Callable[[], Awaitable[str]]
+
 
 class Db(ABC):
     @abstractmethod
-    async def obtener_documentos_recientes(self, cantidad: int, ultimo_id: str | None) -> tuple[list[dict], str]:
+    async def obtener_recientes(self, tabla: str, cantidad: int, ultimo_id: str | None) -> list[Documento]:
         pass
 
     @abstractmethod
-    async def actualizar_documento(self, documento: dict, id: str):
+    async def actualizar(self, tabla: str, id: str, contenido: str):
         pass
 
     @abstractmethod
-    async def crear_documento(self, documento: dict) -> str:
+    async def crear(self, tabla: str, id: str, contenido: str):
         pass
 
     @abstractmethod 
-    async def borrar_documento(self, id: str):
+    async def borrar(self, tabla: str, id: str):
         pass

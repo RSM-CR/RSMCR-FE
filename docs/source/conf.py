@@ -27,14 +27,14 @@ language = 'es'
 # -- Autodoc2 configuration ---------------------------------------------------
 # https://sphinx-autodoc2.readthedocs.io/en/latest/config.html
 autodoc2_class_docstring = "both"
+
+autodoc2_sort_names = True
+
 # Lista de archivos a documentar
 autodoc2_packages = [
-    "../../abstracciones/destino.py",
-    "../../abstracciones/fuente.py",
-    "../../xero/auth.py",
-    "../../servidor/configurar.py",
-    "../../servidor/secretos.py",
-    "../../servidor/token.py",
+    "../../abstracciones/",
+    "../../xero/",
+    "../../servidor/",
     "../../Capa.py",
     "../../factura.py",
     "../../var_a_xml.py"

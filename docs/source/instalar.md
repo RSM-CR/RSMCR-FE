@@ -57,7 +57,7 @@ Para los pasos posteriores, se ocupan varios datos suministrados por Xero al cre
     <img src="../assets/XeroWebhooks.png" width="500" alt="Imagen que muestra dónde encontrar la pestaña Webhooks">
 
 > [!NOTE]
-> Recuerda hacer clic en *Send 'Intent to receive' una vez el servidor esté funcionando. Esto le permite a Xero verificar que el servidor está en funcionamiento para comenzar a mandarle notificaciones.
+> Recuerda hacer clic en *Send 'Intent to receive'* una vez el servidor esté funcionando. Esto le permite a Xero verificar que el servidor está en funcionamiento para comenzar a mandarle notificaciones.
 
 ## 4. Configurar el servidor
 El servidor necesita una variedad de variables de entorno almacenadas en un archivo `.env`. Este se puede configurar automáticamente con una guía interactiva ejecutable con el siguiente comando:

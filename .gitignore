@@ -63,3 +63,6 @@ coverage/
 # Vite
 /interfaz/vite.config.js.timestamp-*
 /interfaz/vite.config.ts.timestamp-*
+
+# Database
+/servidor/filedb

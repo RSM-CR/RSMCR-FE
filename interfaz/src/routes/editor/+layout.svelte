@@ -5,10 +5,11 @@
 
     const urlActual = resolve("/editor");
 
-    const tabs = [new Tab("Editor Automático", urlActual), new Tab("Editor XML", `${urlActual}/xml`)]
+    const tabs = [new Tab("Editor Automático", urlActual), new Tab("Editor JSON", `${urlActual}/json`)]
 
     let { children } = $props();
 </script>
 
 <NavBar tabs={tabs}/>
+
 {@render children()}

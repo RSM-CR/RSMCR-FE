@@ -10,6 +10,14 @@ endpoint = FastAPI()
 #Aquí llegan los datos que vienen del forms en Svelte
 
 class Svelte (BaseModel):
+    #IVA
+
+    tipo_iva: str = ""
+    tarifa_iva: str = ""
+    porcentaje_iva: str = ""
+    monto_iva: str = ""
+
+    #resto de cosas
 
     metododepago: int = ""
     tipodoc: int = ""
@@ -27,6 +35,15 @@ class Svelte (BaseModel):
     distrito: str = ""
     otrassenas: str = ""
     numdoc: int = ""
+
+    #exoneración
+
+    motivo_exoneracion: str = ""
+    num_doc_exo: str = ""
+    institucion: str = ""
+    fecha_exo: str = ""
+    porcentaje_exo: str = ""
+    monto_exonerado: str = ""
 
 @endpoint.post("/generarxml")
 
@@ -99,14 +116,47 @@ def generar_xml (campos: Svelte):
         totales= ET.SubElement(factura_xml, "Totales")
         ET.SubElement(totales, "TotalVenta").text = f"{total_venta:.2f}"
 
-        #aún faltan los impuestos, Matheus cuando termine póngalos aquí
+        #impuestos
 
-        extra = ET.SubElement(factura_xml, "Extra")
-        #ET.SubElement(extra, "EsVersion4_4").text = "true" esto aun no sé
+        if campos.tipo_iva:
+
+            impuestos = ET.SubElement(linea, "Impuestos")
+            impuesto = ET.SubElement(impuestos, "Impuesto")
+
+            ET.SubElement(impuesto, "CodigoImpuesto").text = campos.tipo_iva
+            ET.SubElement(impuesto, "CodigoTarifa").text = campos.tarifa_iva
+            ET.SubElement(impuesto, "PorcentajeImpuesto").text = campos.porcentaje_iva
+            ET.SubElement(impuesto, "MontoImpuesto").text = campos.monto_iva
+
+        #Exoneración
+
+        if campos.motivo_exoneracion:
+
+            exoneracion = ET.SubElement(impuesto, "Exoneracion")
+            ET.SubElement(exoneracion, "TipoDocumento").text = campos.motivo_exoneracion
+            ET.SubElement(exoneracion, "NumeroDocumento").text = campos.num_doc_exo
+            ET.SubElement(exoneracion, "NombreInstitucion").text = campos.institucion
+            ET.SubElement(exoneracion, "FechaEmision").text = campos.fecha_exo
+            ET.SubElement(exoneracion, "PorcentajeExoneracion").text = campos.porcentaje_exo
+            ET.SubElement(exoneracion, "MontoExoneracion").text = campos.monto_exonerado
 
         #XML
 
         tree = ET.ElementTree(root)
         ET.indent(tree, space = "    ")
         tree.write("factura.xml", encoding="utf-8", xml_declaration=True)
-        
+
+        xml_string = ET.tostring(root,encoding="unicode")
+        conn = psycopg2.connect(
+            host = "localhost",
+            database= "Holi",
+            user= "gxbridge",
+            password = ""
+        )
+        cursor = conn.cursor()
+        cursor.execute("INSERT INTO facturas (xml) VALUES (%s)", (xml_string,))
+        conn.commit()
+        cursor.close()
+        conn.close()
+
+        return {"ok": True, "mensaje": "XML generado y guardado correctamente"}

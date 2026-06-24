@@ -1,4 +1,8 @@
-"""Implementación de [`Db`](db.Db) que almacena archivos en una carpeta local."""
+"""Implementación de [`Db`](db.Db) que almacena archivos en una carpeta local.
+Se recomienda leer [`Db`](db.Db) para conocer más detalles.
+
+Conceptualmente, esta implementación trata a **tabla** como si fuese un directorio. Asimismo,
+los parámetros de **id** y **ultimo_id** corresponden al nombre del archivo dentro del directorio."""
 from abstracciones.db import Db, Documento
 from pathlib import Path
 from aiopath import AsyncPath
@@ -7,6 +11,8 @@ import heapq
 
 class FileDb(Db):
     def __init__(self, carpeta: str ="./servidor/filedb") -> None:
+        """:param str carpeta: La carpeta en donde se va a crear la base de datos. De aquí se extraen
+        todos los archivos y datos. Por defecto, tiene un valor de `\"./servidor/filedb\"`"""
         carpeta_path = Path(carpeta)
         carpeta_path.mkdir(exist_ok = True)
         self.carpeta: AsyncPath =  AsyncPath(carpeta_path)
@@ -55,7 +61,9 @@ class FileDb(Db):
         await dir_tabla.mkdir(exist_ok=True)
         nuevo_archivo: AsyncPath = dir_tabla.joinpath(id)
 
-        await nuevo_archivo.touch()
+        if await nuevo_archivo.exists():
+            raise FileExistsError("Se intentó crear un archivo que ya existía")
+
         await nuevo_archivo.write_text(contenido)
     
     async def borrar(self, tabla:str, id: str):

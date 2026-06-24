@@ -1,7 +1,5 @@
 <script lang="ts">
 
-    let mostrarIVA = $state(false);
-
     let codProducto = $state('');
     let codCabys = $state('');
     let codMedicamento = $state('');
@@ -16,10 +14,6 @@
 
     let precioUnitario = $state(0);
     let cantidad = $state(0);
-
-    const baseImponible = $derived(() => subtotal);
-    const porcenIVA = $derived(() => pct01);
-    const montoIVA = $derived(() => ivaCalculado);
 
     let metododepago = $state('');
     let tipodoc = $state('');
@@ -205,6 +199,7 @@
         <div class="informacion"><input bind:value={codigoactividad} placeholder="Código de Actividad..." /></div>
         <div class="informacion"><input bind:value={tipoidreceptor} placeholder="Tipo de identificación del Receptor..." /></div>
     </div>
+
 </div>
 <!-- ══ CONTENEDOR PRINCIPAL ══════════════════════════════════════════════════ -->
 <div class="panel-root">
@@ -628,92 +623,6 @@
         color: rgba(255, 255, 255, 0.95);
     }
 
-    /* Botón */
-    .boton-IVA-wrapper {
-        display: flex;
-        justify-content: center;
-        margin-top: 18px;
-    }
-
-    .boton-IVA {
-        background-color: #4A8EAC;
-        color: white;
-        border: 2px solid #3a7a97;
-        border-radius: 10px;
-        padding: 8px 32px;
-        font-size: 15px;
-        cursor: pointer;
-        transition: background-color 0.2s;
-    }
-
-    .boton-IVA:hover {
-        background-color: #3a7a97;
-    }
-
-    .panel-exoneracion {
-        margin-top: 16px;
-        background-color: #c3e4f3;
-        border: 2px solid #9acde8;
-        border-radius: 14px;
-        padding: 18px 20px;
-    }
-
-    .subtitulo-exoneracion {
-        color: #4A8EAC;
-        font-size: 16px;
-        font-weight: bold;
-        text-align: center;
-        margin: 0 0 14px 0;
-    }
-
-    .inputs-exoneracion {
-        display: grid;
-        grid-template-columns: 1fr 1fr;
-        gap: 10px;
-    }
-
-    .inputs-exoneracion .informacion-ex:last-child:nth-child(odd) {
-        grid-column: 1 / -1;
-    }
-
-    .informacion-ex {
-        background: #4A8EAC;
-        border: 2px solid #4A8EAC;
-        border-radius: 10px;
-        display: flex;
-        align-items: center;
-    }
-
-    .informacion-ex input,
-    .informacion-ex select {
-        background: transparent;
-        border: none;
-        outline: none;
-        color: white;
-        font-size: 14px;
-        padding: 8px 12px;
-        width: 100%;
-        box-sizing: border-box;
-    }
-
-    .informacion-ex input::placeholder {
-        color: rgba(255, 255, 255, 0.9);
-    }
-
-    .select-ex {
-        appearance: none;
-        cursor: pointer;
-    }
-
-    .select-ex option {
-        background-color: #3a7a97;
-        color: white;
-    }
-
-    .input-fecha::-webkit-calendar-picker-indicator {
-        filter: invert(1);
-        cursor: pointer;
-    }
 
     /* ── Reset / base ────────────────────────────────────────────────────────── */
     *, *::before, *::after { box-sizing: border-box; }

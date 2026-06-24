@@ -170,11 +170,11 @@
             OTROS CARGOS
         </button>
     </div>
-
+    
     <!-- ── TAB: LÍNEAS DETALLE ──────────────────────────────────────────────── -->
     {#if tabActivo === 'lineas'}
     <div class="lineas-body">
-
+    
         <!-- Fila 1: Cód. Producto | Cód. CABYS | Cód. Medicamentos | Unid. Medida -->
         <div class="grid-4">
             <div class="field">
@@ -187,12 +187,12 @@
                     <button class="icon-btn icon-btn--green">🔍</button>
                 </div>
             </div>
-
+    
             <div class="field">
                 <label class="field__label" for="cod-cabys">Cód. CABYS:</label>
                 <input bind:value={codCabys} id="cod-cabys" class="inp" placeholder="" />
             </div>
-
+    
             <div class="field">
                 <div class="field__label">
                     <span>Cód. Medicamentos:</span>
@@ -203,7 +203,7 @@
                     <button class="icon-btn icon-btn--green">✏</button>
                 </div>
             </div>
-
+    
             <div class="field">
                 <div class="field__label">
                     <span>Unid. Medida:</span>
@@ -216,25 +216,25 @@
                 </select>
             </div>
         </div>
-
+    
         <!-- Fila 2: Cantidad | Precio unitario | Descripción -->
         <div class="grid-3-wide">
             <div class="field">
                 <label class="field__label" for="cantidad">Cantidad:</label>
                 <input bind:value={cantidad} id="cantidad" type="number" step="0.01" class="inp" />
             </div>
-
+    
             <div class="field">
                 <label class="field__label" for="precio-unitario">Precio unitario:</label>
                 <input bind:value={precioUnitario} id="precio-unitario" type="number" step="0.01" class="inp" />
             </div>
-
+    
             <div class="field field--span2">
                 <label class="field__label" for="descripcion">Descripción:</label>
                 <input bind:value={descripcion} id="descripcion" class="inp" placeholder="" />
             </div>
         </div>
-
+    
         <!-- Fila 3: Descuento | Otros imps | IVA | Total línea -->
         <div class="grid-4">
             <div class="field">
@@ -244,7 +244,7 @@
                 </div>
                 <input bind:value={descuento} type="number" step="0.01" class="inp" />
             </div>
-
+    
             <div class="field">
                 <div class="field__label">
                     <span>Otros imps:</span>
@@ -252,7 +252,7 @@
                 </div>
                 <input bind:value={otrosImps} type="number" step="0.01" class="inp" />
             </div>
-
+    
             <div class="field">
                 <div class="field__label">
                     <span>I.V.A:</span>
@@ -265,19 +265,19 @@
                     class="inp inp--readonly"
                     readonly />
             </div>
-
+    
             <div class="field">
                 <label class="field__label" for="total-linea">Total línea:</label>
                 <input value={totalLinea.toFixed(2)} id="total-linea" class="inp inp--readonly" readonly />
             </div>
         </div>
-
+    
         <!-- Fila 4: Tipo transacción | VIN/Serie | botón combo -->
         <div class="grid-3-bottom">
             <div class="field">
                 <button class="btn-combo">Lista de productos del combo</button>
             </div>
-
+    
             <div class="field">
                 <label class="field__label" for="tipo-transaccion">Tipo transacción<span class="opcional">(Opcional):</span></label>
                 <select bind:value={tipoTransaccion} id="tipo-transaccion" class="inp inp--select">
@@ -286,7 +286,7 @@
                     {/each}
                 </select>
             </div>
-
+    
             <div class="field">
                 <label class="field__label" for="num-vin-serie">Número VIN o Serie<span class="opcional">(Opcional):</span></label>
                 <div class="input-icon-wrap">
@@ -295,7 +295,7 @@
                 </div>
             </div>
         </div>
-
+    
         <!-- Fila 5: botones acción -->
         <div class="actions-row">
             <div></div>
@@ -303,10 +303,10 @@
             <button class="btn-limpiar" onclick={limpiarLinea}>Limpiar Línea</button>
             <button class="btn-agregar" onclick={agregarLinea}>Agregar Línea</button>
         </div>
-
+    
     </div>
     {/if}
-
+    
     <!-- ── TAB: OTROS CARGOS ────────────────────────────────────────────────── -->
     {#if tabActivo === 'otros'}
     <div class="lineas-body">
@@ -314,9 +314,9 @@
     </div>
     {/if}
 </div>
-
-<!-- ══ MODAL IVA ══════════════════════════════════════════════════════════════ -->
-{#if modalIVA}
+    
+    <!-- ══ MODAL IVA ══════════════════════════════════════════════════════════════ -->
+    {#if modalIVA}
     <div
         class="modal-overlay"
         role="button"
@@ -324,7 +324,7 @@
         onclick={() => modalIVA = false}
         onkeydown={(e) => e.key === 'Escape' && (modalIVA = false)}>
             <div class="modal" role="dialog" tabindex="-1" onclick={(e) => e.stopPropagation()} onkeydown={(e) => e.stopPropagation()}>
-
+    
             <!-- Selector tipo siempre visible -->
             <div class="modal-section">
                 <label class="modal-label" for="tipo-iva">Tipo de I.V.A:</label>
@@ -335,7 +335,7 @@
                     {/each}
                 </select>
             </div>
-
+    
             <!-- ── TIPO 01 ── -->
             {#if tipoIVA === '01'}
                 <div class="modal-sep"><span>IVA General</span></div>
@@ -366,7 +366,7 @@
                         <input class="modal-inp modal-inp--ro" id="total-con-iva-01" value="₡{(subtotal + montoIVA01).toFixed(2)}" readonly />
                     </div>
                 </div>
-
+    
                 <!-- Sub-sección exoneración -->
                 <div class="modal-sep"><span>Exoneración (opcional)</span></div>
                 <div class="modal-grid">
@@ -379,7 +379,7 @@
                             {/each}
                         </select>
                     </div>
-
+    
                     {#if mostrarArtIns}
                         <div class="modal-field">
                             <label class="modal-label" for="num-articulo">N.° artículo:</label>
@@ -390,7 +390,7 @@
                             <input bind:value={inciso} id="num-inciso" type="number" class="modal-inp" placeholder="Inciso..." />
                         </div>
                     {/if}
-
+    
                     {#if motivoExoneracion}
                         <div class="modal-field modal-field--full">
                             <label class="modal-label" for="num-doc-exoneracion">N.° documento exoneración (17 car.):</label>
@@ -421,7 +421,7 @@
                     {/if}
                 </div>
             {/if}
-
+    
             <!-- ── TIPO 07 ── -->
             {#if tipoIVA === '07'}
                 <div class="modal-sep"><span>IVA – Cálculo Especial (art. 31 LIVA)</span></div>
@@ -449,7 +449,7 @@
                     </div>
                 </div>
             {/if}
-
+    
             <!-- ── TIPO 08 ── -->
             {#if tipoIVA === '08'}
                 <div class="modal-sep"><span>IVA – Régimen Especial Bienes Usados (REBU)</span></div>
@@ -484,7 +484,7 @@
                     {/if}
                 </div>
             {/if}
-
+    
             <!-- ── TIPO 09 ── -->
             {#if tipoIVA === '09'}
                 <div class="modal-sep"><span>IVA cobrado a nivel de fábrica</span></div>
@@ -504,7 +504,7 @@
                     </div>
                 </div>
             {/if}
-
+    
             <!-- Botones modal -->
             <div class="modal-actions">
                 <button class="btn-modal-cancel" onclick={() => modalIVA = false}>Cancelar</button>
@@ -512,13 +512,9 @@
             </div>
         </div>
     </div>
-{/if}
+    {/if}
 
 <style>
-    /* ── Reset / base ────────────────────────────────────────────────────────── */
-    *, *::before, *::after { box-sizing: border-box; }
-    :global(body) { margin: 0; background: #f0f0f0; font-family: Arial, sans-serif; font-size: 13px; color: #333; }
-
     /* ── Panel raíz ─────────────────────────────────────────────────────────── */
     .panel-root {
         background: #fff;
@@ -526,6 +522,7 @@
         border-radius: 4px;
         margin: 20px;
         box-shadow: 0 1px 4px rgba(0,0,0,0.12);
+        box-sizing: border-box;
     }
 
     /* ── Tabs ────────────────────────────────────────────────────────────────── */

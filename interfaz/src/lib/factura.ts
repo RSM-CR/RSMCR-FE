@@ -1,4 +1,4 @@
-class Factura {
+export class Factura {
     // atributos de la clase
     nombre: string | null;
     cedula: string | null;

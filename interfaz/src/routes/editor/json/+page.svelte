@@ -1,9 +1,17 @@
 <script lang="ts">
     import { JSONEditor } from 'svelte-jsoneditor'
+    import type { Factura } from '$lib/factura';
+    import { getContext } from 'svelte';
+
+    let factura: Factura = getContext('factura');
+    let contenido = $state({
+    text: undefined,
+    json: factura
+    })
 </script>
 
 <div class="editor-root">
-    <JSONEditor/>
+    <JSONEditor bind:content={contenido}/>
 </div>
 
 <style>

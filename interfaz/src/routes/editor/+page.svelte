@@ -1,4 +1,8 @@
 <script lang="ts">
+    import type { Factura } from '$lib/factura';
+    import { getContext } from 'svelte';
+
+    const factura: Factura = getContext('factura');
 
     let codProducto = $state('');
     let codCabys = $state('');
@@ -176,7 +180,7 @@
 
 async function enviarDatos(){
     const respuesta = await fetch("http://localhost:8000/generar-xml", {
-        method: "POST"
+        method: "POST",
         headers: { "Content-Type": "application/json"},
         body: JSON.stringify({
             metododepago,
@@ -197,14 +201,14 @@ async function enviarDatos(){
             numdoc,
             tipo_iva: tipoIVA,
             tarifa_iva:tarifaIVA,
-            porcentaje_iva: String(pct01)
-            monto_iva: String(ivaCalculado0),
+            porcentaje_iva: pct01,
+            monto_iva: ivaCalculado,
             motivo_exoneracion: motivoExoneracion,
             num_doc_exo: numDocExoneracion,
             institucion: institucion,
             fecha_exo: fechaExoneracion,
-            porcentaje_exo: String(porcentajeExoneracion),
-            monto_exonerado: String(montoExonerado)
+            porcentaje_exo: porcentajeExoneracion,
+            monto_exonerado: montoExonerado
 
         })
     });
@@ -220,7 +224,7 @@ async function enviarDatos(){
     </div>
 
     <div class="inputs1">
-        <div class="informacion"><input bind:value={metododepago} placeholder="Método de pago..." /></div>
+        <div class="informacion"><input bind:value={factura.MediosPago.TiposMedioPago} placeholder="Método de pago..." /></div>
         <div class="informacion"><input bind:value={numcuentaemisor} placeholder="Número cuenta emisor..." /></div>
         <div class="informacion"><input bind:value={tipodoc} placeholder="Tipo de documento..." /></div>
         <div class="informacion"><input bind:value={numdoc} placeholder="Número de documento..." /></div>

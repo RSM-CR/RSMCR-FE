@@ -153,13 +153,6 @@
         z-index: 1;
     }
 
-    .content svg {
-        width: 48px;
-        height: 48px;
-        flex-shrink: 0;
-        filter: drop-shadow(0 2px 4px rgba(10, 60, 255, 0.4));
-    }
-
     .content h1 {
         font-size: 20px;
         font-weight: 600;

@@ -1,4 +1,4 @@
-<script>
+<script lang="ts">
     // ── Tab activo ────────────────────────────────────────────────────────────
     let tabActivo = $state('lineas'); // 'lineas' | 'otros'
 
@@ -102,7 +102,7 @@
     let montoIVA07   = $derived(+(diferencia07 * 0.13).toFixed(2));
 
     // IVA tipo 08
-    let factorRebu   = $derived(factoresRebu[modalidadRebu] ?? null);
+    let factorRebu   = $derived(factoresRebu[modalidadRebu as keyof typeof factoresRebu] ?? null);
     let montoIVA08   = $derived(factorRebu ? +(precioNeto08 * factorRebu.factor).toFixed(2) : 0);
 
     // IVA tipo 09
@@ -189,8 +189,8 @@
             </div>
 
             <div class="field">
-                <label class="field__label">Cód. CABYS:</label>
-                <input bind:value={codCabys} class="inp" placeholder="" />
+                <label class="field__label" for="cod-cabys">Cód. CABYS:</label>
+                <input bind:value={codCabys} id="cod-cabys" class="inp" placeholder="" />
             </div>
 
             <div class="field">
@@ -220,18 +220,18 @@
         <!-- Fila 2: Cantidad | Precio unitario | Descripción -->
         <div class="grid-3-wide">
             <div class="field">
-                <label class="field__label">Cantidad:</label>
-                <input bind:value={cantidad} type="number" step="0.01" class="inp" />
+                <label class="field__label" for="cantidad">Cantidad:</label>
+                <input bind:value={cantidad} id="cantidad" type="number" step="0.01" class="inp" />
             </div>
 
             <div class="field">
-                <label class="field__label">Precio unitario:</label>
-                <input bind:value={precioUnitario} type="number" step="0.01" class="inp" />
+                <label class="field__label" for="precio-unitario">Precio unitario:</label>
+                <input bind:value={precioUnitario} id="precio-unitario" type="number" step="0.01" class="inp" />
             </div>
 
             <div class="field field--span2">
-                <label class="field__label">Descripción:</label>
-                <input bind:value={descripcion} class="inp" placeholder="" />
+                <label class="field__label" for="descripcion">Descripción:</label>
+                <input bind:value={descripcion} id="descripcion" class="inp" placeholder="" />
             </div>
         </div>
 
@@ -267,8 +267,8 @@
             </div>
 
             <div class="field">
-                <label class="field__label">Total línea:</label>
-                <input value={totalLinea.toFixed(2)} class="inp inp--readonly" readonly />
+                <label class="field__label" for="total-linea">Total línea:</label>
+                <input value={totalLinea.toFixed(2)} id="total-linea" class="inp inp--readonly" readonly />
             </div>
         </div>
 
@@ -279,8 +279,8 @@
             </div>
 
             <div class="field">
-                <label class="field__label">Tipo transacción<span class="opcional">(Opcional):</span></label>
-                <select bind:value={tipoTransaccion} class="inp inp--select">
+                <label class="field__label" for="tipo-transaccion">Tipo transacción<span class="opcional">(Opcional):</span></label>
+                <select bind:value={tipoTransaccion} id="tipo-transaccion" class="inp inp--select">
                     {#each tiposTransaccion as t}
                         <option value={t.value}>{t.label}</option>
                     {/each}
@@ -288,9 +288,9 @@
             </div>
 
             <div class="field">
-                <label class="field__label">Número VIN o Serie<span class="opcional">(Opcional):</span></label>
+                <label class="field__label" for="num-vin-serie">Número VIN o Serie<span class="opcional">(Opcional):</span></label>
                 <div class="input-icon-wrap">
-                    <input bind:value={numVinSerie} class="inp" placeholder="" />
+                    <input bind:value={numVinSerie} id="num-vin-serie" class="inp" placeholder="" />
                     <button class="icon-btn icon-btn--green">+</button>
                 </div>
             </div>
@@ -317,200 +317,201 @@
 
 <!-- ══ MODAL IVA ══════════════════════════════════════════════════════════════ -->
 {#if modalIVA}
-<div class="modal-overlay" onclick={() => modalIVA = false}>
-    <div class="modal" onclick={(e) => e.stopPropagation()}>
-        <div class="modal-header">
-            <span class="modal-titulo">Editar I.V.A</span>
-            <button class="modal-close" onclick={() => modalIVA = false}>✕</button>
-        </div>
+    <div
+        class="modal-overlay"
+        role="button"
+        tabindex="-1"
+        onclick={() => modalIVA = false}
+        onkeydown={(e) => e.key === 'Escape' && (modalIVA = false)}>
+            <div class="modal" role="dialog" tabindex="-1" onclick={(e) => e.stopPropagation()} onkeydown={(e) => e.stopPropagation()}>
 
-        <!-- Selector tipo siempre visible -->
-        <div class="modal-section">
-            <label class="modal-label">Tipo de I.V.A:</label>
-            <select bind:value={tipoIVA} onchange={onChangeTipoIVA} class="modal-select">
-                <option value="" disabled selected>Seleccione tipo...</option>
-                {#each tiposIVA as t}
-                    <option value={t.value}>{t.label}</option>
-                {/each}
-            </select>
-        </div>
-
-        <!-- ── TIPO 01 ── -->
-        {#if tipoIVA === '01'}
-            <div class="modal-sep"><span>IVA General</span></div>
-            <div class="modal-grid">
-                <div class="modal-field modal-field--full">
-                    <label class="modal-label">Tarifa de I.V.A:</label>
-                    <select bind:value={tarifaIVA} class="modal-select">
-                        <option value="" disabled selected>Seleccione tarifa...</option>
-                        {#each tarifasIVA as t}
-                            <option value={t.value}>{t.label}</option>
-                        {/each}
-                    </select>
-                </div>
-                <div class="modal-field">
-                    <label class="modal-label">Base imponible:</label>
-                    <input class="modal-inp modal-inp--ro" value="₡{subtotal.toFixed(2)}" readonly />
-                </div>
-                <div class="modal-field">
-                    <label class="modal-label">Tarifa aplicada:</label>
-                    <input class="modal-inp modal-inp--ro" value="{pct01}%" readonly />
-                </div>
-                <div class="modal-field">
-                    <label class="modal-label">Monto I.V.A:</label>
-                    <input class="modal-inp modal-inp--ro" value="₡{montoIVA01.toFixed(2)}" readonly />
-                </div>
-                <div class="modal-field">
-                    <label class="modal-label">Total con I.V.A:</label>
-                    <input class="modal-inp modal-inp--ro" value="₡{(subtotal + montoIVA01).toFixed(2)}" readonly />
-                </div>
+            <!-- Selector tipo siempre visible -->
+            <div class="modal-section">
+                <label class="modal-label" for="tipo-iva">Tipo de I.V.A:</label>
+                <select bind:value={tipoIVA} id="tipo-iva" onchange={onChangeTipoIVA} class="modal-select">
+                    <option value="" disabled selected>Seleccione tipo...</option>
+                    {#each tiposIVA as t}
+                        <option value={t.value}>{t.label}</option>
+                    {/each}
+                </select>
             </div>
 
-            <!-- Sub-sección exoneración -->
-            <div class="modal-sep"><span>Exoneración (opcional)</span></div>
-            <div class="modal-grid">
-                <div class="modal-field modal-field--full">
-                    <label class="modal-label">Motivo de exoneración:</label>
-                    <select bind:value={motivoExoneracion} class="modal-select">
-                        <option value="" selected>— Sin exoneración —</option>
-                        {#each motivosExoneracion as m}
-                            <option value={m.value}>{m.label}</option>
-                        {/each}
-                    </select>
+            <!-- ── TIPO 01 ── -->
+            {#if tipoIVA === '01'}
+                <div class="modal-sep"><span>IVA General</span></div>
+                <div class="modal-grid">
+                    <div class="modal-field modal-field--full">
+                        <label class="modal-label" for="tarifa-iva">Tarifa de I.V.A:</label>
+                        <select bind:value={tarifaIVA} id="tarifa-iva" class="modal-select">
+                            <option value="" disabled selected>Seleccione tarifa...</option>
+                            {#each tarifasIVA as t}
+                                <option value={t.value}>{t.label}</option>
+                            {/each}
+                        </select>
+                    </div>
+                    <div class="modal-field">
+                        <label class="modal-label" for="base-imponible">Base imponible:</label>
+                        <input class="modal-inp modal-inp--ro" id="base-imponible" value="₡{subtotal.toFixed(2)}" readonly />
+                    </div>
+                    <div class="modal-field">
+                        <label class="modal-label" for="tarifa-aplicada">Tarifa aplicada:</label>
+                        <input class="modal-inp modal-inp--ro" id="tarifa-aplicada" value="{pct01}%" readonly />
+                    </div>
+                    <div class="modal-field">
+                        <label class="modal-label" for="monto-iva-01">Monto I.V.A:</label>
+                        <input class="modal-inp modal-inp--ro" id="monto-iva-01" value="₡{montoIVA01.toFixed(2)}" readonly />
+                    </div>
+                    <div class="modal-field">
+                        <label class="modal-label" for="total-con-iva-01">Total con I.V.A:</label>
+                        <input class="modal-inp modal-inp--ro" id="total-con-iva-01" value="₡{(subtotal + montoIVA01).toFixed(2)}" readonly />
+                    </div>
                 </div>
 
-                {#if mostrarArtIns}
-                    <div class="modal-field">
-                        <label class="modal-label">N.° artículo:</label>
-                        <input bind:value={articulo} type="number" class="modal-inp" placeholder="Artículo..." />
-                    </div>
-                    <div class="modal-field">
-                        <label class="modal-label">N.° inciso:</label>
-                        <input bind:value={inciso} type="number" class="modal-inp" placeholder="Inciso..." />
-                    </div>
-                {/if}
-
-                {#if motivoExoneracion}
+                <!-- Sub-sección exoneración -->
+                <div class="modal-sep"><span>Exoneración (opcional)</span></div>
+                <div class="modal-grid">
                     <div class="modal-field modal-field--full">
-                        <label class="modal-label">N.° documento exoneración (17 car.):</label>
-                        <input bind:value={numDocExoneracion} maxlength="17" class="modal-inp" placeholder="Número de documento..." />
+                        <label class="modal-label" for="motivo-exoneracion">Motivo de exoneración:</label>
+                        <select bind:value={motivoExoneracion} id="motivo-exoneracion" class="modal-select">
+                            <option value="" selected>— Sin exoneración —</option>
+                            {#each motivosExoneracion as m}
+                                <option value={m.value}>{m.label}</option>
+                            {/each}
+                        </select>
                     </div>
-                    <div class="modal-field">
-                        <label class="modal-label">Institución emisora:</label>
-                        <input bind:value={institucion} class="modal-inp" placeholder="Institución..." />
-                    </div>
-                    <div class="modal-field">
-                        <label class="modal-label">Fecha exoneración:</label>
-                        <input bind:value={fechaExoneracion} type="date" class="modal-inp" />
-                    </div>
-                    <div class="modal-field">
-                        <label class="modal-label">Porcentaje a exonerar (%):</label>
-                        <input bind:value={porcentajeExoneracion} type="number" min="0" max="100" class="modal-inp" placeholder="0 – 100" />
-                    </div>
-                    {#if porcentajeExoneracion}
+
+                    {#if mostrarArtIns}
                         <div class="modal-field">
-                            <label class="modal-label">Monto exonerado:</label>
-                            <input class="modal-inp modal-inp--ro" value="₡{montoExonerado.toFixed(2)}" readonly />
+                            <label class="modal-label" for="num-articulo">N.° artículo:</label>
+                            <input bind:value={articulo} id="num-articulo" type="number" class="modal-inp" placeholder="Artículo..." />
                         </div>
                         <div class="modal-field">
-                            <label class="modal-label">I.V.A efectivo:</label>
-                            <input class="modal-inp modal-inp--ro" value="₡{ivaEfectivo.toFixed(2)}" readonly />
+                            <label class="modal-label" for="num-inciso">N.° inciso:</label>
+                            <input bind:value={inciso} id="num-inciso" type="number" class="modal-inp" placeholder="Inciso..." />
                         </div>
                     {/if}
-                {/if}
-            </div>
-        {/if}
 
-        <!-- ── TIPO 07 ── -->
-        {#if tipoIVA === '07'}
-            <div class="modal-sep"><span>IVA – Cálculo Especial (art. 31 LIVA)</span></div>
-            <p class="modal-nota">Base imponible = Precio de venta − Precio de compra. Tarifa: 13%.</p>
-            <div class="modal-grid">
-                <div class="modal-field">
-                    <label class="modal-label">Precio de venta (₡):</label>
-                    <input bind:value={precioVenta07} type="number" step="0.01" class="modal-inp" placeholder="0.00" />
+                    {#if motivoExoneracion}
+                        <div class="modal-field modal-field--full">
+                            <label class="modal-label" for="num-doc-exoneracion">N.° documento exoneración (17 car.):</label>
+                            <input bind:value={numDocExoneracion} id="num-doc-exoneracion" maxlength="17" class="modal-inp" placeholder="Número de documento..." />
+                        </div>
+                        <div class="modal-field">
+                            <label class="modal-label" for="institucion">Institución emisora:</label>
+                            <input bind:value={institucion} id="institucion" class="modal-inp" placeholder="Institución..." />
+                        </div>
+                        <div class="modal-field">
+                            <label class="modal-label" for="fecha-exoneracion">Fecha exoneración:</label>
+                            <input bind:value={fechaExoneracion} id="fecha-exoneracion" type="date" class="modal-inp" />
+                        </div>
+                        <div class="modal-field">
+                            <label class="modal-label" for="porcentaje-exonerar">Porcentaje a exonerar (%):</label>
+                            <input bind:value={porcentajeExoneracion} id="porcentaje-exonerar" type="number" min="0" max="100" class="modal-inp" placeholder="0 – 100" />
+                        </div>
+                        {#if porcentajeExoneracion}
+                            <div class="modal-field">
+                                <label class="modal-label" for="monto-exonerado">Monto exonerado:</label>
+                                <input class="modal-inp modal-inp--ro" id="monto-exonerado" value="₡{montoExonerado.toFixed(2)}" readonly />
+                            </div>
+                            <div class="modal-field">
+                                <label class="modal-label" for="iva-efectivo">I.V.A efectivo:</label>
+                                <input class="modal-inp modal-inp--ro" id="iva-efectivo" value="₡{ivaEfectivo.toFixed(2)}" readonly />
+                            </div>
+                        {/if}
+                    {/if}
                 </div>
-                <div class="modal-field">
-                    <label class="modal-label">Precio de compra (₡):</label>
-                    <input bind:value={precioCompra07} type="number" step="0.01" class="modal-inp" placeholder="0.00" />
-                </div>
-                <div class="modal-field">
-                    <label class="modal-label">Diferencia (base):</label>
-                    <input class="modal-inp modal-inp--ro" value="₡{diferencia07.toFixed(2)}" readonly />
-                </div>
-                <div class="modal-field">
-                    <label class="modal-label">Monto I.V.A (13%):</label>
-                    <input class="modal-inp modal-inp--ro" value="₡{montoIVA07.toFixed(2)}" readonly />
-                </div>
-                <div class="modal-field modal-field--full">
-                    <label class="modal-label">Total con I.V.A:</label>
-                    <input class="modal-inp modal-inp--ro" value="₡{(precioVenta07 + montoIVA07).toFixed(2)}" readonly />
-                </div>
-            </div>
-        {/if}
+            {/if}
 
-        <!-- ── TIPO 08 ── -->
-        {#if tipoIVA === '08'}
-            <div class="modal-sep"><span>IVA – Régimen Especial Bienes Usados (REBU)</span></div>
-            <p class="modal-nota">IVA = Precio neto de venta × Factor DGT (Res. DGT-R-034-2019).</p>
-            <div class="modal-grid">
-                <div class="modal-field modal-field--full">
-                    <label class="modal-label">Modalidad REBU:</label>
-                    <select bind:value={modalidadRebu} class="modal-select">
-                        <option value="" disabled selected>Seleccione modalidad...</option>
-                        {#each Object.entries(factoresRebu) as [k, v]}
-                            <option value={k}>{v.descripcion}</option>
-                        {/each}
-                    </select>
-                </div>
-                <div class="modal-field modal-field--full">
-                    <label class="modal-label">Precio neto de venta (₡):</label>
-                    <input bind:value={precioNeto08} type="number" step="0.01" class="modal-inp" placeholder="0.00" />
-                </div>
-                {#if modalidadRebu}
+            <!-- ── TIPO 07 ── -->
+            {#if tipoIVA === '07'}
+                <div class="modal-sep"><span>IVA – Cálculo Especial (art. 31 LIVA)</span></div>
+                <p class="modal-nota">Base imponible = Precio de venta − Precio de compra. Tarifa: 13%.</p>
+                <div class="modal-grid">
                     <div class="modal-field">
-                        <label class="modal-label">Factor aplicado:</label>
-                        <input class="modal-inp modal-inp--ro" value="{factorRebu?.factor}" readonly />
+                        <label class="modal-label" for="precio-venta-07">Precio de venta (₡):</label>
+                        <input bind:value={precioVenta07} id="precio-venta-07" type="number" step="0.01" class="modal-inp" placeholder="0.00" />
                     </div>
                     <div class="modal-field">
-                        <label class="modal-label">Monto I.V.A:</label>
-                        <input class="modal-inp modal-inp--ro" value="₡{montoIVA08.toFixed(2)}" readonly />
+                        <label class="modal-label" for="precio-compra-07">Precio de compra (₡):</label>
+                        <input bind:value={precioCompra07} id="precio-compra-07" type="number" step="0.01" class="modal-inp" placeholder="0.00" />
+                    </div>
+                    <div class="modal-field">
+                        <label class="modal-label" for="diferencia-07">Diferencia (base):</label>
+                        <input class="modal-inp modal-inp--ro" id="diferencia-07" value="₡{diferencia07.toFixed(2)}" readonly />
+                    </div>
+                    <div class="modal-field">
+                        <label class="modal-label" for="monto-iva-07">Monto I.V.A (13%):</label>
+                        <input class="modal-inp modal-inp--ro" id="monto-iva-07" value="₡{montoIVA07.toFixed(2)}" readonly />
                     </div>
                     <div class="modal-field modal-field--full">
-                        <label class="modal-label">Total con I.V.A:</label>
-                        <input class="modal-inp modal-inp--ro" value="₡{(precioNeto08 + montoIVA08).toFixed(2)}" readonly />
+                        <label class="modal-label" for="total-con-iva-07">Total con I.V.A:</label>
+                        <input class="modal-inp modal-inp--ro" id="total-con-iva-07" value="₡{(precioVenta07 + montoIVA07).toFixed(2)}" readonly />
                     </div>
-                {/if}
-            </div>
-        {/if}
+                </div>
+            {/if}
 
-        <!-- ── TIPO 09 ── -->
-        {#if tipoIVA === '09'}
-            <div class="modal-sep"><span>IVA cobrado a nivel de fábrica</span></div>
-            <p class="modal-nota">El IVA (13%) ya fue cobrado por el fabricante/importador. Se registra para el XML.</p>
-            <div class="modal-grid">
-                <div class="modal-field modal-field--full">
-                    <label class="modal-label">Precio ex-fábrica (₡):</label>
-                    <input bind:value={precioFabrica09} type="number" step="0.01" class="modal-inp" placeholder="0.00" />
+            <!-- ── TIPO 08 ── -->
+            {#if tipoIVA === '08'}
+                <div class="modal-sep"><span>IVA – Régimen Especial Bienes Usados (REBU)</span></div>
+                <p class="modal-nota">IVA = Precio neto de venta × Factor DGT (Res. DGT-R-034-2019).</p>
+                <div class="modal-grid">
+                    <div class="modal-field modal-field--full">
+                        <label class="modal-label" for="modalidad-rebu">Modalidad REBU:</label>
+                        <select bind:value={modalidadRebu} id="modalidad-rebu" class="modal-select">
+                            <option value="" disabled selected>Seleccione modalidad...</option>
+                            {#each Object.entries(factoresRebu) as [k, v]}
+                                <option value={k}>{v.descripcion}</option>
+                            {/each}
+                        </select>
+                    </div>
+                    <div class="modal-field modal-field--full">
+                        <label class="modal-label" for="precio-neto-08">Precio neto de venta (₡):</label>
+                        <input bind:value={precioNeto08} id="precio-neto-08" type="number" step="0.01" class="modal-inp" placeholder="0.00" />
+                    </div>
+                    {#if modalidadRebu}
+                        <div class="modal-field">
+                            <label class="modal-label" for="factor-aplicado">Factor aplicado:</label>
+                            <input class="modal-inp modal-inp--ro" id="factor-aplicado" value="{factorRebu?.factor}" readonly />
+                        </div>
+                        <div class="modal-field">
+                            <label class="modal-label" for="monto-iva-08">Monto I.V.A:</label>
+                            <input class="modal-inp modal-inp--ro" id="monto-iva-08" value="₡{montoIVA08.toFixed(2)}" readonly />
+                        </div>
+                        <div class="modal-field modal-field--full">
+                            <label class="modal-label" for="total-con-iva-08">Total con I.V.A:</label>
+                            <input class="modal-inp modal-inp--ro" id="total-con-iva-08" value="₡{(precioNeto08 + montoIVA08).toFixed(2)}" readonly />
+                        </div>
+                    {/if}
                 </div>
-                <div class="modal-field">
-                    <label class="modal-label">I.V.A incluido (13%):</label>
-                    <input class="modal-inp modal-inp--ro" value="₡{montoIVA09.toFixed(2)}" readonly />
-                </div>
-                <div class="modal-field">
-                    <label class="modal-label">Precio al consumidor:</label>
-                    <input class="modal-inp modal-inp--ro" value="₡{(precioFabrica09 + montoIVA09).toFixed(2)}" readonly />
-                </div>
-            </div>
-        {/if}
+            {/if}
 
-        <!-- Botones modal -->
-        <div class="modal-actions">
-            <button class="btn-modal-cancel" onclick={() => modalIVA = false}>Cancelar</button>
-            <button class="btn-modal-ok" onclick={() => modalIVA = false}>Aceptar</button>
+            <!-- ── TIPO 09 ── -->
+            {#if tipoIVA === '09'}
+                <div class="modal-sep"><span>IVA cobrado a nivel de fábrica</span></div>
+                <p class="modal-nota">El IVA (13%) ya fue cobrado por el fabricante/importador. Se registra para el XML.</p>
+                <div class="modal-grid">
+                    <div class="modal-field modal-field--full">
+                        <label class="modal-label" for="precio-fabrica-09">Precio ex-fábrica (₡):</label>
+                        <input bind:value={precioFabrica09} id="precio-fabrica-09" type="number" step="0.01" class="modal-inp" placeholder="0.00" />
+                    </div>
+                    <div class="modal-field">
+                        <label class="modal-label" for="iva-incluido-09">I.V.A incluido (13%):</label>
+                        <input class="modal-inp modal-inp--ro" id="iva-incluido-09" value="₡{montoIVA09.toFixed(2)}" readonly />
+                    </div>
+                    <div class="modal-field">
+                        <label class="modal-label" for="precio-consumidor">Precio al consumidor:</label>
+                        <input class="modal-inp modal-inp--ro" id="precio-consumidor" value="₡{(precioFabrica09 + montoIVA09).toFixed(2)}" readonly />
+                    </div>
+                </div>
+            {/if}
+
+            <!-- Botones modal -->
+            <div class="modal-actions">
+                <button class="btn-modal-cancel" onclick={() => modalIVA = false}>Cancelar</button>
+                <button class="btn-modal-ok" onclick={() => modalIVA = false}>Aceptar</button>
+            </div>
         </div>
     </div>
-</div>
 {/if}
 
 <style>
@@ -759,22 +760,6 @@
         box-shadow: 0 8px 32px rgba(0,0,0,0.22);
         padding: 0 0 20px;
     }
-
-    .modal-header {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        background: #4caf50;
-        color: #fff;
-        padding: 12px 18px;
-        border-radius: 6px 6px 0 0;
-    }
-    .modal-titulo { font-size: 15px; font-weight: 700; }
-    .modal-close {
-        background: none; border: none; color: #fff;
-        font-size: 18px; cursor: pointer; line-height: 1;
-    }
-    .modal-close:hover { opacity: 0.75; }
 
     .modal-section {
         padding: 14px 18px 0;

@@ -23,6 +23,7 @@
 		"vite": "^8.0.16"
 	},
 	"dependencies": {
-		"@fontsource/poppins": "^5.2.7"
+		"@fontsource/poppins": "^5.2.7",
+		"svelte-jsoneditor": "^3.12.0"
 	}
 }

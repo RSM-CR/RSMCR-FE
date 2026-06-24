@@ -1,4 +1,5 @@
 <script lang="ts">
+    import "../app.css";
     import { onMount } from "svelte";
     import { connectWebSocket } from "$lib/websockets.service";
 
@@ -9,4 +10,6 @@
     let { children } = $props();
 </script>
 
-{@render children()}
+<div class="root">
+    {@render children()}
+</div>

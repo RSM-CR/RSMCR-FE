@@ -172,6 +172,46 @@
         tarifaIVA = ''; modalidadRebu = '';
         motivoExoneracion = ''; porcentajeExoneracion = '';
     }
+
+
+async function enviarDatos(){
+    const respuesta = await fetch("http://localhost:8000/generar-xml", {
+        method: "POST"
+        headers: { "Content-Type": "application/json"},
+        body: JSON.stringify({
+            metododepago,
+            tipodoc,
+            condicionventa,
+            terminal,
+            sucursal,
+            moneda,
+            situacionenvio,
+            codigoactividad,
+            tipoidreceptor,
+            numcuentaemisor,
+            unidadmedida,
+            provincia,
+            canton,
+            distrito,
+            otrassenas,
+            numdoc,
+            tipo_iva: tipoIVA,
+            tarifa_iva:tarifaIVA,
+            porcentaje_iva: String(pct01)
+            monto_iva: String(ivaCalculado0),
+            motivo_exoneracion: motivoExoneracion,
+            num_doc_exo: numDocExoneracion,
+            institucion: institucion,
+            fecha_exo: fechaExoneracion,
+            porcentaje_exo: String(porcentajeExoneracion),
+            monto_exonerado: String(montoExonerado)
+
+        })
+    });
+    const resultado = await respuesta.json();
+    console.log(resultado.mensaje);
+}
+
 </script>
 
 <div class="contenedor">

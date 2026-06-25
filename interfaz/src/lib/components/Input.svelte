@@ -1,7 +1,9 @@
 <script>
-    let { titulo="", readonly = false, valor1=false, valor2=false } = $props();
-
-    // Ocupa tener el bind:value para poder sacar datos
+    let { 
+        titulo = "", 
+        readonly = false, 
+        value = $bindable("")
+    } = $props();
 </script>
 
 <div class="grid-4">
@@ -11,11 +13,10 @@
             <button class="link-btn">⊕ Agregar más cód.</button>
         </div>
         <div class="input-icon-wrap">
-            <input class="inp" placeholder="" readonly={readonly} />
+            <input class="inp" bind:value={value} placeholder="" readonly={readonly} />
             <button class="icon-btn icon-btn--green">🔍</button>
         </div>
     </div>
-    
 </div>
 
 <style>
@@ -54,14 +55,6 @@
         transition: border-color 0.15s;
     }
     .inp:focus { border-color: #4caf50; box-shadow: 0 0 0 2px rgba(76,175,80,0.18); }
-
-    .inp--readonly {
-        background: #f5f5f5;
-        color: #555;
-        cursor: default;
-    }
-
-    .inp--select { cursor: pointer; padding-right: 4px; }
 
     .input-icon-wrap {
         display: flex;

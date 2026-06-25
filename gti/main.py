@@ -1,9 +1,9 @@
-from gti import gti
+from gti.gti import gti
 import asyncio
 
 class main():
     async def exec(self):
-        with open("gti_implementation\\Prueba.xml", "r") as f:
+        with open("gti\\Prueba.xml", "r") as f:
             xml_facture = f.read()
         return {
             await gti().subir_factura(xml_facture)

@@ -7,6 +7,7 @@ from starlette.middleware.sessions import SessionMiddleware
 from servidor.filedb import FileDb
 from xero.auth import router_auth
 from servidor.secretos import obtener_entorno
+from gti.gti import gti
 import uvicorn
 
 # Esta función es temporal
@@ -49,6 +50,9 @@ if __name__ == "__main__":
         factura_xml = dict_a_xml("FacturaElectronicaXML", diccionario)
         root.append(factura_xml)
         factura_str = ET.tostring(root, encoding="unicode")
+
+        resultado = await gti().subir_factura(factura_str)
+        return {"resultado": str(resultado)}
 
     config = uvicorn.Config(app, "localhost", port=entorno.PUERTO)
     servidor = uvicorn.Server(config)

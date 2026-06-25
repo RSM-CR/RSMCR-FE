@@ -1,5 +1,5 @@
 <script>
-    let { titulo, readonly = false } = $props();
+    let { titulo="", readonly = false, valor1=false, valor2=false } = $props();
 
     // Ocupa tener el bind:value para poder sacar datos
 </script>
@@ -15,6 +15,7 @@
             <button class="icon-btn icon-btn--green">🔍</button>
         </div>
     </div>
+    
 </div>
 
 <style>

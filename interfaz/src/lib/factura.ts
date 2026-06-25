@@ -8,8 +8,8 @@ export type Factura = {
         Moneda: string;
         SituacionEnvio: string;
         CodigoActividad: string;
-        MediosPago: {
-          TiposMedioPago: string;
+        MedioPagos: {
+          TipoMedioPago: string;
         };
         Receptor: {
           TipoIdReceptor: string;
@@ -91,8 +91,8 @@ export function NuevaFactura(): Factura
                     Moneda: "",
                     SituacionEnvio: "",
                     CodigoActividad: "",
-                    MediosPago: {
-                        TiposMedioPago: ""
+                    MedioPagos: {
+                        TipoMedioPago: ""
                     },
                     Receptor:{
                         TipoIdReceptor: "",

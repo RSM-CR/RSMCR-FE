@@ -9,6 +9,8 @@ from xero.auth import router_auth
 from servidor.secretos import obtener_entorno
 from gti.gti import gti
 import uvicorn
+from webhooks_and_websockets.websocket import websockets_router
+from webhooks_and_websockets.webhooks import webhooks_router
 
 # Esta función es temporal
 # Fue puesto aqui para poder hacer la prueba
@@ -34,6 +36,8 @@ if __name__ == "__main__":
 
     auth, _ = router_auth("/app")
     app.include_router(auth)
+    app.include_router(websockets_router)
+    app.include_router(webhooks_router)
 
     app.add_middleware(SessionMiddleware,
         secret_key=entorno.LLAVE_SESIONES.get_secret_value(),

@@ -1,0 +1,19 @@
+{
+	"/": [
+		"src/routes/+layout.ts",
+		"src/routes/+layout.ts"
+	],
+	"/RFiles": [
+		"src/routes/+layout.ts"
+	],
+	"/editor": [
+		"src/routes/+layout.ts",
+		"src/routes/+layout.ts"
+	],
+	"/editor/xml": [
+		"src/routes/+layout.ts"
+	],
+	"/tenants": [
+		"src/routes/+layout.ts"
+	]
+}

@@ -1,0 +1,1 @@
+import{z as e}from"./BLeUhhAG.js";import"./CHCuGAFo.js";var t=e([]),n=t;function r(e){t.update(t=>[...t,e])}export{n,r as t};

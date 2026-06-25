@@ -1,0 +1,1 @@
+import{b as e,v as t}from"../chunks/BLeUhhAG.js";import"../chunks/xihTtKlq.js";var n=e(`<p>Aquí va el editor de XML</p>`);function r(e){t(e,n())}export{r as component};

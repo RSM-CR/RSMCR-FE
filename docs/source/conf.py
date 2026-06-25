@@ -23,6 +23,12 @@ myst_enable_extensions = ['fieldlist', 'alert', 'colon_fence']
 
 language = 'es'
 
+source_suffix = {
+    '.rst': 'restructuredtext',
+    '.md': 'markdown',
+    '.svelte': 'markdown',
+}
+
 
 # -- Autodoc2 configuration ---------------------------------------------------
 # https://sphinx-autodoc2.readthedocs.io/en/latest/config.html

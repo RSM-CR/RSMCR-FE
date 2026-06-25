@@ -6,6 +6,9 @@
 # -- Project information -----------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#project-information
 
+import subprocess, sys
+from pathlib import Path
+
 project = 'GXBridge'
 copyright = 'RSM Costa Rica'
 author = 'Especialidades de IA y Apps del CTP CIT'
@@ -23,11 +26,8 @@ myst_enable_extensions = ['fieldlist', 'alert', 'colon_fence']
 
 language = 'es'
 
-source_suffix = {
-    '.rst': 'restructuredtext',
-    '.md': 'markdown',
-    '.svelte': 'markdown',
-}
+subprocess.run([sys.executable, "extraer_svelte_docs.py"], check=True)
+
 
 
 # -- Autodoc2 configuration ---------------------------------------------------

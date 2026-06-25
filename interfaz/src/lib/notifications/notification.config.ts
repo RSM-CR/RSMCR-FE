@@ -18,16 +18,16 @@ const config: Record<string, NotificationTypeConfig> = {
 };
 
 const fallback: NotificationTypeConfig = {
-    getTitle: (payload: any) => payload?.title ?? 'Notificacion',
-    getMessage: (payload: any) => payload?.message ?? 'Tienes una notificacion nueva'
+    getTitle: (payload: any) => payload?.type ?? 'Notificacion',
+    getMessage: (payload: any) => payload?.payload ?? 'Tienes una notificacion nueva'
 };
 
 export function buildNotification(message: WebSocketsFormat): AppNotification {
-    const cfg = config[message.Type] ?? fallback;
+    const cfg = config[message.type] ?? fallback;
 
     return {
         id: message.id ?? crypto.randomUUID(),
-        type: message.Type,
+        type: message.type,
         payload: message.payload,
         title: cfg.getTitle(message.payload),
         message: cfg.getMessage(message.payload),

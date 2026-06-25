@@ -1,8 +1,16 @@
 import logging # Importar el módulo logging para registrar información, advertencias y errores en el servidor de webhooks. Esto es importante para monitorear el funcionamiento del servidor, detectar problemas y mantener un registro de los eventos que se procesan. Configurar el logging adecuadamente permite tener una visión clara de lo que está sucediendo en el servidor y facilita la depuración en caso de errores o comportamientos inesperados.
 import httpx # Importar httpx para realizar solicitudes HTTP asíncronas a la API de Xero. Esto es necesario para obtener información adicional sobre los eventos que se reciben en los webhooks, como detalles de facturas o clientes, sin bloquear el procesamiento de otros eventos.
 from xero.auth import obtener_cliente # Importar la función obtener_cliente desde el módulo auth para obtener un cliente HTTP configurado con las credenciales de Xero. Este cliente se utilizará para realizar solicitudes a la API de Xero y obtener información adicional sobre los eventos que se reciben en los webhooks, como detalles de facturas o clientes.
+from webhooks_and_websockets.websockets_processor import processor
+from servidor.filedb import FileDb
+import json
+import uuid
+
 
 logger = logging.getLogger(__name__) # Configurar un logger específico para este módulo. Esto permite registrar información, advertencias y errores de manera organizada y diferenciada de otros módulos. El logger se puede configurar para escribir en la consola, archivos o sistemas de monitoreo, facilitando el seguimiento del funcionamiento del servidor de webhooks y la detección de problemas.
+
+# Instancia de FileDb para operaciones de lectura/escritura de eventos.
+db = FileDb()
 logging.basicConfig(level=logging.INFO) # Configurar el logging para mostrar información igual o mayor a INFO en la consola. Esto significa que se mostrarán mensajes de información, advertencias y errores, pero no mensajes de depuración (DEBUG). Esta configuración es adecuada para un entorno de producción o desarrollo donde se desea tener visibilidad de los eventos importantes sin saturar la salida con demasiados detalles de depuración.
 
 
@@ -64,6 +72,11 @@ async def process_webhook_events(payload: dict) -> None: # Función principal pa
 
     logger.info("Procesando %d evento(s)", len(events)) # Registrar un mensaje informativo que indica la cantidad de eventos que se van a procesar. Esto proporciona visibilidad sobre la actividad del webhook y permite monitorear cuántos eventos se están recibiendo y procesando en cada llamada al webhook, lo que puede ser útil para detectar patrones de uso o posibles problemas relacionados con la cantidad de eventos recibidos.
     for event in events: # Iterar sobre cada evento en la lista de eventos recibidos. Esto permite procesar cada evento individualmente, aplicando la lógica específica para cada tipo de evento según lo definido en los handlers correspondientes. Al iterar sobre los eventos, se asegura que se manejen todos los eventos recibidos en el webhook de manera ordenada y eficiente.
+        resource_id = event.get("resourceId") or str(uuid.uuid4())
+        try:
+            await db.crear("xero", resource_id, json.dumps(event))
+        except FileExistsError:
+            await db.actualizar("xero", resource_id, json.dumps(event))
         logger.info("Evento recibido: %s", event) # Registrar un mensaje informativo que incluye el contenido completo del evento recibido. Esto proporciona visibilidad detallada de cada evento que llega al webhook, lo que puede ser útil para monitorear la actividad, detectar patrones o problemas específicos en los eventos recibidos, y facilitar la depuración en caso de errores o comportamientos inesperados.
         logger.info("Categoría=%s | Tipo=%s | ResourceId=%s", # Registrar un mensaje informativo que incluye la categoría, el tipo y el ID del recurso del evento recibido. Esto proporciona una visión rápida de los aspectos clave del evento, lo que puede ser útil para monitorear la actividad del webhook y detectar patrones o problemas específicos relacionados con ciertos tipos de eventos o recursos.
         event.get("eventCategory"), # Obtener la categoría del evento desde el evento recibido. La categoría del evento es un aspecto clave para determinar qué tipo de evento se ha recibido y qué handler específico se debe utilizar para procesarlo. Al registrar esta información, se tiene visibilidad de la distribución de eventos por categoría, lo que puede ser útil para monitorear la actividad del webhook y detectar patrones relacionados con ciertas categorías de eventos.
@@ -73,6 +86,13 @@ async def process_webhook_events(payload: dict) -> None: # Función principal pa
         category = event.get("eventCategory") # Obtener la categoría del evento desde el evento recibido. La categoría del evento es un aspecto clave para determinar qué tipo de evento se ha recibido y qué handler específico se debe utilizar para procesarlo. Al obtener esta información, se puede utilizar junto con el tipo del evento para buscar el handler correspondiente en el diccionario EVENT_HANDLERS y delegar el procesamiento del evento de manera adecuada.
         event_type = event.get("eventType") # Obtener el tipo del evento desde el evento recibido. El tipo del evento, junto con la categoría, es fundamental para identificar qué handler específico se debe utilizar para procesar el evento. Al obtener esta información, se puede utilizar junto con la categoría del evento para buscar el handler correspondiente en el diccionario EVENT_HANDLERS y delegar el procesamiento del evento de manera adecuada.
         handler = EVENT_HANDLERS.get((category, event_type)) # Buscar el handler correspondiente en el diccionario EVENT_HANDLERS utilizando la combinación de categoría y tipo del evento. Si no se encuentra un handler para esta combinación, handler será None. Esto permite delegar el procesamiento del evento a la función específica diseñada para manejar ese tipo de evento, lo que facilita la organización y modularidad del código al separar la lógica de procesamiento para diferentes tipos de eventos en funciones distintas.
+
+        await processor.broadcast({
+            "type": event.get("eventType"),
+            "payload": event,
+            "date": event.get("eventDateUtc"),
+            "id": "%s-%s" % (resource_id, event.get("eventDateUtc"))
+        })
 
         if handler: # Verificar si se encontró un handler para la combinación de categoría y tipo del evento. Si handler no es None, significa que hay una función definida para procesar este tipo de evento, y se procede a ejecutarla. Esto permite manejar los eventos de manera específica según su categoría y tipo, lo que mejora la claridad y mantenibilidad del código al evitar lógica condicional compleja dentro de un único handler genérico.
             try: # Iniciar un bloque try para manejar posibles excepciones que puedan ocurrir durante la ejecución del handler específico para el evento. Esto es importante para garantizar que el servidor de webhooks pueda manejar errores de manera adecuada sin interrumpir el procesamiento de otros eventos, y para registrar cualquier error que ocurra durante el procesamiento de un evento específico, lo que facilita la identificación y solución de problemas relacionados con ese tipo de evento.

@@ -1,5 +1,5 @@
 export interface WebSocketsFormat{
-    Type: string,
+    type: string,
     payload: unknown,
     date: string,
     id?: string

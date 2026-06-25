@@ -18,7 +18,7 @@ function handleIncomingMessage(message: WebSocketsFormat) {
 	notifications.add(notification);
 	toasts.push(notification);
 
-	if (get(soundEnabled) && shouldPlaySound(message.Type)) {
+	if (get(soundEnabled) && shouldPlaySound(message.type)) {
 		playNotificationSound();
 	}
 }

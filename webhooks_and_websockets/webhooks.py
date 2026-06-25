@@ -7,7 +7,6 @@ import logging # Importar el módulo logging para registrar información, advert
 from fastapi import FastAPI, Request, Response, BackgroundTasks, APIRouter # Importar FastAPI para crear la aplicación web, Request para manejar las solicitudes entrantes, Response para enviar respuestas al cliente, BackgroundTasks para ejecutar tareas en segundo plano sin bloquear la respuesta al cliente, y APIRouter para la organizacon y manejo de endpoints.
 from dotenv import load_dotenv # Cargar variables de entorno desde un archivo .env para configurar el servidor de webhooks. Esto permite mantener las configuraciones sensibles, como la clave secreta para validar los webhooks, fuera del código fuente y en un lugar seguro. Al usar dotenv, se puede cargar automáticamente estas variables de entorno al iniciar la aplicación, lo que facilita la configuración y el despliegue del servidor de webhooks en diferentes entornos (desarrollo, producción, etc.) sin necesidad de modificar el código.
 from webhooks_and_websockets.webhooks_processor import process_webhook_events # Importar la función process_webhook_events desde el módulo webhooks_processor para manejar el procesamiento de los eventos recibidos en los webhooks de Xero. Esta función se encargará de procesar los diferentes tipos de eventos que Xero puede enviar, como la creación o actualización de facturas, y realizar las acciones necesarias en respuesta a esos eventos. Al importar esta función, podemos delegar el procesamiento de los eventos a un módulo separado, lo que ayuda a mantener el código organizado y modular.
-from webhooks_and_websockets.websockets_processor import processor
 
 load_dotenv() # Cargar variables de entorno desde el archivo .env
 logging.basicConfig(level=logging.INFO) # Configurar el logging para mostrar información igual o mayor a INFO en la consola. Esto significa que se mostrarán mensajes de información, advertencias y errores, pero no mensajes de depuración (DEBUG). Esta configuración es adecuada para un entorno de producción o desarrollo donde se desea tener visibilidad de los eventos importantes sin saturar la salida con demasiados detalles de depuración.
@@ -36,19 +35,6 @@ async def xero_webhooks(request: Request, background_tasks: BackgroundTasks): # 
         return Response(status_code=401) # Responder con un código de estado 401 Unauthorized si la firma es inválida para indicar que la solicitud no es aceptada. Esto es importante para proteger el servidor de webhooks contra solicitudes no autorizadas o maliciosas, y para cumplir con las expectativas de seguridad al manejar webhooks.
 
     payload = json.loads(body)
-    events = payload.get("events", [])  # sin el nivel extra de "payload"
-
-    for event in events:
-        event_type = event.get("eventType")
-        resource_id = event.get("resourceId")
-        event_date = event.get("eventDateUtc")
-
-        await processor.broadcast({
-            "type": event_type,
-            "payload": event,
-            "date": event_date,
-            "id": f"{resource_id}-{event_date}"
-        })
 
     background_tasks.add_task(process_webhook_events, payload) # Agregar la tarea de procesar los eventos del webhook a BackgroundTasks para que se ejecute en segundo plano. Esto permite que el servidor responda rápidamente a Xero con un código de estado 200 OK, mientras que el procesamiento real del evento se realiza de manera asíncrona sin bloquear la respuesta. Es importante utilizar BackgroundTasks para evitar que el procesamiento del evento afecte el tiempo de respuesta al servidor de Xero, lo cual podría causar problemas si el procesamiento es lento o si hay muchos eventos llegando al mismo tiempo.
 

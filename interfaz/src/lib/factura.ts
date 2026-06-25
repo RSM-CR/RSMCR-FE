@@ -14,68 +14,68 @@ export type Factura = {
           TiposMedioPago: string;
         };
         Receptor: {
-          tipoidreceptor: string;
-          nombrereceptor: string;
-          correoreceptor: string;
-          numdoc: string;
+          TipoIdReceptor: string;
+          NombreReceptor: string;
+          CorreoReceptor: string;
+          NumDoc: string;
           Ubicacion: {
-            provincia: string;
-            canton: string;
-            distrito: string;
-            otrassenas: string;
+            Provincia: string;
+            Canton: string;
+            Distrito: string;
+            OtrasSenas: string;
           };
         };
         Emisor: {
-          numcuentaemisor: string;
+          NumCuentaEmisor: string;
         };
       };
       Detalle: {
-        preciounitario: string;
-        cantidad: string;
+        PrecioUnitario: string;
+        Cantidad: string;
         Linea: {
-          unidadmedida: string;
-          preciounitario: string;
-          detallemerc: string;
-          codigocabyss: string;
+          UnidadMedida: string;
+          PrecioUnitario: string;
+          DetalleMerc: string;
+          CodigoCabyss: string;
           Impuestos: {
             Impuesto: {
-              tipo_iva: string;
-              tarifa_iva: string;
-              porcentaje_iva: string;
-              monto_iva: number;
+              Tipo_Iva: string;
+              Tarifa_Iva: string;
+              Porcentaje_Iva: string;
+              Monto_Iva: number;
               Exoneracion: {
-                motivo_exoneracion: string;
-                num_doc_exo: string;
-                institucion: string;
-                fecha_exo: string;
-                porcentaje_exo: number;
-                monto_exonerado: number;
+                Motivo_Exoneracion: string;
+                Num_Doc_Exo: string;
+                Institucion: string;
+                Fecha_Exo: string;
+                Porcentaje_Exo: number;
+                Monto_Exonerado: number;
               };
             };
           };
         };
       };
       Totales: {
-        totalServGravados: number;
-        totalServExentos: number;
-        totalServExonerados: number;
-        totalMercanciasGravadas: number;
-        totalMercanciasExentas: number;
-        totalMercanciasExoneradas: number;
-        totalGravado: number;
-        totalExento: number;
-        totalExonerado: number;
-        totalOtrosCargos: number;
-        totalIVADevuelto: number;
-        totalVenta: number;
-        totalVentaNeta: number;
-        totalDescuentos: number;
-        totalImpuesto: number;
-        totalNoSujeto: number;
-        totalServNoSujetos: number;
-        totalMercanciaNoSujeta: number;
-        totalImpuestoAsumidoEmisor: number;
-        totalComprobante: number;
+        TotalesServGravados: number;
+        TotalServExentos: number;
+        TotalServExonerados: number;
+        TotalMercanciasGravadas: number;
+        TotalMercanciasExentas: number;
+        TotalMercanciasExoneradas: number;
+        TotalGravado: number;
+        TotalExento: number;
+        TotalExonerado: number;
+        TotalOtrosCargos: number;
+        TotalIVADevuelto: number;
+        TotalVenta: number;
+        TotalVentaNeta: number;
+        TotalDescuentos: number;
+        TotalImpuesto: number;
+        TotalNoSujeto: number;
+        TotalServNoSujetos: number;
+        TotalMercanciaNoSujeta: number;
+        TotalImpuestoAsumidoEmisor: number;
+        TotalComprobante: number;
       };
       Extra: {
         EsVersion4_4: boolean;
@@ -102,69 +102,69 @@ export function NuevaFactura(): Factura
                         TiposMedioPago: ""
                     },
                     Receptor:{
-                        tipoidreceptor: "",
-                        nombrereceptor: "",
-                        correoreceptor: "",
-                        numdoc: "",
+                        TipoIdReceptor: "",
+                        NombreReceptor: "",
+                        CorreoReceptor: "",
+                        NumDoc: "",
                         Ubicacion:{
-                            provincia: "",
-                            canton: "",
-                            distrito: "",
-                            otrassenas: "",
+                            Provincia: "",
+                            Canton: "",
+                            Distrito: "",
+                            OtrasSenas: "",
                         },
                     },
                     Emisor:{
-                        numcuentaemisor: "",
+                        NumCuentaEmisor: "",
                     }
                 },
                 Detalle:{
-                    preciounitario: "",
-                    cantidad: "",
+                    PrecioUnitario: "",
+                    Cantidad: "",
                     Linea:{
-                        unidadmedida: "",
-                        preciounitario: "",
-                        detallemerc: "",
-                        codigocabyss: "",
+                        UnidadMedida: "",
+                        PrecioUnitario: "",
+                        DetalleMerc: "",
+                        CodigoCabyss: "",
 
                         Impuestos:{
                             Impuesto:{
-                                 tipo_iva: "",
-                                tarifa_iva: "",
-                                porcentaje_iva:"",
-                                monto_iva: 0,
-                                Exoneracion:{
-                                    motivo_exoneracion: "",
-                                    num_doc_exo: "",
-                                    institucion: "",
-                                    fecha_exo: "",
-                                    porcentaje_exo: 0,
-                                    monto_exonerado: 0,
+                                 Tipo_Iva: "",
+                                 Tarifa_Iva: "",
+                                 Porcentaje_Iva:"",
+                                 Monto_Iva: 0,
+                                 Exoneracion:{
+                                    Motivo_Exoneracion: "",
+                                    Num_Doc_Exo: "",
+                                    Institucion: "",
+                                    Fecha_Exo: "",
+                                    Porcentaje_Exo: 0,
+                                    Monto_Exonerado: 0,
                                 }
                             },
                         }
                     }
                 },
                 Totales:{
-                    totalServGravados: 0,
-                    totalServExentos: 0,
-                    totalServExonerados: 0,
-                    totalMercanciasGravadas: 0,
-                    totalMercanciasExentas: 0,
-                    totalMercanciasExoneradas: 0,
-                    totalGravado: 0,
-                    totalExento: 0,
-                    totalExonerado: 0,
-                    totalOtrosCargos: 0,
-                    totalIVADevuelto: 0,
-                    totalVenta: 0,
-                    totalVentaNeta: 0,
-                    totalDescuentos: 0,
-                    totalImpuesto: 0,
-                    totalNoSujeto: 0,
-                    totalServNoSujetos: 0,
-                    totalMercanciaNoSujeta: 0,
-                    totalImpuestoAsumidoEmisor: 0,
-                    totalComprobante: 0
+                    TotalesServGravados: 0,
+                    TotalServExentos: 0,
+                    TotalServExonerados: 0,
+                    TotalMercanciasGravadas: 0,
+                    TotalMercanciasExentas: 0,
+                    TotalMercanciasExoneradas: 0,
+                    TotalGravado: 0,
+                    TotalExento: 0,
+                    TotalExonerado: 0,
+                    TotalOtrosCargos: 0,
+                    TotalIVADevuelto: 0,
+                    TotalVenta: 0,
+                    TotalVentaNeta: 0,
+                    TotalDescuentos: 0,
+                    TotalImpuesto: 0,
+                    TotalNoSujeto: 0,
+                    TotalServNoSujetos: 0,
+                    TotalMercanciaNoSujeta: 0,
+                    TotalImpuestoAsumidoEmisor: 0,
+                    TotalComprobante: 0
                 },
                 Extra:{
                     EsVersion4_4: true

@@ -1,7 +1,5 @@
 
 export type Factura = {
-  Documentos: {
-    FacturaElectronicaXML: {
       Encabezado: {
         TipoDoc: string;
         CondicionVenta: string;
@@ -81,15 +79,10 @@ export type Factura = {
         EsVersion4_4: boolean;
       };
     };
-  };
-};
 
 export function NuevaFactura(): Factura
 {
     return {
-        Documentos:{
-            FacturaElectronicaXML:{
-
                 Encabezado:{
                     TipoDoc: "",
                     CondicionVenta: "",
@@ -171,5 +164,3 @@ export function NuevaFactura(): Factura
                 }
             }
         }
-    }
-}

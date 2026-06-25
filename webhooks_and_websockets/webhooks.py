@@ -35,12 +35,20 @@ async def xero_webhooks(request: Request, background_tasks: BackgroundTasks): # 
         logger.error("Body: %s", body.decode("utf-8")) # Registrar el cuerpo de la solicitud en el log para ayudar a diagnosticar problemas de validación de la firma. Esto puede ser útil para entender si hay problemas de formato o codificación en el cuerpo que podrían afectar el cálculo de la firma, o para detectar intentos de ataque que envíen datos maliciosos. El cuerpo se decodifica como UTF-8 para que sea legible en el log, pero es importante tener cuidado al registrar el cuerpo completo, ya que podría contener información sensible. En un entorno de producción, se podría considerar registrar solo una parte del cuerpo o utilizar un nivel de log más bajo para evitar exponer datos sensibles en los logs.
         return Response(status_code=401) # Responder con un código de estado 401 Unauthorized si la firma es inválida para indicar que la solicitud no es aceptada. Esto es importante para proteger el servidor de webhooks contra solicitudes no autorizadas o maliciosas, y para cumplir con las expectativas de seguridad al manejar webhooks.
 
-    payload = json.loads(body) # Si la firma es válida, cargar el cuerpo de la solicitud como JSON para obtener el payload del webhook. Este payload contiene la información sobre el evento que Xero está notificando, como el tipo de evento, los recursos afectados, etc. Es importante cargar el payload como JSON para poder acceder a sus datos de manera estructurada y procesarlos adecuadamente en la función process_webhook_events.
+    payload = json.loads(body)
+    events = payload.get("events", [])  # sin el nivel extra de "payload"
 
-    await processor.broadcast({
-        "type": "xero_webhook",
-        "data": payload
-    })
+    for event in events:
+        event_type = event.get("eventType")
+        resource_id = event.get("resourceId")
+        event_date = event.get("eventDateUtc")
+
+        await processor.broadcast({
+            "type": event_type,
+            "payload": event,
+            "date": event_date,
+            "id": f"{resource_id}-{event_date}"
+        })
 
     background_tasks.add_task(process_webhook_events, payload) # Agregar la tarea de procesar los eventos del webhook a BackgroundTasks para que se ejecute en segundo plano. Esto permite que el servidor responda rápidamente a Xero con un código de estado 200 OK, mientras que el procesamiento real del evento se realiza de manera asíncrona sin bloquear la respuesta. Es importante utilizar BackgroundTasks para evitar que el procesamiento del evento afecte el tiempo de respuesta al servidor de Xero, lo cual podría causar problemas si el procesamiento es lento o si hay muchos eventos llegando al mismo tiempo.
 

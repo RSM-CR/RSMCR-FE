@@ -14,4 +14,5 @@ intro
 instalar
 pasos
 apidocs/index
+svelte_docs/editor_+page
 ```

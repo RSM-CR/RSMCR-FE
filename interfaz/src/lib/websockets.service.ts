@@ -1,23 +1,30 @@
-import { addMessage, type WebSocketsFormat } from '$lib/stores/websockets.store';
+import { get } from 'svelte/store';
+import { onMessage, connectWebSocket, disconnectWebSocket } from './websocket-connection';
+import { notifications } from './stores/notifications.store';
+import { toasts } from './stores/toasts.store';
+import { soundEnabled } from './stores/sound-preference.store';
+import { buildNotification, shouldPlaySound } from './notifications/notification.config';
+import { playNotificationSound } from './notifications/sound';
+import type { WebSocketsFormat } from './types/notifications.types';
+import { handlers } from 'svelte/legacy';
 
-let socket: WebSocket | undefined;
+export { connectWebSocket, disconnectWebSocket };
 
-export function connectWebSocket() {
+function handleIncomingMessage(message: WebSocketsFormat) {
+	const notification = buildNotification(message);
 
-	if (socket) return;
+	if (notifications.has(notification.id)) return;
 
-	socket = new WebSocket(
-		'ws://localhost:8000/app'
-	);
+	notifications.add(notification);
+	toasts.push(notification);
 
-	socket.onmessage = (event) => {
-
-		const data = JSON.parse(event.data);
-
-		if (
-			typeof data.type === 'string'
-		) {
-			addMessage(data as WebSocketsFormat);
-		}
-	};
+	if (get(soundEnabled) && shouldPlaySound(message.Type)) {
+		playNotificationSound();
+	}
 }
+
+onMessage((data) => {
+	if (typeof (data as {type?: unknown})?.type === 'string') {
+		handleIncomingMessage(data as WebSocketsFormat);
+	}
+})

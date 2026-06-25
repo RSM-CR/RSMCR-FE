@@ -18,7 +18,7 @@ class WebSocketProcessor():
         async def broadcast(self, message: dict):
                 disconnected = []
 
-                logger.info("Enviando mensaje a %s conexion/es", len(self.activated_connections))
+                logger.info("Enviando mensaje a %s conexion(es)", len(self.activated_connections))
 
                 for connection in self.activated_connections:
                         try:

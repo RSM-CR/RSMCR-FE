@@ -23,18 +23,23 @@ myst_enable_extensions = ['fieldlist', 'alert', 'colon_fence']
 
 language = 'es'
 
+source_suffix = {
+    '.rst': 'restructuredtext',
+    '.md': 'markdown',
+    '.svelte': 'markdown',
+}
+
 
 # -- Autodoc2 configuration ---------------------------------------------------
 # https://sphinx-autodoc2.readthedocs.io/en/latest/config.html
 autodoc2_class_docstring = "both"
-
-autodoc2_sort_names = True
-
 # Lista de archivos a documentar
 autodoc2_packages = [
-    "../../abstracciones/",
-    "../../xero/",
-    "../../servidor/",
+    "../../abstracciones/destino.py",
+    "../../abstracciones/fuente.py",
+    "../../xero/auth.py",
+    "../../servidor/configurar.py",
+    "../../servidor/secretos.py"
     "../../Capa.py",
     "../../factura.py",
     "../../var_a_xml.py"

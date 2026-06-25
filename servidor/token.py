@@ -25,8 +25,8 @@ class Token(BaseModel):
 
     sub: str
     """El identificador único de cada usuario. Es el mismo que utiliza Xero."""
-    exp: datetime = Field(default_factory=lambda: datetime.now(timezone.utc) + timedelta(hours=4))
-    """La fecha de expiración del token. Por defecto, es de 4 horas a partir de su fecha de creación."""
+    exp: datetime = Field(default_factory=lambda: datetime.now(timezone.utc) + timedelta(minutes=30))
+    """La fecha de expiración del token. Por defecto, es de 30 minutos a partir de su fecha de creación."""
     tenants: list[Tenant]
     """La lista de organizaciones a las cuales el usuario tiene acceso."""
 

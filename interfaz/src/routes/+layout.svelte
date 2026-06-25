@@ -28,7 +28,6 @@
 
 <ToastContainer />
 
-{@render children()}
 <div class="root">
     {@render children()}
 </div>

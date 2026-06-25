@@ -45,7 +45,7 @@ class Svelte (BaseModel):
     porcentaje_exo: str = ""
     monto_exonerado: str = ""
 
-@endpoint.post("/generarxml")
+@endpoint.post("/enviar-json")
 
 def generar_xml (campos: Svelte):
 

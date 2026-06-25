@@ -16,8 +16,20 @@
     const factura = $state(NuevaFactura())
 
     setContext('factura', factura);
+
+    async function enviarDatos()
+    {
+        const respuesta = await fetch("http://localhost:8000/enviar-json", {
+            method: "POST",
+            headers: { "Content-Type": "application/json"},
+            body: JSON.stringify(factura)
+        })
+    }
+
 </script>
 
 <NavBar tabs={tabs}/>
 
 {@render children()}
+
+<button style="background-color: #4caf50;" onclick={enviarDatos}><p>Enviar factura</p></button>

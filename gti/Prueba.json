@@ -1,0 +1,67 @@
+{
+    "Encabezado": {
+    "TipoDoc": 1,
+    "CondicionVenta": 1,
+    "Sucursal": 1,
+    "Terminal": 1,
+    "Moneda": 1,
+    "SituacionEnvio": 1,
+    "CodigoActividad": 6202.0,
+    "MedioPagos": {
+        "TipoMedioPago": 1
+    },
+    "Receptor": {
+        "TipoIdentificacion": 2,
+        "NombreReceptor": "Probando",
+        "CorreoElectronicoReceptor": "correo@example.com",
+        "IdentificacionReceptor": "303560398"
+    },
+    "Emisor": {
+        "NumCuenta": 5473
+    }
+    },
+    "Detalle": {
+    "Cantidad": 1,
+    "PrecioUnitario": 1000,
+    "Linea": {
+        "Cantidad": 1,
+        "UnidadMedida": 1,
+        "PrecioUnitario": 1000,
+        "DetalleMerc": "Prueba",
+        "Codigo": "8231000000000",
+        "Impuestos": {
+        "Impuesto": {
+            "CodigoImpuesto": 1,
+            "CodigoTarifa": 8,
+            "PorcentajeImpuesto": 13,
+            "MontoImpuesto": 130
+        }
+        }
+    }
+    },
+    "Totales": {
+    "TotalServGravados": 1000.0,
+    "TotalServExentos": 0.0,
+    "TotalServExonerados": 0.0,
+    "TotalMercanciasGravadas": 0.0,
+    "TotalMercanciasExentas": 0.0,
+    "TotalMercanciasExoneradas": 0.0,
+    "TotalGravado": 1000.0,
+    "TotalExento": 0.0,
+    "TotalExonerado": 0.0,
+    "TotalOtrosCargos": 0.0,
+    "TotalIVADevuelto": 0.0,
+    "TotalVenta": 1000.0,
+    "TotalVentaNeta": 1000.0,
+    "TotalDescuentos": 0.0,
+    "TotalImpuesto": 130.0,
+    "TotalNoSujeto": 0.0,
+    "TotalServNoSujetos": 0.0,
+    "TotalMercanciaNoSujeta": 0.0,
+    "TotalImpuestoAsumidoEmisorFabrica": 0.0,
+    "TotalComprobante": 1130.0
+    },
+    "Extra": {
+    "EsVersion4_4": true
+    }
+}

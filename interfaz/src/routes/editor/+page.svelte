@@ -9,7 +9,6 @@ se encarga de que las variables sean convertidas a un **XML** y las devuelvan co
 para finalmente poder añadir las variables que hagan falta de manera manual y al presionar el botón sean
 añadidad automáticamente al XML.
 
-Este código también se encarga de conectarse con una *base de datos* de PostgresSQL creada por nostros mismos.
 -->
 
 <script lang="ts">
@@ -259,10 +258,8 @@ async function enviarDatos(){
     </div>
 
 </div>
-<!-- ══ CONTENEDOR PRINCIPAL ══════════════════════════════════════════════════ -->
 <div class="panel-root">
 
-    <!-- Tabs -->
     <div class="tabs">
         <button
             class="tab {tabActivo === 'lineas' ? 'tab--active' : ''}"
@@ -276,11 +273,9 @@ async function enviarDatos(){
         </button>
     </div>
 
-    <!-- ── TAB: LÍNEAS DETALLE ──────────────────────────────────────────────── -->
     {#if tabActivo === 'lineas'}
     <div class="lineas-body">
 
-        <!-- Fila 1: Cód. Producto | Cód. CABYS | Cód. Medicamentos | Unid. Medida -->
         <div class="grid-4">
             <div class="field">
                 <div class="field__label">
@@ -322,7 +317,6 @@ async function enviarDatos(){
             </div>
         </div>
 
-        <!-- Fila 2: Cantidad | Precio unitario | Descripción -->
         <div class="grid-3-wide">
             <div class="field">
                 <label class="field__label" for="cantidad">Cantidad:</label>
@@ -340,7 +334,6 @@ async function enviarDatos(){
             </div>
         </div>
 
-        <!-- Fila 3: Descuento | Otros imps | IVA | Total línea -->
         <div class="grid-4">
             <div class="field">
                 <div class="field__label">
@@ -377,7 +370,6 @@ async function enviarDatos(){
             </div>
         </div>
 
-        <!-- Fila 4: Tipo transacción | VIN/Serie | botón combo -->
         <div class="grid-3-bottom">
             <div class="field">
                 <button class="btn-combo">Lista de productos del combo</button>
@@ -401,7 +393,6 @@ async function enviarDatos(){
             </div>
         </div>
 
-        <!-- Fila 5: botones acción -->
         <div class="actions-row">
             <div></div>
             <div></div>
@@ -412,7 +403,6 @@ async function enviarDatos(){
     </div>
     {/if}
 
-    <!-- ── TAB: OTROS CARGOS ────────────────────────────────────────────────── -->
     {#if tabActivo === 'otros'}
     <div class="lineas-body">
         <p class="otros-placeholder">Sección de Otros Cargos — próximamente.</p>
@@ -420,7 +410,6 @@ async function enviarDatos(){
     {/if}
 </div>
 
-<!-- ══ MODAL IVA ══════════════════════════════════════════════════════════════ -->
 {#if modalIVA}
     <div
         class="modal-overlay"
@@ -430,7 +419,6 @@ async function enviarDatos(){
         onkeydown={(e) => e.key === 'Escape' && (modalIVA = false)}>
             <div class="modal" role="dialog" tabindex="-1" onclick={(e) => e.stopPropagation()} onkeydown={(e) => e.stopPropagation()}>
 
-            <!-- Selector tipo siempre visible -->
             <div class="modal-section">
                 <label class="modal-label" for="tipo-iva">Tipo de I.V.A:</label>
                 <select bind:value={tipoIVA} id="tipo-iva" onchange={onChangeTipoIVA} class="modal-select">
@@ -441,7 +429,6 @@ async function enviarDatos(){
                 </select>
             </div>
 
-            <!-- ── TIPO 01 ── -->
             {#if tipoIVA === '01'}
                 <div class="modal-sep"><span>IVA General</span></div>
                 <div class="modal-grid">
@@ -472,7 +459,6 @@ async function enviarDatos(){
                     </div>
                 </div>
 
-                <!-- Sub-sección exoneración -->
                 <div class="modal-sep"><span>Exoneración (opcional)</span></div>
                 <div class="modal-grid">
                     <div class="modal-field modal-field--full">
@@ -527,7 +513,6 @@ async function enviarDatos(){
                 </div>
             {/if}
 
-            <!-- ── TIPO 07 ── -->
             {#if tipoIVA === '07'}
                 <div class="modal-sep"><span>IVA – Cálculo Especial (art. 31 LIVA)</span></div>
                 <p class="modal-nota">Base imponible = Precio de venta − Precio de compra. Tarifa: 13%.</p>
@@ -555,7 +540,6 @@ async function enviarDatos(){
                 </div>
             {/if}
 
-            <!-- ── TIPO 08 ── -->
             {#if tipoIVA === '08'}
                 <div class="modal-sep"><span>IVA – Régimen Especial Bienes Usados (REBU)</span></div>
                 <p class="modal-nota">IVA = Precio neto de venta × Factor DGT (Res. DGT-R-034-2019).</p>
@@ -590,7 +574,6 @@ async function enviarDatos(){
                 </div>
             {/if}
 
-            <!-- ── TIPO 09 ── -->
             {#if tipoIVA === '09'}
                 <div class="modal-sep"><span>IVA cobrado a nivel de fábrica</span></div>
                 <p class="modal-nota">El IVA (13%) ya fue cobrado por el fabricante/importador. Se registra para el XML.</p>
@@ -610,7 +593,6 @@ async function enviarDatos(){
                 </div>
             {/if}
 
-            <!-- Botones modal -->
             <div class="modal-actions">
                 <button class="btn-modal-cancel" onclick={() => modalIVA = false}>Cancelar</button>
                 <button class="btn-modal-ok" onclick={() => modalIVA = false}>Aceptar</button>

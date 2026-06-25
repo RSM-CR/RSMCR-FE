@@ -1,8 +1,10 @@
 import re
 from pathlib import Path
 
-SVELTE_DIRS = [Path("routes/editor/+page.svelte")]
-OUTPUT_DIR = Path("docs/build/index.html")
+BASE_DIR = Path(__file__).parent.parent.parent
+
+SVELTE_DIRS = [Path(r"C:\Users\AlexaVillalobosAraya\Desktop\RSM\RSMCR-FE\interfaz\src\routes\editor\+page.svelte")]
+OUTPUT_DIR = Path(r"C:\Users\AlexaVillalobosAraya\Desktop\RSM\RSMCR-FE\docs\source\svelte_docs")
 
 def extraer_comentarios(svelte_path: Path) -> str:
     texto = svelte_path.read_text(encoding="utf-8")
@@ -20,15 +22,17 @@ def extraer_comentarios(svelte_path: Path) -> str:
 
 def main():
     OUTPUT_DIR.mkdir(exist_ok=True)
-    for directorio in SVELTE_DIRS:
-        for svelte in directorio.rglob("*.svelte"):
-            contenido = extraer_comentarios(svelte)
+    for svelte_path in SVELTE_DIRS:
+        if svelte_path.is_file():
+            contenido = extraer_comentarios(svelte_path)
+            print(f"Contenido extraído:\n{repr(contenido[:300])}")
             if contenido:
-                # mismo cambio aquí
-                nombre = f"{svelte.parent.name}_{svelte.stem}"
+                nombre = f"{svelte_path.parent.name}_{svelte_path.stem}"
                 salida = OUTPUT_DIR / (nombre + ".md")
                 salida.write_text(contenido, encoding="utf-8")
-                print(f"  ✓ {svelte.name} → {salida}")
+                print(f"  ✓ {svelte_path.name} → {salida}")
+        else:
+            print(f"  ✗ No encontrado: {svelte_path}")
 
 if __name__ == "__main__":
     main()

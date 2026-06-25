@@ -26,7 +26,7 @@ myst_enable_extensions = ['fieldlist', 'alert', 'colon_fence']
 
 language = 'es'
 
-subprocess.run([sys.executable, "extraer_svelte_docs.py"], check=True)
+subprocess.run([sys.executable, "extraer_svelte.py"], check=True)
 
 
 

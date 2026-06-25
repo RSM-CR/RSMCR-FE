@@ -93,6 +93,18 @@ def _router_auth(redirigir_a: str, admin = False) -> tuple[APIRouter, StarletteO
         request.session["token"] = {"access_token": token.get("access_token")}
 
         return RedirectResponse(url=redirigir_a)
+    
+    @router.get("/tenants/get")
+    async def obtener_tenants(request: Request) -> JSONResponse:
+        token = request.session.get("token")
+        if token is None:
+            return JSONResponse(content={"error": "No tienes autorización. Inicia sesión primero."}, status_code=status.HTTP_403_FORBIDDEN)
+
+        response = await cliente.get("https://api.xero.com/connections", token=token)
+
+        return response.json()
+    
+    return router, cliente
 
 async def _iniciar_sesion() -> None:
     if _token_actualizacion and _entorno.ID_TENANT_XERO:

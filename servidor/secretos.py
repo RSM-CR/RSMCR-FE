@@ -18,7 +18,6 @@ class _Entorno(BaseSettings):
     leer y validar las variables de entorno"""
 
     def __init__(self) -> None:
-        """:meta private:"""
         super().__init__()
 
     # Define todas las configuraciones
@@ -51,6 +50,8 @@ class _Entorno(BaseSettings):
     LLAVE_SESIONES: SecretStr = SecretStr(token_hex(32))
     """La llave que se usa para encriptar los datos sensibles en las cookies que se mandan devuelta al cliente.
     Se usa en conjunto del [`SessionMiddleware`](https://starlette.dev/middleware/#sessionmiddleware) de Starlette."""
+    LLAVE_JWT: SecretStr = SecretStr(token_hex(32))
+    """La llave que se usa para encriptar las cookies de autorización que se le mandan devuelta al usuario."""
 
 def crear_entorno() -> None:
     """Crea un archivo .env en base a los datos suministrados por el usuario. También, da

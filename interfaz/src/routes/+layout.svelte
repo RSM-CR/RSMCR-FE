@@ -4,6 +4,7 @@
 	import { unlockAudioContext } from '$lib/notifications/sound';
 	import NotificationBell from '$lib/components/NotificationBell.svelte';
 	import ToastContainer from '$lib/components/ToastContainer.svelte';
+    import "../app.css";
 
 	onMount(() => {
 		connectWebSocket();
@@ -28,3 +29,6 @@
 <ToastContainer />
 
 {@render children()}
+<div class="root">
+    {@render children()}
+</div>

@@ -32,4 +32,22 @@
 
 {@render children()}
 
-<button style="background-color: #4caf50;" onclick={enviarDatos}><p>Enviar factura</p></button>
+<button class="btn-enviar" onclick={enviarDatos}>Enviar Factura a GTI</button>
+
+<style>
+    .btn-enviar {
+        margin: 16px auto;
+        max-width: 200px;
+        height: 34px;
+        background: #4caf50;
+        color: #fff;
+        border: none;
+        border-radius: 3px;
+        font-size: 13px;
+        font-weight: 700;
+        cursor: pointer;
+        width: 100%;
+        transition: background 0.15s;
+    }
+    .btn-enviar:hover { background: #388e3c; }
+</style>

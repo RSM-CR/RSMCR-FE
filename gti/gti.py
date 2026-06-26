@@ -9,6 +9,7 @@ import httpx
 from servidor.secretos import obtener_entorno
 
 logger = logging.getLogger(__name__)
+logger.setLevel(logging.DEBUG)
 
 WSDL_URL = "https://pruebas.gticr.com/AplicacionFEPruebas/WSCargaFactura/Pruebas/GTICargaFactura.asmx?WSDL"
 

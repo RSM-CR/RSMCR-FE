@@ -101,11 +101,11 @@ def crear_entorno() -> None:
 
 _entorno: None | _Entorno = None
 def obtener_entorno():
-    """Instanciar un [_Entorno](secretos._Entorno) directamente puede causar errores al
+    """Instanciar un [_Entorno](servidor.secretos._Entorno) directamente puede causar errores al
     importar el módulo. Esta función evita este problema al popular la variable
-    [_entorno](secretos._entorno) de forma perezosa. En otras palabras,
-    [_entorno](secretos._entorno) comienza con un valor de `None` y cuando la función es
-    llamada por primera vez, se crea y se carga el [_Entorno](secretos._Entorno)."""
+    [`_entorno`](servidor.secretos._entorno) de forma perezosa. En otras palabras,
+    [`_entorno`](servidor.secretos._entorno) comienza con un valor de `None` y cuando la función es
+    llamada por primera vez, se crea y se carga el [_Entorno](servidor.secretos._Entorno)."""
     global _entorno
     if _entorno is None:
         _entorno = _Entorno()

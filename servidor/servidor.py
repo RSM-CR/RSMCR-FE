@@ -64,7 +64,7 @@ app.add_middleware(SessionMiddleware,
 # Lugar temporal para recibir el JSON
 # Esto fue puesto aquí para poner a andar una implementación lo más rápido posible
 @app.post("/enviar-json")
-async def recibir_xml(request: Request):
+async def recibir_json(request: Request):
     try:
         diccionario = await request.json()
     except json.JSONDecodeError:
@@ -96,10 +96,10 @@ async def recibir_xml(request: Request):
             logger.error("Error detallado: %s", e)
         }
 
-    try:
-        await filedb.crear("gti", resource_id, factura_str)
-    except FileExistsError:
-        await filedb.actualizar("gti", resource_id, factura_str)
+    # try:
+    #     await filedb.crear("gti", resource_id, factura_str)
+    # except FileExistsError:
+    #     await filedb.actualizar("gti", resource_id, factura_str)
 
     return {"resultado": str(resultado)}
 
@@ -121,29 +121,29 @@ async def recent_xml(count: int = 10):
 
 if __name__ == "__main__":
 
-    # Lanzamiento normal de uvicorn a menos que se active ngrok temporalmente.
-    ngrok_token = os.getenv("NGROK_AUTHTOKEN")
-    use_ngrok = os.getenv("USE_NGROK") == "1" or bool(ngrok_token)
+    # # Lanzamiento normal de uvicorn a menos que se active ngrok temporalmente.
+    # ngrok_token = os.getenv("NGROK_AUTHTOKEN")
+    # use_ngrok = os.getenv("USE_NGROK") == "1" or bool(ngrok_token)
 
-    if use_ngrok:
-        # Comando temporal para exponer el servidor con ngrok.
-        # borrar la variable de entorno `USE_NGROK` o `NGROK_AUTHTOKEN` y este bloque no se ejecutará.
-        cmd = [
-            "py", "-m", "ngrok",
-            "--authtoken", ngrok_token or "",
-            "uvicorn", "servidor.servidor:app",
-            "--port", str(entorno.PUERTO),
-            "--host", "localhost",
-            "--reload",
-        ]
-        logger.info("Iniciando ngrok temporalmente:", " ".join(cmd))
-        try:
-            proc = subprocess.Popen(cmd)
-            proc.wait()
-        except KeyboardInterrupt:
-            proc.terminate()
-            proc.wait()
-    else:
+    # if use_ngrok:
+    #     # Comando temporal para exponer el servidor con ngrok.
+    #     # borrar la variable de entorno `USE_NGROK` o `NGROK_AUTHTOKEN` y este bloque no se ejecutará.
+    #     cmd = [
+    #         "py", "-m", "ngrok",
+    #         "--authtoken", ngrok_token or "",
+    #         "uvicorn", "servidor.servidor:app",
+    #         "--port", str(entorno.PUERTO),
+    #         "--host", "localhost",
+    #         "--reload",
+    #     ]
+    #     logger.info("Iniciando ngrok temporalmente:", " ".join(cmd))
+    #     try:
+    #         proc = subprocess.Popen(cmd)
+    #         proc.wait()
+    #     except KeyboardInterrupt:
+    #         proc.terminate()
+    #         proc.wait()
+    # else:
         config = uvicorn.Config(app, "localhost", port=entorno.PUERTO)
         servidor = uvicorn.Server(config)
 

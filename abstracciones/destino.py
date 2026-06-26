@@ -1,7 +1,7 @@
 from abc import ABC, abstractmethod
 
 class Destino(ABC):
-    """Representa el receptor de los datos generados por la [fuente](fuente.Fuente). Estos datos serán subidos al destino para que se sincronicen."""
+    """Representa el receptor de los datos generados por la [fuente](abstracciones.fuente.Fuente). Estos datos serán subidos al destino para que se sincronicen."""
     def __init__(self) -> None:
         pass
 
@@ -11,7 +11,7 @@ class Destino(ABC):
         """Sube la factura a la plataforma relevante. En caso de GTI, primero se hará la conversión a XML.
         
         > [!CAUTION]
-        > En caso de que ocurra cualquier error, se va a asumir que la fuente de verdad se encuentra en la [fuente](fuente.Fuente) que haya sido seleccionada. Esto puede causar que se sobreescriban datos en el destino para corregirlos."""
+        > En caso de que ocurra cualquier error, se va a asumir que la fuente de verdad se encuentra en la [fuente](abstracciones.fuente.Fuente) que haya sido seleccionada. Esto puede causar que se sobreescriban datos en el destino para corregirlos."""
         pass
 
     @abstractmethod

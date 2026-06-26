@@ -1,5 +1,5 @@
-"""Implementación de [`Db`](db.Db) que almacena archivos en una carpeta local.
-Se recomienda leer [`Db`](db.Db) para conocer más detalles.
+"""Implementación de [`Db`](abstracciones.db.Db) que almacena archivos en una carpeta local.
+Se recomienda leer [`Db`](abstracciones.db.Db) para conocer más detalles.
 
 Conceptualmente, esta implementación trata a **tabla** como si fuese un directorio. Asimismo,
 los parámetros de **id** y **ultimo_id** corresponden al nombre del archivo dentro del directorio."""

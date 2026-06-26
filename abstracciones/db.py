@@ -21,7 +21,7 @@ class Db(ABC):
         :param int cantidad: La cantidad de elementos que se van a retornar.
         :param str | None ultimo_id: Especifíca un ID de documento para obtener su fecha de creación. Todos los documentos creados
         después de este serán ignorados. El propósito de este parámetro es facilitar la paginación de datos.
-        :returns: Una lista con **cantidad** [`Documentos`](db.Documento)."""
+        :returns: Una lista con **cantidad** [`Documentos`](abstracciones.db.Documento)."""
         pass
 
     @abstractmethod

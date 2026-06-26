@@ -20,7 +20,7 @@ class Fuente(ABC):
 
     def escuchar_nueva_factura(self, funcion: CallbackNuevaFactura) -> None:
         """Añade un callback que se ejecuta cada vez que se detecta una nueva factura.
-        El formato de este callback es dictado por [CallbackNuevaFactura](fuente.CallbackNuevaFactura).
+        El formato de este callback es dictado por [`CallbackNuevaFactura`](abstracciones.fuente.CallbackNuevaFactura).
         
         :param CallbackNuevaFactura funcion: La función o método que se ejecutará cuando se detecta la creación de una nueva factura"""
         self.callbacks.append(funcion)

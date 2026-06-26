@@ -168,7 +168,7 @@ def iniciar_sesion() -> None:
 async def _al_actualizar_token(token: dict, refresh_token=None, access_token=None):
     """Callback que se ejecuta cada vez que un token se actualiza tanto de forma manual como
     automática. Esta función está diseñada para ser pasada al constructor de
-    [OAuth2Client](https://docs.authlib.org/en/stable/oauth2/client/http/api.html#httpx-oauth-2-0). Revisa
+    [`OAuth2Client`](https://docs.authlib.org/en/stable/oauth2/client/http/api.html#httpx-oauth-2-0). Revisa
     la
     [documentación de Authlib](https://docs.authlib.org/en/stable/oauth2/client/http/index.html#manually-refreshing-tokens)
     para obtener más información"""
@@ -189,10 +189,10 @@ def _adjuntar_headers(url, headers, body):
 
 async def crear_cliente() -> AsyncOAuth2Client:
     """Crea un
-    [OAuth2Client](https://docs.authlib.org/en/stable/oauth2/client/http/api.html#httpx-oauth-2-0)
+    [`OAuth2Client`](https://docs.authlib.org/en/stable/oauth2/client/http/api.html#httpx-oauth-2-0)
     correctamente configurado para su uso con Xero y HTTPX.
     En la mayoría de los casos, se puede reutilizar el mismo cliente para varias solicitudes. Por ende,
-    se recomienda usar [obtener_cliente()](auth.obtener_cliente) a menos que haya una razón específica
+    se recomienda usar [`obtener_cliente()`](xero.auth.obtener_cliente) a menos que haya una razón específica
     para usar varios clientes"""
     global _token_actualizacion
     if not _token_actualizacion:
@@ -215,7 +215,7 @@ async def crear_cliente() -> AsyncOAuth2Client:
 async def obtener_cliente() -> AsyncOAuth2Client:
     """Obtiene un cliente compartido que puede ser utilizado en todo el programa. Este es el enfoque
     recomendado para la mayoría de situaciones, a menos de que se requieran clientes distintos por
-    alguna razón en concreto"""
+    alguna razón en concreto."""
     global _cliente
     if _cliente is None:
         _cliente = await crear_cliente()

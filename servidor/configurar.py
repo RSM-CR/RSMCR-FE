@@ -11,7 +11,7 @@ py -m servidor.configurar
 A continuación, deberás suministrar los datos solicitados y seguir las
 instrucciones dadas por el módulo.
 
-Revisa la documentación del módulo [secretos](secretos._Entorno) para ver información
+Revisa la documentación del módulo [`secretos`](servidor.secretos._Entorno) para ver información
 sobre todas las variables de entorno disponibles.
 """
 import subprocess

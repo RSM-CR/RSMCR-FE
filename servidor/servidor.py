@@ -2,7 +2,7 @@ import asyncio
 import json
 from typing import Any
 import xml.etree.ElementTree as ET
-from fastapi import FastAPI, Request
+from fastapi import FastAPI, Request, Response
 from starlette.middleware.sessions import SessionMiddleware
 from servidor.filedb import FileDb
 from xero.auth import router_auth
@@ -13,6 +13,7 @@ from webhooks_and_websockets.webhooks import webhooks_router
 import uvicorn
 import os
 import subprocess
+import logging
 
 # Esta función es temporal
 # Fue puesto aqui para poder hacer la prueba
@@ -29,6 +30,8 @@ def dict_a_xml(tag: str, diccionario: dict[str, Any]) -> ET.Element:
     return root
 
 entorno = obtener_entorno()
+
+logger = logging.getLogger(__name__)
 
 app = FastAPI()
 app.add_middleware(SessionMiddleware, secret_key=entorno.LLAVE_SESIONES.get_secret_value())
@@ -52,14 +55,31 @@ app.add_middleware(SessionMiddleware,
 # Esto fue puesto aquí para poner a andar una implementación lo más rápido posible
 @app.post("/enviar-json")
 async def recibir_xml(request: Request):
-    diccionario = await request.json()
+    try:
+        diccionario = await request.json()
+    except json.JSONDecodeError:
+        return Response(status_code=400, content="JSON inválido")
+
+    resource_id = diccionario.get("CodigoActividad")
+    if not resource_id:
+        return Response(status_code=400, content="Falta el identificador del documento")
 
     root = ET.Element("Documentos")
     factura_xml = dict_a_xml("FacturaElectronicaXML", diccionario)
     root.append(factura_xml)
     factura_str = ET.tostring(root, encoding="unicode")
 
-    resultado = await gti().subir_factura(factura_str)
+    try:
+        resultado = await gti().subir_factura(factura_str)
+    except Exception as e:
+        logger.error("Error al subir factura a GTI: %s", e)
+        return Response(status_code=502, content="Error al comunicarse con GTI")
+
+    try:
+        await filedb.crear("gti", resource_id, factura_str)
+    except FileExistsError:
+        await filedb.actualizar("gti", resource_id, factura_str)
+
     return {"resultado": str(resultado)}
 
 @app.get("/api/recent-xml")

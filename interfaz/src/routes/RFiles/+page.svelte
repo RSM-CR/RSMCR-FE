@@ -49,7 +49,7 @@
 						</div>
 					{/each}
 					{#if xmls.length === 0}
-						<p>No hay XML recientes en filedb/xero.</p>
+						<p>No hay XML recientes en filedb/gti.</p>
 					{/if}
 				{/if}
 			{/if}

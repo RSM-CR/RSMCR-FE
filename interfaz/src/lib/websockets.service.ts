@@ -6,7 +6,6 @@ import { soundEnabled } from './stores/sound-preference.store';
 import { buildNotification, shouldPlaySound } from './notifications/notification.config';
 import { playNotificationSound } from './notifications/sound';
 import type { WebSocketsFormat } from './types/notifications.types';
-import { handlers } from 'svelte/legacy';
 
 export { connectWebSocket, disconnectWebSocket };
 

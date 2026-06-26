@@ -1,6 +1,5 @@
 import { writable, derived, get, readable, type Readable } from "svelte/store";
 import type { AppNotification } from "$lib/types/notifications.types";
-import { read } from "$app/server";
 
 const MAX_HISTORY = 100;
 const STORAGE_KEY = 'app:notifications';

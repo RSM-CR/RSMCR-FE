@@ -15,6 +15,7 @@ import uvicorn
 import os
 import subprocess
 import logging
+import uuid
 
 # Esta función es temporal
 # Fue puesto aqui para poder hacer la prueba
@@ -69,7 +70,7 @@ async def recibir_xml(request: Request):
     except json.JSONDecodeError:
         return Response(status_code=400, content="JSON inválido")
 
-    resource_id = diccionario.get("CodigoActividad")
+    resource_id = str(uuid.uuid4)
     if not resource_id:
         return Response(status_code=400, content="Falta el identificador del documento")
 

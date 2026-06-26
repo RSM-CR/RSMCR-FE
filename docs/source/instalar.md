@@ -5,6 +5,8 @@ eso no se va a tratar aquí por temas de simplicidad.
 > [!IMPORTANT]
 > Este proyecto ha sido validado únicamente en Python 3.13. Es posible que funcione en versionas más recientes o más antiguas, pero no podemos garantizarlo con certeza.
 
+Adicionalmente, instalar [Node.js](https://nodejs.org/en/download/current) también es necesario.
+
 ## 2. Instalar las dependencias
 ### Con `requirements.txt`
 En el directorio base del proyecto, se puede encontrar un archivo llamado `requirements.txt`. Este archivo es una lista de todas las dependencias que usa el código. Sabiendo esto, se pueden ejecutar alguno de los siguientes comandos para llevar a cabo este proceso:
@@ -38,23 +40,23 @@ Para los pasos posteriores, se ocupan varios datos suministrados por Xero al cre
 1. Ve a [*My Apps*](https://developer.xero.com/app/manage) en Xero Developer e inicia sesión
 2. Crea una nueva app e ingresa los datos solicitados. Cambia `https://example.com` por el URL de tu servidor.
 
-    <img src="../assets/CrearAppXero.jpeg" height="700" alt="Imagen con ejemplo de datos solicitados por Xero Developer">
+    <img src="../assets/xero/CrearApp.jpeg" height="700" alt="Imagen con ejemplo de datos solicitados por Xero Developer">
 
 3. Selecciona la nueva aplicación en la lista y navega a la pestaña de *Configuration*.
 
-    <img src="../assets/XeroAppConfiguration.png" width="500" alt="Imagen que muestra dónde encontrar la pestaña Configuration">
+    <img src="../assets/xero/AppConfiguration.png" width="500" alt="Imagen que muestra dónde encontrar la pestaña Configuration">
 
 4. Navega al fondo de la página. Guarda el *Client ID* y haz clic en *Generate a Secret*. Seguidamente, guarda el *Client Secret* en algún lugar seguro.
 
-    <img src="../assets/XeroSecrets.png" width="500" alt="Imagen que muestra dónde obtener los secretos de la aplicación">
+    <img src="../assets/xero/Secrets.pngXeroSecrets.png" width="500" alt="Imagen que muestra dónde obtener los secretos de la aplicación">
 
 5. Navega a la pestaña de *Webhooks*.
 
-    <img src="../assets/XeroGoToWebhooks.png" width="500" alt="Imagen que muestra dónde encontrar la pestaña Webhooks">
+    <img src="../assets/xero/IrAWebhooks.png" width="500" alt="Imagen que muestra dónde encontrar la pestaña Webhooks">
 
 6. En *Webhooks*, copia la configuración mostrada y copia el *Webhooks key* que será generada.
 
-    <img src="../assets/XeroWebhooks.png" width="500" alt="Imagen que muestra dónde encontrar la pestaña Webhooks">
+    <img src="../assets/xero/Webhooks.png" width="500" alt="Imagen que muestra dónde encontrar la pestaña Webhooks">
 
 > [!NOTE]
 > Recuerda hacer clic en *Send 'Intent to receive'* una vez el servidor esté funcionando. Esto le permite a Xero verificar que el servidor está en funcionamiento para comenzar a mandarle notificaciones.

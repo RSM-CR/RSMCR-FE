@@ -13,5 +13,6 @@
 intro
 instalar
 pasos
+arquitectura
 apidocs/index
 ```

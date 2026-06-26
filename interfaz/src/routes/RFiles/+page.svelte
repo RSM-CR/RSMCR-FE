@@ -1,10 +1,17 @@
-<script>
+<script lang="ts">
+	import { onMount } from 'svelte';
 	import { slide } from 'svelte/transition';
-
-	const items = ['XML 1', 'XML 2', 'XML 3', 'XML 4', 'XML 5', 'XML 6', 'XML 7', 'XML 8', 'XML 9', 'XML 10'];
+	import { fetchRecentXml, type RecentXml } from '$lib/recent-xml.service';
 
 	let showItems = $state(true);
 	let i = $state(5);
+	let xmls: RecentXml[] = $state([]);
+	let loading = $state(true);
+
+	onMount(async () => {
+		xmls = await fetchRecentXml(10);
+		loading = false;
+	});
 </script>
 
 <div class="shell">
@@ -31,10 +38,20 @@
 		</div>
 
 		<div class="doc-list">
-			{#if showItems}
-				{#each items.slice(0, i) as doc}
-					<div class="doc-row" transition:slide|global>{doc}</div>
-				{/each}
+			{#if loading}
+				<p>Cargando XML recientes...</p>
+			{:else}
+				{#if showItems}
+					{#each xmls.slice(0, i) as doc}
+						<div class="doc-row" transition:slide|global>
+							<strong>{doc.name}</strong>
+							<pre>{doc.content}</pre>
+						</div>
+					{/each}
+					{#if xmls.length === 0}
+						<p>No hay XML recientes en filedb/xero.</p>
+					{/if}
+				{/if}
 			{/if}
 		</div>
 	</main>

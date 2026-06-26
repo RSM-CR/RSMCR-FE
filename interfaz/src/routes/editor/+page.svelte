@@ -224,7 +224,7 @@ async function enviarDatos(){
     </div>
 
     <div class="inputs1">
-        <div class="informacion"><input bind:value={factura.Encabezado.MediosPago.TiposMedioPago} placeholder="Método de pago..." /></div>
+        <div class="informacion"><input bind:value={factura.Encabezado.MedioPagos.TipoMedioPago} placeholder="Método de pago..." /></div>
         <div class="informacion"><input bind:value={numcuentaemisor} placeholder="Número cuenta emisor..." /></div>
         <div class="informacion"><input bind:value={tipodoc} placeholder="Tipo de documento..." /></div>
         <div class="informacion"><input bind:value={numdoc} placeholder="Número de documento..." /></div>

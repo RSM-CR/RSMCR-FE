@@ -1,5 +1,6 @@
 import asyncio
 import json
+import logging
 from typing import Any
 import xml.etree.ElementTree as ET
 from fastapi import FastAPI, Request, Response
@@ -20,6 +21,8 @@ import logging
 def dict_a_xml(tag: str, diccionario: dict[str, Any]) -> ET.Element:
     root = ET.Element(tag)
     for k, v in diccionario.items():
+        if not v:
+            continue
         elemento = None
         if type(v) is dict:
             elemento = dict_a_xml(k, v)
@@ -31,15 +34,21 @@ def dict_a_xml(tag: str, diccionario: dict[str, Any]) -> ET.Element:
 
 entorno = obtener_entorno()
 
+
 logger = logging.getLogger(__name__)
+logger.setLevel(logging.DEBUG)
 
 app = FastAPI()
 app.add_middleware(SessionMiddleware, secret_key=entorno.LLAVE_SESIONES.get_secret_value())
 
 filedb = FileDb()
 
+auth, _ = router_auth("/app")
+app.include_router(auth)
 app.include_router(websockets_router)
 app.include_router(webhooks_router)
+
+
 
 app.frontend("/app", directory="./interfaz/build")
 
@@ -70,10 +79,21 @@ async def recibir_xml(request: Request):
     factura_str = ET.tostring(root, encoding="unicode")
 
     try:
+        logger.debug("Se ha recibido el siguiente body: " + str(diccionario))
+
+        root = ET.Element("Documentos")
+        factura_xml = dict_a_xml("FacturaElectronicaXML", diccionario)
+        root.append(factura_xml)
+        factura_str = ET.tostring(root, encoding="unicode")
+
+        logger.debug("Se ha creado el siguiente XML: " + factura_str)
+
         resultado = await gti().subir_factura(factura_str)
     except Exception as e:
-        logger.error("Error al subir factura a GTI: %s", e)
-        return Response(status_code=502, content="Error al comunicarse con GTI")
+        return {
+            Response(status_code=502, content="Error al comunicarse con GTI"),
+            logger.error("Error detallado: %s", e)
+        }
 
     try:
         await filedb.crear("gti", resource_id, factura_str)
@@ -84,16 +104,19 @@ async def recibir_xml(request: Request):
 
 @app.get("/api/recent-xml")
 async def recent_xml(count: int = 10):
-    documentos = await filedb.obtener_recientes("gti", count, None)
-    resultados = []
-    for documento in documentos:
-        contenido = await documento.obtener_contenido()
-        resultados.append({
-            "name": documento.nombre,
-            "id": documento.id,
-            "content": contenido,
-        })
-    return resultados
+    try:
+        documentos = await filedb.obtener_recientes("gti", count, None)
+        resultados = []
+        for documento in documentos:
+            contenido = await documento.obtener_contenido()
+            resultados.append({
+                "name": documento.nombre,
+                "id": documento.id,
+                "content": contenido,
+            })
+        return resultados
+    except Exception as e:
+        logger.error("Error al enviar XMLs recientes al frontend: %s", e)
 
 if __name__ == "__main__":
 
@@ -102,8 +125,8 @@ if __name__ == "__main__":
     use_ngrok = os.getenv("USE_NGROK") == "1" or bool(ngrok_token)
 
     if use_ngrok:
-        # Comando temporal para exponer el servidor con ngrok. Fácil de quitar: borrar la
-        # variable de entorno `USE_NGROK` o `NGROK_AUTHTOKEN` y este bloque no se ejecutará.
+        # Comando temporal para exponer el servidor con ngrok.
+        # borrar la variable de entorno `USE_NGROK` o `NGROK_AUTHTOKEN` y este bloque no se ejecutará.
         cmd = [
             "py", "-m", "ngrok",
             "--authtoken", ngrok_token or "",
@@ -112,7 +135,7 @@ if __name__ == "__main__":
             "--host", "localhost",
             "--reload",
         ]
-        print("Iniciando ngrok temporalmente:", " ".join(cmd))
+        logger.info("Iniciando ngrok temporalmente:", " ".join(cmd))
         try:
             proc = subprocess.Popen(cmd)
             proc.wait()

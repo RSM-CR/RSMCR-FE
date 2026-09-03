@@ -1,7 +1,7 @@
 
 # Production
 dist/
-build/
+#build/
 .next/
 out/
 __pycache__/

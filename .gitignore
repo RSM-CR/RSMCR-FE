@@ -42,8 +42,8 @@ coverage/
 *.zip
 
 # Sphinx
-/docs/build/
-/docs/source/apidocs/
+#/docs/build/
+#/docs/source/apidocs/
 
 # Svelte
 /interfaz/node_modules/

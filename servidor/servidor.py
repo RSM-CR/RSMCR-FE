@@ -70,9 +70,9 @@ async def recibir_json(request: Request):
     except json.JSONDecodeError:
         return Response(status_code=400, content="JSON inválido")
 
-    resource_id = str(uuid.uuid4)
-    if not resource_id:
-        return Response(status_code=400, content="Falta el identificador del documento")
+    # resource_id = str(uuid.uuid4)
+    # if not resource_id:
+    #     return Response(status_code=400, content="Falta el identificador del documento")
 
     root = ET.Element("Documentos")
     factura_xml = dict_a_xml("FacturaElectronicaXML", diccionario)

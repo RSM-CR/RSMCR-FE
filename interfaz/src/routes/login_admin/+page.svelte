@@ -50,28 +50,34 @@
     border-radius: 4px;
   }
 
-  .adminbtn left{
-    background-color: #4CAF50;
+  .admin-left{
+    background-color: #008CBA;
     color: white;
     border: none;
-    padding: 10px 20px;
-    margin-right: 10px;
 
-    width: 50%;
+
+
+    width: 40%;
     cursor: pointer;
   }
 
   adminbtn{
     display: flex;
+
+    align-items: center;
+    gap: 10px;
+
+    WIDTH: 100%;
+    HEIGHT: 100%;
   }
 
-  .adminbtn right{
+  .admin-right{
     background-color: #008CBA;
     color: white;
     border: none;
-    padding: 10px 20px;
 
-    width: 50%;
+
+    width: 40%;
     cursor: pointer;
 
   }
@@ -95,8 +101,9 @@
   <div>
     <label for="role">Rol de Administrador:</label>
     <div class="adminbtn">
-        <button class="adminbtn-left" on:click={() => role = 'admin'}>Administrador</button>
-        <button class="adminbtn-right" on:click={() => role = 'user'}>Gerente</button>
+        <button class="admin-left" on:click={() => role = 'admin'}>Administrador</button>
+        <br>
+        <button class="admin-right" on:click={() => role = 'user'}>Gerente</button>
     </div>
     
   </div>

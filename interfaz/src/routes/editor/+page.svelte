@@ -19,7 +19,6 @@ añadidad automáticamente al XML.
 
     let codProducto = $state('');
     let codCabys = $state('');
-    let codMedicamento = $state('');
     let unidMedida = $state('Unidad');
 
     let descripcion = $state('');
@@ -32,7 +31,6 @@ añadidad automáticamente al XML.
     let precioUnitario = $state(0);
     let cantidad = $state(0);
 
-    let metododepago = $state('');
     let tipodoc = $state('');
     let condicionventa = $state('');
     let terminal = $state('');
@@ -42,12 +40,15 @@ añadidad automáticamente al XML.
     let codigoactividad = $state('');
     let tipoidreceptor = $state('');
     let numcuentaemisor = $state('');
-    let unidadmedida = $state('');
+    let unidadMedidaGeneral = $state('');
     let provincia = $state('');
     let canton = $state('');
     let distrito = $state('');
     let otrassenas = $state('');
-    let numdoc = $state(''); 
+    let numdoc = $state('');
+
+    // ── Líneas ya agregadas a la factura ────────────────────────────────────────
+    let lineas = $state<any[]>([]);
 
     // ── Tab activo ────────────────────────────────────────────────────────────
     let tabActivo = $state('lineas'); // 'lineas' | 'otros'
@@ -162,13 +163,18 @@ añadidad automáticamente al XML.
     let ivaEfectivo = $derived(+(ivaCalculado - montoExonerado).toFixed(2));
 
     // Total línea
-    let totalLinea = $derived(+(subtotal - descuento + otrosImps + (ivaEfectivo > 0 ? ivaEfectivo : ivaCalculado)).toFixed(2));
+    // Antes se usaba "ivaEfectivo > 0" como condición, lo cual fallaba cuando
+    // la exoneración era del 100% (ivaEfectivo daba 0 y caía al IVA sin exonerar).
+    // Ahora preguntamos si HAY un porcentaje de exoneración cargado, sin importar el resultado.
+    let totalLinea = $derived(
+        +(subtotal - descuento + otrosImps + (porcentajeExoneracion ? ivaEfectivo : ivaCalculado)).toFixed(2)
+    );
 
     let mostrarArtIns = $derived(['02','03','06','07','08'].includes(motivoExoneracion));
 
     // ── Acciones ──────────────────────────────────────────────────────────────
     function limpiarLinea() {
-        codProducto = ''; codCabys = ''; codMedicamento = '';
+        codProducto = ''; codCabys = '';
         unidMedida = 'Unidad'; cantidad = 2.00; precioUnitario = 1000.00;
         descripcion = ''; descuento = 0.00; otrosImps = 0.00;
         tipoTransaccion = ''; numVinSerie = '';
@@ -182,7 +188,34 @@ añadidad automáticamente al XML.
     }
 
     function agregarLinea() {
-        alert(`Línea agregada:\nProducto: ${codProducto || '(sin código)'}\nTotal: ₡${totalLinea.toFixed(2)}`);
+        lineas.push({
+            codProducto,
+            codCabys,
+            unidMedida,
+            cantidad,
+            precioUnitario,
+            descripcion,
+            descuento,
+            otrosImps,
+            tipoTransaccion,
+            numVinSerie,
+            tipoIVA,
+            tarifaIVA,
+            porcentajeIVA: pct01,
+            montoIVA: ivaCalculado,
+            motivoExoneracion,
+            numDocExoneracion,
+            institucion,
+            fechaExoneracion,
+            porcentajeExoneracion,
+            montoExonerado,
+            totalLinea
+        });
+        limpiarLinea();
+    }
+
+    function eliminarLinea(index: number) {
+        lineas.splice(index, 1);
     }
 
     function onChangeTipoIVA() {
@@ -192,11 +225,16 @@ añadidad automáticamente al XML.
 
 
 async function enviarDatos(){
+    if (lineas.length === 0) {
+        alert('Agregá al menos una línea antes de generar el XML.');
+        return;
+    }
+
     const respuesta = await fetch("http://localhost:8000/generar-xml", {
         method: "POST",
         headers: { "Content-Type": "application/json"},
         body: JSON.stringify({
-            metododepago,
+            metododepago: factura.Encabezado.MediosPago.TiposMedioPago,
             tipodoc,
             condicionventa,
             terminal,
@@ -206,23 +244,13 @@ async function enviarDatos(){
             codigoactividad,
             tipoidreceptor,
             numcuentaemisor,
-            unidadmedida,
+            unidadmedida: unidadMedidaGeneral,
             provincia,
             canton,
             distrito,
             otrassenas,
             numdoc,
-            tipo_iva: tipoIVA,
-            tarifa_iva:tarifaIVA,
-            porcentaje_iva: pct01,
-            monto_iva: ivaCalculado,
-            motivo_exoneracion: motivoExoneracion,
-            num_doc_exo: numDocExoneracion,
-            institucion: institucion,
-            fecha_exo: fechaExoneracion,
-            porcentaje_exo: porcentajeExoneracion,
-            monto_exonerado: montoExonerado
-
+            lineas
         })
     });
     const resultado = await respuesta.json();
@@ -231,7 +259,8 @@ async function enviarDatos(){
 
 </script>
 
-<div class="panel-root panel-root--top">
+<div class="panel-root">
+    <div class="datos-generales">
     <div class="panel-title">Editor de XML</div>
 
     <div class="grid-4">
@@ -253,7 +282,7 @@ async function enviarDatos(){
         </div>
         <div class="field">
             <label class="field__label" for="unidad-medida-top">Unidad de medida:</label>
-            <input bind:value={unidadmedida} id="unidad-medida-top" class="inp" placeholder="Unidad de Medida" />
+            <input bind:value={unidadMedidaGeneral} id="unidad-medida-top" class="inp" placeholder="Unidad de Medida" />
         </div>
         <div class="field">
             <label class="field__label" for="condicion-venta">Condición de venta:</label>
@@ -280,14 +309,6 @@ async function enviarDatos(){
             <input bind:value={distrito} id="distrito" class="inp" placeholder="Distrito..." />
         </div>
         <div class="field">
-            <label class="field__label" for="precio-unitario-top">Precio Unitario:</label>
-            <input bind:value={precioUnitario} id="precio-unitario-top" class="inp" placeholder="Precio Unitario..." />
-        </div>
-        <div class="field">
-            <label class="field__label" for="cantidad-top">Cantidad:</label>
-            <input bind:value={cantidad} id="cantidad-top" class="inp" placeholder="Cantidad..." />
-        </div>
-        <div class="field">
             <label class="field__label" for="moneda">Moneda:</label>
             <input bind:value={moneda} id="moneda" class="inp" placeholder="Moneda..." />
         </div>
@@ -308,9 +329,7 @@ async function enviarDatos(){
             <input bind:value={tipoidreceptor} id="tipo-id-receptor" class="inp" placeholder="Tipo de identificación del Receptor..." />
         </div>
     </div>
-</div>
-
-<div class="panel-root">
+    </div>
 
     <div class="tabs">
         <button
@@ -343,17 +362,6 @@ async function enviarDatos(){
             <div class="field">
                 <label class="field__label" for="cod-cabys">Cód. CABYS:</label>
                 <input bind:value={codCabys} id="cod-cabys" class="inp" placeholder="" />
-            </div>
-
-            <div class="field">
-                <div class="field__label">
-                    <span>Cód. Medicamentos:</span>
-                    <span class="info-icon" title="Requerido para medicamentos de consumo humano (v4.4)">ℹ</span>
-                </div>
-                <div class="input-icon-wrap">
-                    <input bind:value={codMedicamento} class="inp" placeholder="Agregar Código" />
-                    <button class="icon-btn icon-btn--green">✏</button>
-                </div>
             </div>
 
             <div class="field">
@@ -450,6 +458,43 @@ async function enviarDatos(){
             <div></div>
             <button class="btn-limpiar" onclick={limpiarLinea}>Limpiar Línea</button>
             <button class="btn-agregar" onclick={agregarLinea}>Agregar Línea</button>
+        </div>
+
+        {#if lineas.length > 0}
+        <div class="lineas-tabla-wrap">
+            <table class="lineas-tabla">
+                <thead>
+                    <tr>
+                        <th>Producto</th>
+                        <th>Cant.</th>
+                        <th>Precio unit.</th>
+                        <th>IVA</th>
+                        <th>Total</th>
+                        <th></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {#each lineas as linea, i}
+                    <tr>
+                        <td>{linea.codProducto || linea.descripcion || '(sin código)'}</td>
+                        <td>{linea.cantidad}</td>
+                        <td>₡{Number(linea.precioUnitario).toFixed(2)}</td>
+                        <td>₡{Number(linea.montoIVA).toFixed(2)}</td>
+                        <td>₡{Number(linea.totalLinea).toFixed(2)}</td>
+                        <td>
+                            <button class="btn-eliminar-linea" onclick={() => eliminarLinea(i)}>✕</button>
+                        </td>
+                    </tr>
+                    {/each}
+                </tbody>
+            </table>
+        </div>
+        {/if}
+
+        <div class="generar-row">
+            <button class="btn-generar" onclick={enviarDatos} disabled={lineas.length === 0}>
+                Generar XML ({lineas.length} línea{lineas.length === 1 ? '' : 's'})
+            </button>
         </div>
 
     </div>
@@ -668,8 +713,9 @@ async function enviarDatos(){
         box-shadow: 0 1px 4px rgba(0,0,0,0.12);
     }
 
-    .panel-root--top {
+    .datos-generales {
         padding: 16px 18px 18px;
+        border-bottom: 1px solid #ccc;
     }
 
     .panel-title {
@@ -727,7 +773,7 @@ async function enviarDatos(){
         align-items: end;
     }
 
-    .panel-root--top .grid-4 {
+    .datos-generales .grid-4 {
         grid-template-columns: 1fr 1fr;
         row-gap: 12px;
     }
@@ -899,6 +945,73 @@ async function enviarDatos(){
         font-style: italic;
         text-align: center;
         padding: 40px 0;
+    }
+
+    /* ── Tabla de líneas agregadas ───────────────────────────────────────────── */
+    .lineas-tabla-wrap {
+        overflow-x: auto;
+        border: 1px solid #ddd;
+        border-radius: 3px;
+        margin-top: 4px;
+    }
+
+    .lineas-tabla {
+        width: 100%;
+        border-collapse: collapse;
+        font-size: 12px;
+    }
+
+    .lineas-tabla th {
+        background: #f0f0f0;
+        text-align: left;
+        padding: 6px 10px;
+        font-weight: 700;
+        color: #444;
+        border-bottom: 1px solid #ddd;
+    }
+
+    .lineas-tabla td {
+        padding: 6px 10px;
+        border-bottom: 1px solid #eee;
+        color: #333;
+    }
+
+    .lineas-tabla tr:last-child td { border-bottom: none; }
+
+    .btn-eliminar-linea {
+        background: none;
+        border: none;
+        color: #c0392b;
+        cursor: pointer;
+        font-size: 13px;
+        font-weight: 700;
+        padding: 0 4px;
+    }
+    .btn-eliminar-linea:hover { color: #922b21; }
+
+    /* ── Botón Generar XML ───────────────────────────────────────────────────── */
+    .generar-row {
+        display: flex;
+        justify-content: flex-end;
+        margin-top: 4px;
+    }
+
+    .btn-generar {
+        height: 36px;
+        padding: 0 20px;
+        background: #2a7a2a;
+        color: #fff;
+        border: none;
+        border-radius: 3px;
+        font-size: 13px;
+        font-weight: 700;
+        cursor: pointer;
+        transition: background 0.15s;
+    }
+    .btn-generar:hover:not(:disabled) { background: #1f5c1f; }
+    .btn-generar:disabled {
+        background: #bbb;
+        cursor: not-allowed;
     }
 
     /* ══ MODAL ════════════════════════════════════════════════════════════════ */

@@ -24,6 +24,7 @@
 	},
 	"dependencies": {
 		"@fontsource/poppins": "^5.2.7",
+		"postgres": "^3.4.9",
 		"svelte-jsoneditor": "^3.12.0"
 	}
 }

@@ -231,33 +231,85 @@ async function enviarDatos(){
 
 </script>
 
-<div class="contenedor">
-    <div class="header">
-        <p class="titulo">Editor de XML</p>
-    </div>
+<div class="panel-root panel-root--top">
+    <div class="panel-title">Editor de XML</div>
 
-    <div class="inputs1">
-        <div class="informacion"><input bind:value={factura.Encabezado.MediosPago.TiposMedioPago} placeholder="Método de pago..." /></div>
-        <div class="informacion"><input bind:value={numcuentaemisor} placeholder="Número cuenta emisor..." /></div>
-        <div class="informacion"><input bind:value={tipodoc} placeholder="Tipo de documento..." /></div>
-        <div class="informacion"><input bind:value={numdoc} placeholder="Número de documento..." /></div>
-        <div class="informacion"><input bind:value={unidadmedida} placeholder="Unidad de Medida" /></div>
-        <div class="informacion"><input bind:value={condicionventa} placeholder="Condición de venta..." /></div>
-        <div class="informacion"><input bind:value={provincia} placeholder="Provincia..." /></div>
-        <div class="informacion"><input bind:value={sucursal} placeholder="Sucursal..." /></div>
-        <div class="informacion"><input bind:value={canton} placeholder="Cantón..." /></div>
-        <div class="informacion"><input bind:value={terminal} placeholder="Terminal..." /></div>
-        <div class="informacion"><input bind:value={distrito} placeholder="Distrito..." /></div>
-        <div class="informacion"><input bind:value={precioUnitario} placeholder="Precio Unitario..." /></div>
-        <div class="informacion"><input bind:value={cantidad} placeholder="Cantidad..." /></div>
-        <div class="informacion"><input bind:value={moneda} placeholder="Moneda..." /></div>
-        <div class="informacion"><input bind:value={otrassenas} placeholder="Otras Señas..." /></div>
-        <div class="informacion"><input bind:value={situacionenvio} placeholder="Situación del envío..." /></div>
-        <div class="informacion"><input bind:value={codigoactividad} placeholder="Código de Actividad..." /></div>
-        <div class="informacion"><input bind:value={tipoidreceptor} placeholder="Tipo de identificación del Receptor..." /></div>
+    <div class="grid-4">
+        <div class="field">
+            <label class="field__label" for="metodo-pago">Método de pago:</label>
+            <input bind:value={factura.Encabezado.MediosPago.TiposMedioPago} id="metodo-pago" class="inp" placeholder="Método de pago..." />
+        </div>
+        <div class="field">
+            <label class="field__label" for="num-cuenta-emisor">N.° cuenta emisor:</label>
+            <input bind:value={numcuentaemisor} id="num-cuenta-emisor" class="inp" placeholder="Número cuenta emisor..." />
+        </div>
+        <div class="field">
+            <label class="field__label" for="tipo-doc">Tipo de documento:</label>
+            <input bind:value={tipodoc} id="tipo-doc" class="inp" placeholder="Tipo de documento..." />
+        </div>
+        <div class="field">
+            <label class="field__label" for="num-doc">N.° de documento:</label>
+            <input bind:value={numdoc} id="num-doc" class="inp" placeholder="Número de documento..." />
+        </div>
+        <div class="field">
+            <label class="field__label" for="unidad-medida-top">Unidad de medida:</label>
+            <input bind:value={unidadmedida} id="unidad-medida-top" class="inp" placeholder="Unidad de Medida" />
+        </div>
+        <div class="field">
+            <label class="field__label" for="condicion-venta">Condición de venta:</label>
+            <input bind:value={condicionventa} id="condicion-venta" class="inp" placeholder="Condición de venta..." />
+        </div>
+        <div class="field">
+            <label class="field__label" for="provincia">Provincia:</label>
+            <input bind:value={provincia} id="provincia" class="inp" placeholder="Provincia..." />
+        </div>
+        <div class="field">
+            <label class="field__label" for="sucursal">Sucursal:</label>
+            <input bind:value={sucursal} id="sucursal" class="inp" placeholder="Sucursal..." />
+        </div>
+        <div class="field">
+            <label class="field__label" for="canton">Cantón:</label>
+            <input bind:value={canton} id="canton" class="inp" placeholder="Cantón..." />
+        </div>
+        <div class="field">
+            <label class="field__label" for="terminal">Terminal:</label>
+            <input bind:value={terminal} id="terminal" class="inp" placeholder="Terminal..." />
+        </div>
+        <div class="field">
+            <label class="field__label" for="distrito">Distrito:</label>
+            <input bind:value={distrito} id="distrito" class="inp" placeholder="Distrito..." />
+        </div>
+        <div class="field">
+            <label class="field__label" for="precio-unitario-top">Precio Unitario:</label>
+            <input bind:value={precioUnitario} id="precio-unitario-top" class="inp" placeholder="Precio Unitario..." />
+        </div>
+        <div class="field">
+            <label class="field__label" for="cantidad-top">Cantidad:</label>
+            <input bind:value={cantidad} id="cantidad-top" class="inp" placeholder="Cantidad..." />
+        </div>
+        <div class="field">
+            <label class="field__label" for="moneda">Moneda:</label>
+            <input bind:value={moneda} id="moneda" class="inp" placeholder="Moneda..." />
+        </div>
+        <div class="field">
+            <label class="field__label" for="otras-senas">Otras señas:</label>
+            <input bind:value={otrassenas} id="otras-senas" class="inp" placeholder="Otras Señas..." />
+        </div>
+        <div class="field">
+            <label class="field__label" for="situacion-envio">Situación del envío:</label>
+            <input bind:value={situacionenvio} id="situacion-envio" class="inp" placeholder="Situación del envío..." />
+        </div>
+        <div class="field">
+            <label class="field__label" for="codigo-actividad">Código de actividad:</label>
+            <input bind:value={codigoactividad} id="codigo-actividad" class="inp" placeholder="Código de Actividad..." />
+        </div>
+        <div class="field">
+            <label class="field__label" for="tipo-id-receptor">Tipo id. Receptor:</label>
+            <input bind:value={tipoidreceptor} id="tipo-id-receptor" class="inp" placeholder="Tipo de identificación del Receptor..." />
+        </div>
     </div>
-
 </div>
+
 <div class="panel-root">
 
     <div class="tabs">
@@ -603,78 +655,32 @@ async function enviarDatos(){
 
 <style>
 
-    :global(body) {
-        background-color: #b2e1f5;
-        margin: 0;
-    }
-
-    .contenedor {
-        background-color: #d6eef8;
-        border: 2px solid #b0d8ec;
-        border-radius: 20px;
-        padding: 30px 40px;
-        width: 640px;
-        margin: 30px auto;
-    }
-
-    .header {
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        position: relative;
-        margin-bottom: 25px;
-    }
-
-    .titulo {
-        color: #ffffff;
-        border: 2px solid #4A8EAC;
-        border-radius: 10px;
-        background-color: #4A8EAC;
-        padding: 6px 40px;
-        font-size: 20px;
-        margin: 0;
-        text-align: center;
-    }
-
-    .inputs1 {
-        display: grid;
-        grid-template-columns: 1fr 1fr;
-        gap: 10px;
-    }
-
-    .informacion {
-        background: #4AB265;
-        border: 2px solid #4AB265;
-        border-radius: 10px;
-    }
-
-    input {
-        background: transparent;
-        border: none;
-        outline: none;
-        color: white;
-        font-size: 15px;
-        padding: 8px 12px;
-        width: 100%;
-        box-sizing: border-box;
-    }
-
-    input::placeholder {
-        color: rgba(255, 255, 255, 0.95);
-    }
-
-
     /* ── Reset / base ────────────────────────────────────────────────────────── */
     *, *::before, *::after { box-sizing: border-box; }
     :global(body) { margin: 0; background: #f0f0f0; font-family: Arial, sans-serif; font-size: 13px; color: #333; }
 
-    /* ── Panel raíz ─────────────────────────────────────────────────────────── */
+    /* ── Panel raíz (usado tanto arriba como abajo) ─────────────────────────── */
     .panel-root {
         background: #fff;
         border: 1px solid #ccc;
         border-radius: 4px;
         margin: 20px;
         box-shadow: 0 1px 4px rgba(0,0,0,0.12);
+    }
+
+    .panel-root--top {
+        padding: 16px 18px 18px;
+    }
+
+    .panel-title {
+        font-size: 14px;
+        font-weight: 700;
+        color: #2a7a2a;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        border-bottom: 2px solid #ccc;
+        padding-bottom: 8px;
+        margin-bottom: 14px;
     }
 
     /* ── Tabs ────────────────────────────────────────────────────────────────── */
@@ -716,9 +722,14 @@ async function enviarDatos(){
     /* ── Grids de filas ──────────────────────────────────────────────────────── */
     .grid-4 {
         display: grid;
-        grid-template-columns: 1fr 1fr 1.6fr 1fr;
+        grid-template-columns: 1fr 1fr 1fr 1fr;
         gap: 12px;
         align-items: end;
+    }
+
+    .panel-root--top .grid-4 {
+        grid-template-columns: 1fr 1fr;
+        row-gap: 12px;
     }
 
     .grid-3-wide {
@@ -800,6 +811,8 @@ async function enviarDatos(){
         transition: border-color 0.15s;
     }
     .inp:focus { border-color: #4caf50; box-shadow: 0 0 0 2px rgba(76,175,80,0.18); }
+
+    .inp::placeholder { color: #999; }
 
     .inp--readonly {
         background: #f5f5f5;

@@ -1,12 +1,15 @@
 <!-- Login.svelte -->
-<script>
-  import { writable } from 'svelte/store';
+<script lang="ts">
+  import type { PageData } from './$types';
+
+  // Datos que vienen de +page.server.ts (consulta a la base de datos)
+  let { data }: { data: PageData } = $props();
 
   // Estado de login
-  let username = '';
-  let password = '';
-  let role = '';
-  let error = '';
+  let username = $state('');
+  let password = $state('');
+  let role = $state('');
+  let error = $state('');
 
   // Simulación de credenciales
   const mockUser = {
@@ -147,6 +150,25 @@
     box-shadow: 0 0 0 2px rgba(0, 140, 186, 0.3);
   }
 
+  .usuarios {
+    margin-top: 24px;
+    padding-top: 16px;
+    border-top: 1px solid var(--gris-borde);
+  }
+
+  .usuarios h3 {
+    font-size: 0.95em;
+    color: var(--verde);
+    margin: 0 0 8px;
+  }
+
+  .usuarios ul {
+    margin: 0;
+    padding-left: 18px;
+    font-size: 0.9em;
+    color: var(--gris-texto);
+  }
+
   .error {
     color: #d32f2f;
     background-color: #fdecea;
@@ -177,14 +199,14 @@
       <button
         class="adminbtn-left"
         class:active={role === 'admin'}
-        on:click={() => (role = 'admin')}
+        onclick={() => (role = 'admin')}
       >
         Administrador
       </button>
       <button
         class="adminbtn-right"
         class:active={role === 'user'}
-        on:click={() => (role = 'user')}
+        onclick={() => (role = 'user')}
       >
         Gerente
       </button>
@@ -195,5 +217,19 @@
     <div class="error">{error}</div>
   {/if}
 
-  <button class="submit-btn" on:click={handleLogin}>Ingresar</button>
+  <button class="submit-btn" onclick={handleLogin}>Ingresar</button>
+
+  <!-- Usuarios traídos de la base de datos -->
+  <div class="usuarios">
+    <h3>Usuarios registrados</h3>
+    {#if data.usuarios.length > 0}
+      <ul>
+        {#each data.usuarios as usuario}
+          <li>{usuario.id} - {usuario.nombre}</li>
+        {/each}
+      </ul>
+    {:else}
+      <p>No hay usuarios registrados.</p>
+    {/if}
+  </div>
 </div>

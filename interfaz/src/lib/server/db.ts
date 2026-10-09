@@ -1,6 +1,8 @@
 import postgres from 'postgres';
-import  DATABASE_URL  from '$env/static/private';
+import { env } from '$env/dynamic/private';
 
-const sql = postgres(DATABASE_URL);
+if (!env.DATABASE_URL) throw new Error('Falta DATABASE_URL en el .env');
+
+const sql = postgres(env.DATABASE_URL);
 
 export default sql;
